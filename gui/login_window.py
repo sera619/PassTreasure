@@ -1,0 +1,142 @@
+from PySide6.QtWidgets import (
+    QWidget, QVBoxLayout, QLabel, QLineEdit,
+    QPushButton, QMessageBox
+)
+from PySide6.QtCore import Qt, Signal
+from PySide6.QtGui import QIcon, QPixmap
+import os, sys
+from backend.database import PasswordDatabase
+from src.loginwindow_ui import Ui_LoginWindowUI
+from config import  Styles, resource_path, VERSION_NUM
+
+
+class LoginWindow(QWidget):
+    login_success = Signal(object)
+
+    def __init__(self):
+        super().__init__()
+
+        self.db = PasswordDatabase()
+        self.BASE_DIR = resource_path("data")
+        self.VAULT_PATH = resource_path('data/vault.db')
+        self.is_first_run = not os.path.exists(self.VAULT_PATH)
+        
+        # Load UI
+        self.ui = Ui_LoginWindowUI()
+        self.ui.setupUi(self)
+        self.setStyleSheet(Styles.dark_style)
+        footer_text = f"PassTreasure v{VERSION_NUM} © S3R43o3 2025"
+        self.ui.footer_label.setText(f"{footer_text}")
+
+        # Shortcuts for easier access
+        self.input_pw = self.ui.input_password
+        self.label = self.ui.label_title
+        self.error_label = self.ui.label_error
+        self.btn_login = self.ui.btn_login
+        self.btn_create = self.ui.btn_create
+        
+        pixmap = QPixmap(":/assets/icon.png")
+        pixmap = pixmap.scaled(100, 100)
+        self.ui.label_icon.setPixmap(pixmap)
+        # self.input_pw.setText("kekskeks")
+        
+        self.input_pw.setFocus()
+        self._pw_visible = False
+        
+        self.configure_mode()
+        self.ui.btn_toggle_pw.setStyleSheet("font-size: 14px;")
+        self.ui.btn_toggle_pw.setText("👁️")
+        self.ui.btn_toggle_pw2.setStyleSheet("font-size: 14px;")
+        self.ui.btn_toggle_pw2.setText("👁️")
+        self.ui.input_password2.setEchoMode(QLineEdit.EchoMode.Password)
+
+        self.ui.btn_toggle_pw.clicked.connect(self.toggle_password_visibility)
+        self.ui.btn_toggle_pw2.clicked.connect(self.toggle_password_visibility)
+
+        self.ui.btn_delete_vault.clicked.connect(self.handle_delete_vault)
+        self.input_pw.returnPressed.connect(self.on_enter)
+        self.ui.input_password2.returnPressed.connect(self.on_enter)
+        
+
+    def configure_mode(self):
+        if self.is_first_run:
+            self.label.setText("Create Master Password:")
+            self.btn_login.hide()
+            self.btn_create.show()
+            self.ui.pw2Frame.show()
+            self.ui.btn_delete_vault.hide()
+            self.btn_create.clicked.connect(self.handle_create)
+        else:
+            self.label.setText("Enter Master Password:")
+            self.btn_create.hide()
+            self.btn_login.show()
+            self.ui.pw2Frame.hide()
+            self.ui.btn_delete_vault.show()
+            self.btn_login.clicked.connect(self.handle_login)
+
+        self.error_label.setText("")
+
+    def handle_delete_vault(self):
+        confirm = QMessageBox.question(self, "Confirm Delete", "Are you sure you want to delete this vault?")
+        if confirm != QMessageBox.Yes:
+            return
+        try:        
+            self.db.delete_vault()
+            self.is_first_run = not os.path.exists(self.VAULT_PATH)
+            self.configure_mode()
+            QMessageBox.information(self, "Success", f"Vault deleted successfully!")
+        except Exception as e:
+            QMessageBox.critical(self, "Error", f"Failure delete vault:\n{e}")
+
+    def handle_create(self):
+        pw = self.input_pw.text().strip()
+        pw2 = self.ui.input_password2.text().strip()
+        if len(pw) < 6:
+            self.error_label.setText("Password must be at least 6 characters!")
+            return
+        
+        if pw != pw2:
+            self.error_label.setText("Password didnt match!")
+            return
+
+        try:
+            self.db.create_new_vault(pw)
+        except Exception as e:
+            QMessageBox.critical(self, "Error", str(e))
+            return
+
+        QMessageBox.information(self, "Success", "Vault created successfully!")
+        self.login_success.emit(self.db)
+        self.close()
+
+    def handle_login(self):
+        pw = self.input_pw.text().strip()
+
+        if len(pw) < 6:
+            self.error_label.setText("Password must be at least 6 characters!")
+            return
+
+        if self.db.unlock_vault(pw):
+            self.login_success.emit(self.db)
+            self.close()
+        else:
+            self.error_label.setText("Wrong password!")
+    
+    def toggle_password_visibility(self):
+        self._pw_visible = not self._pw_visible
+        if self._pw_visible:
+            self.input_pw.setEchoMode(QLineEdit.EchoMode.Normal)
+            self.ui.btn_toggle_pw.setText("🙈") 
+            self.ui.input_password2.setEchoMode(QLineEdit.EchoMode.Normal)
+            self.ui.btn_toggle_pw2.setText("🙈") 
+        else:
+            self.input_pw.setEchoMode(QLineEdit.EchoMode.Password)
+            self.ui.btn_toggle_pw.setText("👁️")
+            self.ui.input_password2.setEchoMode(QLineEdit.EchoMode.Password)
+            self.ui.btn_toggle_pw2.setText("👁️") 
+
+    def on_enter(self):
+        if self.is_first_run:
+            self.handle_create()
+        else:
+            self.handle_login()
