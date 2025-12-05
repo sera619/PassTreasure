@@ -34,7 +34,11 @@ class CsvImportWorker(QObject):
                     username = row.get("username") or row.get("login") or ""
                     password = row.get("password") or ""
                     url = row.get("url") or ""
-
+                elif self.mode == "chrome":
+                    service = row.get("name") or ""
+                    username = row.get("username") or ""
+                    password = row.get("password") or ""
+                    url = row.get("url") or ""
                 if password:
                     db.add_entry(service, username, password, "General", url)
 
