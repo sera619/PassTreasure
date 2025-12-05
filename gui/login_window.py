@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import (
+from PySide6.QtWidgets import (QApplication,
     QWidget, QVBoxLayout, QLabel, QLineEdit,
     QPushButton, QMessageBox
 )
@@ -7,7 +7,9 @@ from PySide6.QtGui import QIcon, QPixmap
 import os, sys
 from backend.database import PasswordDatabase
 from src.loginwindow_ui import Ui_LoginWindowUI
-from config import  Styles, resource_path, VERSION_NUM, IS_DEBUGGING
+from gui.password_strength_indicator import PasswordStrengthIndicator
+from backend.password_strength_logic import evaluate_password_strength
+from config import Styles, resource_path, VERSION_NUM, IS_DEBUGGING
 
 
 class LoginWindow(QWidget):
@@ -15,7 +17,6 @@ class LoginWindow(QWidget):
 
     def __init__(self):
         super().__init__()
-
         self.db = PasswordDatabase()
         self.BASE_DIR = resource_path("data")
         self.VAULT_PATH = resource_path('data/vault.db')
@@ -28,7 +29,9 @@ class LoginWindow(QWidget):
         self.apply_styles()
         footer_text = f"PassTreasure v{VERSION_NUM} © S3R43o3 2025"
         self.ui.footer_label.setText(f"{footer_text}")
-
+        self.strength_indicator = PasswordStrengthIndicator(self)
+        self.ui.indicatorHolder.addWidget(self.strength_indicator)
+        
         # Shortcuts for easier access
         self.input_pw = self.ui.input_password
         self.label = self.ui.label_title
@@ -40,11 +43,9 @@ class LoginWindow(QWidget):
         pixmap = pixmap.scaled(100, 100)
         self.ui.label_icon.setPixmap(pixmap)
         
-        if IS_DEBUGGING:
-            self.input_pw.setText("kekskeks")
-        
         self.input_pw.setFocus()
         self._pw_visible = False
+        self._pw2_visible = False
         
         self.configure_mode()
         self.ui.btn_toggle_pw.font().setPointSize(18)
@@ -53,12 +54,17 @@ class LoginWindow(QWidget):
         self.ui.btn_toggle_pw2.setText("👁️")
         self.ui.input_password2.setEchoMode(QLineEdit.EchoMode.Password)
 
-        self.ui.btn_toggle_pw.clicked.connect(self.toggle_password_visibility)
-        self.ui.btn_toggle_pw2.clicked.connect(self.toggle_password_visibility)
+        self.ui.btn_toggle_pw.clicked.connect(lambda checked, b=self.ui.btn_toggle_pw: self.toggle_password_visibility(b))
+        self.ui.btn_toggle_pw2.clicked.connect(lambda checked, b=self.ui.btn_toggle_pw2: self.toggle_password_visibility(b))
 
         self.ui.btn_delete_vault.clicked.connect(self.handle_delete_vault)
         self.input_pw.returnPressed.connect(self.on_enter)
+        self.input_pw.textChanged.connect(self._update_strength)
         self.ui.input_password2.returnPressed.connect(self.on_enter)
+        
+        if IS_DEBUGGING:
+            self.input_pw.setText("kekskeks")
+        
     
     def apply_styles(self):
         self.ui.btn_login.setStyleSheet(Styles.green_button_outlined)
@@ -66,18 +72,25 @@ class LoginWindow(QWidget):
         self.ui.btn_create.setStyleSheet(Styles.green_button_outlined)
         self.ui.btn_toggle_pw.setStyleSheet(Styles.dark_button)            
         self.ui.btn_toggle_pw2.setStyleSheet(Styles.dark_button)            
-            
+    
+    def _update_strength(self):
+        pw = self.ui.input_password.text()
+        level = evaluate_password_strength(pw)
+        self.strength_indicator.set_strength(level)
+                
     def configure_mode(self):
         if self.is_first_run:
             self.label.setText("Create Master Password:")
             self.btn_login.hide()
             self.btn_create.show()
             self.ui.pw2Frame.show()
+            self.strength_indicator.show()
             self.ui.btn_delete_vault.hide()
             self.btn_create.clicked.connect(self.handle_create)
         else:
             self.label.setText("Enter Master Password:")
             self.btn_create.hide()
+            self.strength_indicator.hide()
             self.btn_login.show()
             self.ui.pw2Frame.hide()
             self.ui.btn_delete_vault.show()
@@ -131,18 +144,24 @@ class LoginWindow(QWidget):
         else:
             self.error_label.setText("Wrong password!")
     
-    def toggle_password_visibility(self):
-        self._pw_visible = not self._pw_visible
-        if self._pw_visible:
-            self.input_pw.setEchoMode(QLineEdit.EchoMode.Normal)
-            self.ui.btn_toggle_pw.setText("🙈") 
-            self.ui.input_password2.setEchoMode(QLineEdit.EchoMode.Normal)
-            self.ui.btn_toggle_pw2.setText("🙈") 
-        else:
-            self.input_pw.setEchoMode(QLineEdit.EchoMode.Password)
-            self.ui.btn_toggle_pw.setText("👁️")
-            self.ui.input_password2.setEchoMode(QLineEdit.EchoMode.Password)
-            self.ui.btn_toggle_pw2.setText("👁️") 
+    def toggle_password_visibility(self, button):
+        if button == self.ui.btn_toggle_pw:
+            self._pw_visible = not self._pw_visible
+            if self._pw_visible:
+                self.input_pw.setEchoMode(QLineEdit.EchoMode.Normal)
+                self.ui.btn_toggle_pw.setText("🙈") 
+            else:
+                self.input_pw.setEchoMode(QLineEdit.EchoMode.Password)
+                self.ui.btn_toggle_pw.setText("👁️")
+
+        elif button == self.ui.btn_toggle_pw2:
+            self._pw2_visible = not self._pw2_visible
+            if self._pw2_visible:
+                self.ui.input_password2.setEchoMode(QLineEdit.EchoMode.Normal)
+                self.ui.btn_toggle_pw2.setText("🙈")   
+            else:
+                self.ui.input_password2.setEchoMode(QLineEdit.EchoMode.Password)
+                self.ui.btn_toggle_pw2.setText("👁️") 
 
     def on_enter(self):
         if self.is_first_run:
