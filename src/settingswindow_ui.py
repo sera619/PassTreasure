@@ -15,10 +15,11 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QDialog,
-    QFrame, QHBoxLayout, QLabel, QLineEdit,
-    QProgressBar, QPushButton, QScrollArea, QSizePolicy,
-    QSpacerItem, QStackedWidget, QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QDateTimeEdit,
+    QDialog, QFrame, QHBoxLayout, QLabel,
+    QLineEdit, QProgressBar, QPushButton, QScrollArea,
+    QSizePolicy, QSpacerItem, QStackedWidget, QTimeEdit,
+    QVBoxLayout, QWidget)
 
 class Ui_SettingsWindow(object):
     def setupUi(self, SettingsWindow):
@@ -82,11 +83,78 @@ class Ui_SettingsWindow(object):
         self.scrollAreaGeneral.setWidgetResizable(True)
         self.scrollAreaWidgetContents_2 = QWidget()
         self.scrollAreaWidgetContents_2.setObjectName(u"scrollAreaWidgetContents_2")
-        self.scrollAreaWidgetContents_2.setGeometry(QRect(0, 0, 473, 457))
+        self.scrollAreaWidgetContents_2.setGeometry(QRect(0, 0, 473, 607))
         self.verticalLayout_3 = QVBoxLayout(self.scrollAreaWidgetContents_2)
         self.verticalLayout_3.setSpacing(40)
         self.verticalLayout_3.setObjectName(u"verticalLayout_3")
         self.verticalLayout_3.setContentsMargins(0, 0, 0, 0)
+        self.autoLogoutFrame = QFrame(self.scrollAreaWidgetContents_2)
+        self.autoLogoutFrame.setObjectName(u"autoLogoutFrame")
+        self.autoLogoutFrame.setFrameShape(QFrame.Shape.StyledPanel)
+        self.autoLogoutFrame.setFrameShadow(QFrame.Shadow.Raised)
+        self.verticalLayout_15 = QVBoxLayout(self.autoLogoutFrame)
+        self.verticalLayout_15.setObjectName(u"verticalLayout_15")
+        self.label_10 = QLabel(self.autoLogoutFrame)
+        self.label_10.setObjectName(u"label_10")
+        font1 = QFont()
+        font1.setPointSize(12)
+        font1.setBold(True)
+        self.label_10.setFont(font1)
+
+        self.verticalLayout_15.addWidget(self.label_10)
+
+        self.frame_8 = QFrame(self.autoLogoutFrame)
+        self.frame_8.setObjectName(u"frame_8")
+        self.frame_8.setFrameShape(QFrame.Shape.NoFrame)
+        self.frame_8.setFrameShadow(QFrame.Shadow.Raised)
+        self.verticalLayout_14 = QVBoxLayout(self.frame_8)
+        self.verticalLayout_14.setObjectName(u"verticalLayout_14")
+        self.verticalLayout_14.setContentsMargins(0, 5, 0, 5)
+        self.line_6 = QFrame(self.frame_8)
+        self.line_6.setObjectName(u"line_6")
+        self.line_6.setStyleSheet(u"background:rgb(170, 0, 0)")
+        self.line_6.setFrameShape(QFrame.Shape.HLine)
+        self.line_6.setFrameShadow(QFrame.Shadow.Sunken)
+
+        self.verticalLayout_14.addWidget(self.line_6)
+
+
+        self.verticalLayout_15.addWidget(self.frame_8)
+
+        self.frame_9 = QFrame(self.autoLogoutFrame)
+        self.frame_9.setObjectName(u"frame_9")
+        self.frame_9.setFrameShape(QFrame.Shape.NoFrame)
+        self.frame_9.setFrameShadow(QFrame.Shadow.Raised)
+        self.horizontalLayout_10 = QHBoxLayout(self.frame_9)
+        self.horizontalLayout_10.setObjectName(u"horizontalLayout_10")
+        self.label_11 = QLabel(self.frame_9)
+        self.label_11.setObjectName(u"label_11")
+
+        self.horizontalLayout_10.addWidget(self.label_11)
+
+        self.autoLogoutTimeEdit = QTimeEdit(self.frame_9)
+        self.autoLogoutTimeEdit.setObjectName(u"autoLogoutTimeEdit")
+        self.autoLogoutTimeEdit.setWrapping(False)
+        self.autoLogoutTimeEdit.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.autoLogoutTimeEdit.setCurrentSection(QDateTimeEdit.Section.SecondSection)
+
+        self.horizontalLayout_10.addWidget(self.autoLogoutTimeEdit)
+
+        self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+
+        self.horizontalLayout_10.addItem(self.horizontalSpacer)
+
+        self.autoLogoutCheckBox = QCheckBox(self.frame_9)
+        self.autoLogoutCheckBox.setObjectName(u"autoLogoutCheckBox")
+
+        self.horizontalLayout_10.addWidget(self.autoLogoutCheckBox)
+
+
+        self.verticalLayout_15.addWidget(self.frame_9)
+
+
+        self.verticalLayout_3.addWidget(self.autoLogoutFrame)
+
         self.backupFrame = QFrame(self.scrollAreaWidgetContents_2)
         self.backupFrame.setObjectName(u"backupFrame")
         sizePolicy = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
@@ -100,9 +168,6 @@ class Ui_SettingsWindow(object):
         self.verticalLayout_2.setObjectName(u"verticalLayout_2")
         self.backupTitleLabel = QLabel(self.backupFrame)
         self.backupTitleLabel.setObjectName(u"backupTitleLabel")
-        font1 = QFont()
-        font1.setPointSize(12)
-        font1.setBold(True)
         self.backupTitleLabel.setFont(font1)
 
         self.verticalLayout_2.addWidget(self.backupTitleLabel)
@@ -662,6 +727,10 @@ class Ui_SettingsWindow(object):
         self.btn_import.setText(QCoreApplication.translate("SettingsWindow", u"Import", None))
         self.btn_about.setText(QCoreApplication.translate("SettingsWindow", u"About", None))
         self.label_2.setText(QCoreApplication.translate("SettingsWindow", u"General", None))
+        self.label_10.setText(QCoreApplication.translate("SettingsWindow", u"Auto. Logout", None))
+        self.label_11.setText(QCoreApplication.translate("SettingsWindow", u"Logout Time (mm:ss):", None))
+        self.autoLogoutTimeEdit.setDisplayFormat(QCoreApplication.translate("SettingsWindow", u"mm:ss", None))
+        self.autoLogoutCheckBox.setText(QCoreApplication.translate("SettingsWindow", u"Active", None))
         self.backupTitleLabel.setText(QCoreApplication.translate("SettingsWindow", u"Backups", None))
         self.label_4.setText(QCoreApplication.translate("SettingsWindow", u"Auto. Backups:", None))
         self.label_3.setText(QCoreApplication.translate("SettingsWindow", u"Last Backup:", None))

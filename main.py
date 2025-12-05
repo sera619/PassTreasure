@@ -1,8 +1,9 @@
-from PySide6.QtWidgets import QApplication
+from PySide6.QtWidgets import QApplication, QMessageBox
 from PySide6.QtGui import QIcon
 from gui.login_window import LoginWindow
 from gui.main_window import MainWindow
 from gui.intro_splash import IntroSplash
+
 import config
 from config import Styles
 import sys
@@ -13,17 +14,25 @@ main_window = None
 splash = None
 login = None
 
+def autologout_restart():
+    global login
+    login.show()
+    QMessageBox.information(login, "Autologout", "You was a long time inactive.\nYou got logged out!")
+    
 def open_main(db_instance):
     global main_window
-    main_window = None
+    global login
     main_window = MainWindow(db_instance)
     main_window.setWindowIcon(QIcon(":/assets/icon.png"))
     main_window.logout_success.connect(restart_login)
+    main_window.auto_logout_success.connect(autologout_restart)
     main_window.show()
     
 def restart_login():
     global login
+    global main_window
     login = None
+    main_window = None
     login = LoginWindow()
     login.setWindowIcon(QIcon(":/assets/icon.png"))
     login.login_success.connect(open_main)
