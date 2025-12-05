@@ -4,7 +4,7 @@ import sys
 from pathlib import Path
 from datetime import datetime
 
-IS_DEBUGGING = False
+IS_DEBUGGING = True
 
 def resource_path(relative: str) -> Path:
     """
@@ -84,46 +84,50 @@ TEST_ENTRIES = [
     {"service": "VMware", "username": "nickvm", "password": "Fr5=Qk67Sw"},
     {"service": "Mega", "username": "nickmega", "password": "Xy1*Hp93Td"}
 ]
-ABOUT_TEXT = (
-    "PassTreasure is a local password manager that securely stores your data in an "
-    "encrypted SQLite database. No cloud, no tracking, no telemetry – your passwords "
-    "stay 100% offline.\n"
-    "\n"
-    "Features:\n"
-    "• AES-256-GCM encryption\n"
-    "• Master password secured with strong key derivation (Argon2 / PBKDF2)\n"
-    "• Add, edit and delete password entries\n"
-    "• Modern PySide6 user interface\n"
-    "• Completely offline – no external communication\n"
-    "• Auto-logout with configurable timer\n"
-    "• Customizable password generator with security rating\n"
-    "• Custom categories for password entries\n"
-    "• Vault backup function (manual & automatic)\n"
-    "• Browser password import (Firefox/Chrome)\n"
-    "• Search and filtering for large vaults\n"
-    "• Full error handling and secure exception management\n"
-    "\n"
-    "Security:\n"
-    "• Strong key derivation: Argon2id / PBKDF2-HMAC-SHA256\n"
-    "• Unique salt and nonce values per entry\n"
-    "• AES-GCM authenticated encryption\n"
-    "• The master key never leaves the device\n"
-    "• No cloud libraries, no online syncing\n"
-    "\n"
-    "About this project:\n"
-    "PassTreasure started as a learning project focused on IT security, Python "
-    "development and GUI programming. It is actively maintained and frequently "
-    "extended with new features.\n"
-    "\n"
-    "Author:\n"
-    "• S3R43o3\n"
-    "\n"
-    "License:\n"
-    "This project is released under the MIT License.\n"
-    "Copyright (c) 2025 S3R43o3\n"
-    "\n"
-    f"Version: v{VERSION_NUM}\n"
-)
+
+
+ABOUT_TEXT = f"""
+<h3 style="color:#ff4444; margin:0; padding:0;">PassTreasure</h3>
+<p style="margin-top:6px;">
+    PassTreasure is a fully local password manager that securely stores your data in an
+    encrypted SQLite database. No cloud, no telemetry, no tracking — everything stays offline.
+</p>
+
+<h4 style="color:#66b3ff; margin-bottom:4px; margin-top:14px;">Features</h4>
+<ul style="margin-top:0;">
+    <li>AES-256-GCM encryption</li>
+    <li>Strong key derivation (Argon2id / PBKDF2-HMAC-SHA256)</li>
+    <li>Add, edit and delete password entries</li>
+    <li>Modern PySide6 interface</li>
+    <li>Auto-logout with configurable timer</li>
+    <li>Customizable password generator</li>
+    <li>Custom categories for entries</li>
+    <li>Vault backup (manual & automatic)</li>
+    <li>Import from Firefox/Chrome</li>
+    <li>Search and filtering</li>
+</ul>
+
+<h4 style="color:#8cff66; margin-bottom:4px; margin-top:14px;">Security</h4>
+<ul style="margin-top:0;">
+    <li>Argon2id / PBKDF2 key derivation</li>
+    <li>Unique salt & nonce per entry</li>
+    <li>Authenticated AES-GCM encryption</li>
+    <li>Master key never leaves the device</li>
+    <li>No cloud services involved</li>
+</ul>
+
+<h4 style="color:#ffaa44; margin-bottom:4px; margin-top:14px;">About</h4>
+<p style="margin-top:0;">
+    PassTreasure started as a learning project focused on Python, cryptography and GUI
+    programming. It is actively maintained and expanded.
+</p>
+
+<p style="margin-top:20px; font-size:11px; color:#888;">
+    <b>Author:</b> S3R43o3<br>
+    <b>License:</b> MIT License<br>
+    <b>Version:</b> v{VERSION_NUM}
+</p>
+"""
 
 
 def load_settings():
