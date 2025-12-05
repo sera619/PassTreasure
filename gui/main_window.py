@@ -43,24 +43,23 @@ class MainWindow(QWidget):
         self.check_autologout()
         QTimer.singleShot(0, self.clear_initial_selection)
             
-    #autologout
+    # autologout
     def start_autologout(self):
         settings = load_settings()
         self.watcher = InactivityWatcher()
-        self.autolock = AutoLocker(settings.get("auto_logouttime"), self.logout)
-        self.installEventFilter(self.watcher)
+        self.autolock = AutoLocker(settings.get("auto_logouttime"), self.auto_logout)
+        QApplication.instance().installEventFilter(self.watcher)
         self.watcher.user_active.connect(self.autolock.reset)
     
     def stop_autologout(self):
         if not hasattr(self, "watcher") or self.watcher is None:
             return False
-        self.removeEventFilter(self.watcher)        
+        QApplication.instance().removeEventFilter(self.watcher)        
         if hasattr(self, "autolock") or self.autolock is not None:
             self.autolock.timer.stop()        
         self.watcher = None
         self.autolock = None
         return True
-        self.auto_logout_success.emit()
         
     def check_autologout(self):
         settings = load_settings()
@@ -68,7 +67,7 @@ class MainWindow(QWidget):
             return
         timeout_ms = settings.get("auto_logouttime")
         self.start_autologout()
-        print(f"Start: Autologout started with {timeout_ms} ms!")
+        # print(f"Start: Autologout started with {timeout_ms} ms!")
 
     
     # Dark Theme
@@ -154,17 +153,24 @@ class MainWindow(QWidget):
             self.sort_list("username")
         elif text == "ID":
             self.sort_list("id")          
-     
+    
+    def auto_logout(self):
+        if self.db.disconnect():
+            self.close()     
+            self.stop_autologout()
+            if self.settings_window:
+                self.settings_window.close()
+                self.settings_window = None
+            self.auto_logout_success.emit()
+    
     def logout(self):
         if self.db.disconnect():
             self.close()     
-            if self.stop_autologout():
-                if self.settings_window:
-                    self.settings_window.close()
-                    self.settings_window = None
-                self.auto_logout_success.emit()
-            else:
-                self.logout_success.emit()
+            self.stop_autologout()
+            if self.settings_window:
+                self.settings_window.close()
+                self.settings_window = None
+            self.logout_success.emit()
         
     def render_list(self):
         lw = self.ui.listWidget
