@@ -29,7 +29,7 @@ class Ui_MainWindow(object):
         self.verticalLayout_2.setSpacing(6)
         self.verticalLayout_2.setContentsMargins(11, 11, 11, 11)
         self.verticalLayout_2.setObjectName(u"verticalLayout_2")
-        self.verticalLayout_2.setContentsMargins(2, 2, 2, 2)
+        self.verticalLayout_2.setContentsMargins(4, 4, 4, 4)
         self.headerFrame = QFrame(MainWindow)
         self.headerFrame.setObjectName(u"headerFrame")
         self.headerFrame.setStyleSheet(u"border:0px;")
@@ -112,13 +112,13 @@ class Ui_MainWindow(object):
         self.verticalLayout_2.addWidget(self.headerFrame)
 
         self.mainLayout = QHBoxLayout()
-        self.mainLayout.setSpacing(4)
+        self.mainLayout.setSpacing(8)
         self.mainLayout.setObjectName(u"mainLayout")
         self.mainLayout.setContentsMargins(0, 0, 0, 0)
         self.leftLayout = QVBoxLayout()
         self.leftLayout.setSpacing(4)
         self.leftLayout.setObjectName(u"leftLayout")
-        self.leftLayout.setContentsMargins(2, -1, 2, -1)
+        self.leftLayout.setContentsMargins(0, -1, 0, -1)
         self.frame_2 = QFrame(MainWindow)
         self.frame_2.setObjectName(u"frame_2")
         self.frame_2.setFrameShape(QFrame.Shape.NoFrame)
@@ -188,6 +188,7 @@ class Ui_MainWindow(object):
         self.buttonLayout = QHBoxLayout()
         self.buttonLayout.setSpacing(6)
         self.buttonLayout.setObjectName(u"buttonLayout")
+        self.buttonLayout.setContentsMargins(4, -1, 4, -1)
         self.btnClearEntries = QPushButton(MainWindow)
         self.btnClearEntries.setObjectName(u"btnClearEntries")
 
@@ -218,7 +219,7 @@ class Ui_MainWindow(object):
         self.rightLayout = QVBoxLayout()
         self.rightLayout.setSpacing(4)
         self.rightLayout.setObjectName(u"rightLayout")
-        self.rightLayout.setContentsMargins(4, 4, 4, 4)
+        self.rightLayout.setContentsMargins(0, 0, 0, 0)
         self.detailFrame = QFrame(MainWindow)
         self.detailFrame.setObjectName(u"detailFrame")
         self.detailFrame.setEnabled(True)
@@ -530,7 +531,7 @@ class Ui_MainWindow(object):
         self.verticalLayout.addWidget(self.detailBtnFrame)
 
 
-        self.rightLayout.addWidget(self.detailFrame, 0, Qt.AlignmentFlag.AlignVCenter)
+        self.rightLayout.addWidget(self.detailFrame)
 
 
         self.mainLayout.addLayout(self.rightLayout)
