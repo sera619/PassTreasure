@@ -1,6 +1,7 @@
 from PySide6.QtWidgets import QDialog
 from PySide6.QtGui import QIcon, QFont
 from src.category_popup_ui import Ui_CategoryPopup
+from config import load_settings, save_settings
 import resources_rc
 
 class CategoryPopup(QDialog):

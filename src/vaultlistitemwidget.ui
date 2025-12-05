@@ -15,10 +15,16 @@
     <number>4</number>
    </property>
    <property name="leftMargin">
-    <number>11</number>
+    <number>9</number>
+   </property>
+   <property name="topMargin">
+    <number>6</number>
    </property>
    <property name="rightMargin">
-    <number>11</number>
+    <number>9</number>
+   </property>
+   <property name="bottomMargin">
+    <number>6</number>
    </property>
    <item>
     <layout class="QVBoxLayout" name="textLayout">
@@ -30,8 +36,17 @@
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
+       <property name="font">
+        <font>
+         <family>Segoe UI</family>
+         <pointsize>8</pointsize>
+         <italic>false</italic>
+         <bold>false</bold>
+        </font>
+       </property>
        <property name="styleSheet">
-        <string notr="true">font-weight: bold; background: None;</string>
+        <string notr="true"> background: None;
+font: 8pt &quot;Segoe UI&quot;;</string>
        </property>
        <property name="text">
         <string>1: Service (Username)</string>
@@ -50,7 +65,7 @@
      </property>
      <property name="sizeHint" stdset="0">
       <size>
-       <width>40</width>
+       <width>20</width>
        <height>20</height>
       </size>
      </property>
@@ -60,13 +75,13 @@
     <widget class="QLabel" name="badgeLabel">
      <property name="minimumSize">
       <size>
-       <width>60</width>
+       <width>110</width>
        <height>16</height>
       </size>
      </property>
      <property name="maximumSize">
       <size>
-       <width>60</width>
+       <width>110</width>
        <height>16</height>
       </size>
      </property>

@@ -29,9 +29,12 @@ class Ui_PasswordGeneratorDialog(object):
         self.label = QLabel(PasswordGeneratorDialog)
         self.label.setObjectName(u"label")
         font = QFont()
+        font.setFamilies([u"Segoe UI"])
         font.setPointSize(12)
         font.setBold(True)
+        font.setItalic(False)
         self.label.setFont(font)
+        self.label.setStyleSheet(u"font: bold 12pt \"Segoe UI\";")
         self.label.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.verticalLayout.addWidget(self.label)
@@ -87,6 +90,11 @@ class Ui_PasswordGeneratorDialog(object):
         self.lineGenerated.setReadOnly(True)
 
         self.verticalLayout.addWidget(self.lineGenerated)
+
+        self.indicatorHolder = QVBoxLayout()
+        self.indicatorHolder.setObjectName(u"indicatorHolder")
+
+        self.verticalLayout.addLayout(self.indicatorHolder)
 
         self.buttonLayout = QHBoxLayout()
         self.buttonLayout.setObjectName(u"buttonLayout")

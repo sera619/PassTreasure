@@ -1,10 +1,11 @@
 import sqlite3
 import os
 import random
+import csv
 from datetime import datetime, timezone 
 from typing import Optional, List, Tuple
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
-from config import TEST_ENTRIES, resource_path, load_settings, save_settings, ENTRY_CATEGORYS
+from config import TEST_ENTRIES, resource_path, load_settings, save_settings, clean_url
 import shutil
 from backend.kdf import (
     generate_salt,
@@ -28,9 +29,7 @@ class PasswordDatabase:
         self._init_data()
         self._init_backup()
         
-    # ---------------------------
     # Backup
-    # ---------------------------
     def _init_backup(self):
         if not os.path.exists(BACKUP_PATH):
             os.makedirs(BACKUP_PATH)
@@ -38,7 +37,39 @@ class PasswordDatabase:
     def _init_data(self):
         if not os.path.exists(DATA_PATH):
             os.makedirs(DATA_PATH)
+        load_settings()
+
+    def add_test_entries(self) -> None:
+        if self.aes_key is None:
+            raise Exception("Vault not unlocked!")
+        entries = TEST_ENTRIES
+        
+        for entry in entries:
+            settings = load_settings()
+            entry_categories = settings["entry_categories"]
+            service = entry.get("service")
+            username = entry.get("username")
+            password = entry.get("password")
+            url = entry.get("url", "https://www.google.com")
+            category = entry.get("category", "General")
+            category = random.choice(entry_categories)
             
+            if not service or not username or not password:
+                print(f"skipping invalid entry: {entry}")
+                continue
+            try:
+                self.add_entry(service, username, password, category, url)
+            except Exception as e:
+                print(f"Failed to add entry: {e}")
+            
+    def connect(self) -> bool:
+        if not os.path.exists(self.path):
+            return False
+        
+        self.conn = sqlite3.connect(self.path)
+        self.cursor = self.conn.cursor()
+        return True
+          
     def create_backup(self):
         if not VAULT_PATH.exists():
             raise FileNotFoundError("vault.db does not exist – nothing to backup!")
@@ -89,10 +120,7 @@ class PasswordDatabase:
         backup_file = BACKUP_PATH / backup_filename
         if not backup_file.exists():
             raise FileNotFoundError(f"Backup file not found: {backup_file}")
-        
-            # ---------
         # 1. Close DB connection if open
-        # ---------
         try:
             if self.conn:
                 self.conn.close()
@@ -153,34 +181,7 @@ class PasswordDatabase:
 
         return True
 
-    def add_test_entries(self) -> None:
-        if self.aes_key is None:
-            raise Exception("Vault not unlocked!")
-        entries = TEST_ENTRIES
-        
-        for entry in entries:
-            service = entry.get("service")
-            username = entry.get("username")
-            password = entry.get("password")
-            category = entry.get("category", "General")
-            category = random.choice(ENTRY_CATEGORYS)
-            
-            if not service or not username or not password:
-                print(f"skipping invalid entry: {entry}")
-                continue
-            try:
-                self.add_entry(service, username, password, category)
-            except Exception as e:
-                print(f"Failed to add entry: {e}")
-            
-    def connect(self) -> bool:
-        if not os.path.exists(self.path):
-            return False
-        
-        self.conn = sqlite3.connect(self.path)
-        self.cursor = self.conn.cursor()
-        return True
-    
+    # Unlock / Verify
     def create_new_vault(self, master_password: str) -> None:
         if os.path.exists(self.path):
             raise Exception("Vault already exists!")
@@ -209,6 +210,7 @@ class PasswordDatabase:
                 service TEXT NOT NULL,
                 username TEXT NOT NULL,
                 password BLOB NOT NULL,
+                url TEXT,
                 nonce BLOB NOT NULL,
                 category TEXT DEFAULT 'General',
                 created_at TEXT,
@@ -222,6 +224,63 @@ class PasswordDatabase:
         )
 
         self.conn.commit()
+
+    def change_master_password(self, old_password: str, new_password: str) -> bool:
+        """
+        Changes the master password securely.
+        Steps:
+        1. Verify old password
+        2. Generate new salt + new hash
+        3. Decrypt ALL entries using old aes_key
+        4. Re-encrypt them using the new aes_key
+        5. Write updated meta + entries back
+        """
+        # 1: Check old password
+        if not self.unlock_vault(old_password):
+            return False
+
+        # Load existing encrypted entries
+        self.cursor.execute("SELECT id, password, nonce FROM entries")
+        rows = self.cursor.fetchall()
+
+        # Decrypt all entries with old key
+        aes_old = AESGCM(self.aes_key)
+        decrypted_entries = []
+
+        for entry_id, encrypted_pw, nonce in rows:
+            pw = aes_old.decrypt(nonce, encrypted_pw, None).decode("utf-8")
+            decrypted_entries.append((entry_id, pw))
+
+        # 2: Generate new salt + derive new key
+        new_salt = generate_salt()
+        new_hash = derive_key(new_password, new_salt)
+        new_aes_key = new_hash
+
+        aes_new = AESGCM(new_aes_key)
+
+        # 3: Re-encrypt all entries
+        for entry_id, pw in decrypted_entries:
+            new_nonce = os.urandom(12)
+            new_enc = aes_new.encrypt(new_nonce, pw.encode("utf-8"), None)
+
+            self.cursor.execute("""
+                UPDATE entries
+                SET password = ?, nonce = ?
+                WHERE id = ?
+            """, (new_enc, new_nonce, entry_id))
+
+        # 4: Update meta table
+        self.cursor.execute("""
+            UPDATE meta
+            SET salt = ?, master_hash = ?
+            WHERE id = 1
+        """, (new_salt, new_hash))
+    
+        self.conn.commit()
+
+        # 5: Update runtime aes_key
+        self.aes_key = new_aes_key
+        return True
 
     def delete_vault(self) -> None:
         try:
@@ -244,7 +303,6 @@ class PasswordDatabase:
                 "Schließe andere Programme oder Fenster, die darauf zugreifen."
             )
 
-    # Unlock / Verify
     def unlock_vault(self, master_password: str) -> bool:
 
         if not self.connect():
@@ -264,7 +322,7 @@ class PasswordDatabase:
         return False
 
     # Password Entry Handling
-    def add_entry(self, service: str, username: str, password: str, category: str = "General") -> None:
+    def add_entry(self, service: str, username: str, password: str, category: str = "General", url: str = "Unknown") -> None:
 
         if self.aes_key is None:
             raise Exception("Vault not unlocked!")
@@ -276,9 +334,9 @@ class PasswordDatabase:
         now = datetime.now(timezone.utc).isoformat()
 
         self.cursor.execute("""
-            INSERT INTO entries (service, username, password, nonce, category, created_at, updated_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
-        """, (service, username, encrypted_pw, nonce, category, now, now))
+            INSERT INTO entries (service, username, password, url, nonce, category, created_at, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        """, (service, username, encrypted_pw, url, nonce, category, now, now))
 
         self.conn.commit()
 
@@ -287,7 +345,7 @@ class PasswordDatabase:
         Returns full entry details including timestamps and category.
         """
         self.cursor.execute("""
-            SELECT service, username, category, created_at, updated_at
+            SELECT service, username, category, url, created_at, updated_at
             FROM entries
             WHERE id = ?
         """, (entry_id,))
@@ -296,11 +354,12 @@ class PasswordDatabase:
         if row is None:
             raise Exception("Entry not found!")
 
-        service, username, category, created_at, updated_at = row
+        service, username, category, url, created_at, updated_at = row
         return {
             "service": service,
             "username": username,
             "category": category,
+            "url": url,
             "created_at": created_at,
             "updated_at": updated_at
         }
@@ -333,6 +392,22 @@ class PasswordDatabase:
     def delete_entry(self, entry_id: int) -> None:
 
         self.cursor.execute("DELETE FROM entries WHERE id = ?", (entry_id,))
+        self.conn.commit()
+    
+    def get_entries_by_category(self, category: str) -> List[tuple]:
+        """
+        Returns all entries assigned to a specific category.
+        """
+        self.cursor.execute("""
+            SELECT id, service, username, category
+            FROM entries
+            WHERE category = ?
+        """, (category,))
+        return self.cursor.fetchall()
+
+    def clear_entries(self):
+        self.cursor.execute("DELETE FROM entries")
+        self.cursor.execute("DELETE FROM sqlite_sequence WHERE name='entries'")
         self.conn.commit()
         
     # UPDATE: Edit fields
@@ -379,6 +454,14 @@ class PasswordDatabase:
 
         self.conn.commit()
 
+    def edit_url(self, entry_id: int, new_url: str) -> None:
+        now = datetime.now(timezone.utc).isoformat()
+        self.cursor.execute(
+            "UPDATE entries SET url = ?, updated_at = ? WHERE id = ?",
+            (new_url, now, entry_id)
+        )
+        self.conn.commit()
+
     def update_entry(self, entry_id: int, service: str, username: str, password: str, category: str) -> None:
 
         if self.aes_key is None:
@@ -397,3 +480,5 @@ class PasswordDatabase:
         """, (service, username, encrypted_pw, nonce, category, now, entry_id))
 
         self.conn.commit()
+
+

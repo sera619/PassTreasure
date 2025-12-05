@@ -1,8 +1,11 @@
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QIcon
-from PySide6.QtWidgets import QDialog, QLineEdit
+from PySide6.QtWidgets import QDialog, QLineEdit, QVBoxLayout, QDialogButtonBox
 from src.change_password_dialog_ui import Ui_ChangePasswordDialog
 from gui.passwordgenerator_popup import PasswordGeneratorPopup
+from gui.password_strength_indicator import PasswordStrengthIndicator
+from backend.password_strength_logic import evaluate_password_strength
+from config import Styles
 import resources_rc
 
 class ChangePasswordPopup(QDialog):
@@ -11,10 +14,21 @@ class ChangePasswordPopup(QDialog):
         self.ui = Ui_ChangePasswordDialog()
         self.ui.setupUi(self)
         self.setWindowIcon(QIcon(":/assets/icon.png"))
+        self._apply_style()
         # Make sure both edits are in password mode (uic already sets this,
         # but it's harmless to enforce)
         self.ui.lineEditPassword1.setEchoMode(QLineEdit.EchoMode.Password)
         self.ui.lineEditPassword2.setEchoMode(QLineEdit.EchoMode.Password)
+        
+        self.strength_indicator = PasswordStrengthIndicator(self)
+        indicator_layout = QVBoxLayout()
+        indicator_layout.setContentsMargins(0, 0, 0, 0)
+        indicator_layout.addWidget(self.strength_indicator)
+        
+        self.ui.vboxLayout.insertLayout(
+            self.ui.vboxLayout.indexOf(self.ui.lineEditPassword1) + 1,
+            indicator_layout
+        )
 
         # Connect the dialog button box to the internal handlers
         self.ui.buttonBox.accepted.connect(self._on_accept)
@@ -24,11 +38,27 @@ class ChangePasswordPopup(QDialog):
         self._password = None
 
         # Optional: small UX nicety — clear error when user types
+        self.ui.lineEditPassword1.textChanged.connect(self._update_strength)
         self.ui.lineEditPassword1.textChanged.connect(self._clear_error)
         self.ui.lineEditPassword2.textChanged.connect(self._clear_error)
         self.ui.btnGeneratePw.clicked.connect(self._open_generator)
         self.ui.check_show_pass.toggled.connect(self._on_toggle_show)
     
+    def _apply_style(self):
+        self.ui.btnGeneratePw.setStyleSheet(Styles.yellow_button_outlined)
+        ok_button = self.ui.buttonBox.button(QDialogButtonBox.StandardButton.Ok)
+        cancel_button = self.ui.buttonBox.button(QDialogButtonBox.StandardButton.Cancel)
+            
+        if ok_button:
+            ok_button.setStyleSheet(Styles.green_button_outlined)
+        if cancel_button:
+            cancel_button.setStyleSheet(Styles.red_button_outlined)
+            
+    def _update_strength(self):
+        pw = self.ui.lineEditPassword1.text()
+        level = evaluate_password_strength(pw)
+        self.strength_indicator.set_strength(level)
+            
     def _open_generator(self):
         dialog = PasswordGeneratorPopup(parent=self)
         if dialog.exec():

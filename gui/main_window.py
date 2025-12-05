@@ -24,20 +24,69 @@ class MainWindow(QWidget):
         self.setWindowTitle("PassTreasure - Vault")
         self.apply_dark_theme()
         self.build_ui()  
+        self.apply_styles()
         loaded_entries = self.db.get_all_entries()
-        if len(loaded_entries) == 0:
-            self.db.add_test_entries()
-            
+        # if len(loaded_entries) == 0:
+        #     self.db.add_test_entries()
+        self._block_click = False
         self.load_entries()
-        self.check_auto_backup()        
+        self.check_auto_backup()
         QTimer.singleShot(0, self.clear_initial_selection)
-
-    # -------------------------
+            
     # Dark Theme
-    # -------------------------
     def apply_dark_theme(self):
         self.setStyleSheet(Styles.dark_style)
 
+    def apply_styles(self):
+        self.ui.btnSettings.setStyleSheet(Styles.blue_button_outlined)
+        self.ui.btnLogout.setStyleSheet(Styles.red_button_outlined)
+        self.ui.btnAdd.setStyleSheet(Styles.green_button_outlined)
+        self.ui.btnDelete.setStyleSheet(Styles.red_button_outlined)
+
+        self.ui.btnEditCategory.setStyleSheet(Styles.yellow_button_outlined_low)
+        self.ui.btnEditPass.setStyleSheet(Styles.yellow_button_outlined_low)
+        self.ui.btnEditService.setStyleSheet(Styles.yellow_button_outlined_low)
+        self.ui.btnEditUsername.setStyleSheet(Styles.yellow_button_outlined_low)
+        self.ui.btnEditUrl.setStyleSheet(Styles.yellow_button_outlined_low)
+        self.ui.btnClearEntries.setStyleSheet(Styles.red_button)
+        self.ui.btnCopyPass.setStyleSheet(Styles.dark_button)
+        self.ui.btnShowPass.setStyleSheet(Styles.dark_button)
+        self.ui.listWidget.setStyleSheet(Styles.list_widget_style)
+        self.ui.btnCloseDetails.setStyleSheet(Styles.red_button_outlined)
+    
+    def build_ui(self):
+        pixmap = QPixmap(":/assets/icon.png")
+        pixmap = pixmap.scaled(35, 35)
+        self.ui.mainTitleIcon.setPixmap(pixmap)
+        
+        self.ui.listWidget.currentItemChanged.connect(self.update_details)
+        self.ui.btnAdd.clicked.connect(self.add_entry)
+        self.ui.btnDelete.clicked.connect(self.delete_entry)
+        
+        self.ui.btnEditUsername.clicked.connect(self.edit_entry_username)
+        self.ui.btnEditService.clicked.connect(self.edit_entry_service)
+        self.ui.btnEditPass.clicked.connect(self.edit_entry_password)
+        self.ui.btnEditUrl.clicked.connect(self.edit_entry_url)
+        
+        self.ui.btnShowPass.clicked.connect(self.toggle_password_visibility)
+        self.ui.btnCopyPass.clicked.connect(self.copy_password_to_clipboard)
+        self.ui.btnSettings.clicked.connect(self.open_settings)
+        self.ui.btnEditCategory.clicked.connect(self.edit_entry_category)
+        self.ui.searchLineEdit.textChanged.connect(self.filter_list)
+        self.ui.btnCloseDetails.clicked.connect(self.close_details)
+        self.ui.btnClearEntries.clicked.connect(self.clear_all_entries)
+        
+        self.ui.footerLabel.setText(f"PassTreasure v{VERSION_NUM} © S3R43o3 2025")
+        self.ui.sortBox.addItems([
+            "ID",
+            "Service",
+            "Username",
+            "Kategorie"
+        ])        
+        self.ui.sortBox.currentIndexChanged.connect(self.sort_by_selection)
+        self.ui.mainLayout.setStretch(4, 3)
+        self.ui.btnLogout.clicked.connect(self.logout)
+    
     def clear_initial_selection(self):
         self.ui.listWidget.blockSignals(True)
         self.ui.listWidget.setCurrentRow(-1)
@@ -46,10 +95,12 @@ class MainWindow(QWidget):
         self.ui.listWidget.blockSignals(False)
     
     def show_details(self):
-        self.ui.detailFrame.setVisible(True)
-
+        self.ui.detailFrame.show()
+        self.ui.btnDelete.show()
+        
     def hide_details(self):
-        self.ui.detailFrame.setVisible(False)
+        self.ui.detailFrame.hide()
+        self.ui.btnDelete.hide()
 
     def sort_list(self, role_key):
         self.entry_cache.sort(key= lambda e: e[role_key])
@@ -64,39 +115,7 @@ class MainWindow(QWidget):
         elif text == "Username":
             self.sort_list("username")
         elif text == "ID":
-            self.sort_list("id")        
-        
-    def build_ui(self):
-        pixmap = QPixmap(":/assets/icon.png")
-        pixmap = pixmap.scaled(35, 35)
-        self.ui.mainTitleIcon.setPixmap(pixmap)
-        
-        self.ui.listWidget.currentItemChanged.connect(self.update_details)
-        self.ui.btnAdd.clicked.connect(self.add_entry)
-        self.ui.btnDelete.clicked.connect(self.delete_entry)
-        
-        self.ui.btnEditUsername.clicked.connect(self.edit_entry_username)
-        self.ui.btnEditService.clicked.connect(self.edit_entry_service)
-        self.ui.btnEditPass.clicked.connect(self.edit_entry_password)
-        
-        self.ui.btnShowPass.clicked.connect(self.toggle_password_visibility)
-        self.ui.btnCopyPass.clicked.connect(self.copy_password_to_clipboard)
-        self.ui.btnSettings.clicked.connect(self.open_settings)
-        self.ui.btnEditCategory.clicked.connect(self.edit_entry_category)
-        self.ui.searchLineEdit.textChanged.connect(self.filter_list)
-        
-        self.ui.footerLabel.setText(f"PassTreasure v{VERSION_NUM} © S3R43o3 2025")
-        self.ui.sortBox.addItems([
-            "ID",
-            "Service",
-            "Username",
-            "Kategorie"
-        ])        
-        self.ui.sortBox.currentIndexChanged.connect(self.sort_by_selection)
-        
-        self.ui.mainLayout.setStretch(0, 1)
-        self.ui.mainLayout.setStretch(1, 1)
-        self.ui.btnLogout.clicked.connect(self.logout)
+            self.sort_list("id")          
      
     def logout(self):
         self.logout_success.emit()
@@ -156,6 +175,10 @@ class MainWindow(QWidget):
     # -------------------------
     # Update detail view
     # -------------------------
+    def close_details(self):
+        self.ui.listWidget.setCurrentItem(None)
+        self.hide_details()
+      
     def update_details(self, current: QListWidgetItem, previous=None):
         if not current:
             self.hide_details()
@@ -177,6 +200,7 @@ class MainWindow(QWidget):
             self.ui.usernameLabel.setText(username)
             self.ui.passLabel.setText("•" * len(pw))
             self.ui.categoryLabel.setText(category)
+            self.ui.urlLabel.setText(details.get("url"))
             
             def format_datetime(dt_str):
                 try:
@@ -218,14 +242,13 @@ class MainWindow(QWidget):
         username, ok2 = QInputDialog.getText(self, "Username", "Enter username:")
         if not ok2 or not username.strip():
             return
-        # password, ok3 = QInputDialog.getText(self, "Password", "Enter password (or leave blank to generate):")
-        # if not ok3:
-        #     return
         pass_dialog = ChangePasswordPopup(parent=self)
         if pass_dialog.exec():
             password = pass_dialog.get_password()
         
-        category_dialog = CategoryPopup(service_name=service.strip(), parent=self)
+        settings = load_settings()
+        entry_categories = settings.get("entry_categories")
+        category_dialog = CategoryPopup(service_name=service.strip(), categories=entry_categories, parent=self)
         if category_dialog.exec():
             category = category_dialog.selected_category
         
@@ -247,7 +270,7 @@ class MainWindow(QWidget):
             return
         entry_id = selected.data(Qt.ItemDataRole.UserRole)
         confirm = QMessageBox.question(self, "Confirm Delete", "Are you sure you want to delete this entry?")
-        if confirm != QMessageBox.Yes:
+        if confirm != QMessageBox.StandardButton.Yes:
             return
         try:
             self.db.delete_entry(entry_id)
@@ -255,9 +278,22 @@ class MainWindow(QWidget):
             self.hide_details()
         except Exception as e:
             QMessageBox.critical(self, "Error", f"Failed to delete entry:\n{e}")
-            
+         
+    def clear_all_entries(self):
+        confirm = QMessageBox.question(self, "Confirm Clear", "Are you sure you want delete ALL entries?")
+        if confirm != QMessageBox.StandardButton.Yes:
+            return
+        try:
+            self.db.clear_entries()
+            self.load_entries()
+            self.hide_details()
+            QMessageBox.information(self, "Clear Successfully", "Entries successfully cleared!")
+        except Exception as e:
+            QMessageBox.critical(self, "Error", f"Failed to clear entries:\n{e}")
+    
     def edit_entry_username(self):
         selected =  self.ui.listWidget.currentItem()
+        index = self.ui.listWidget.currentIndex()
         if not selected:
             return
         
@@ -276,13 +312,16 @@ class MainWindow(QWidget):
         try:
             self.db.edit_username(entry_id, new_username.strip())
             self.load_entries()
-            self.ui.listWidget.setCurrentRow(self.ui.listWidget.count() - 1)
-            self.update_details(self.ui.listWidget.currentItem())
+            # self.ui.listWidget.setCurrentRow(self.ui.listWidget.count() - 1)
+            self.update_details(selected)
+            self.ui.listWidget.setCurrentIndex(index)
         except Exception as e:
             QMessageBox.critical(self, "ERROR", f"Failed to update username:\n{e}")
     
     def edit_entry_password(self):
         selected = self.ui.listWidget.currentItem()
+        index = self.ui.listWidget.currentIndex()
+
         if not selected:
             return
         service_name = self.ui.serviceLabel.text()
@@ -299,6 +338,7 @@ class MainWindow(QWidget):
             try:
                 self.db.edit_password(entry_id, new_password)
                 self.update_details(selected)
+                self.ui.listWidget.setCurrentIndex(index)
                 QMessageBox.information(self, "Success", f"Password updated for:\n{service_name}")
 
             except Exception as e:
@@ -306,13 +346,16 @@ class MainWindow(QWidget):
     
     def edit_entry_category(self):
         selected = self.ui.listWidget.currentItem()
+        index = self.ui.listWidget.currentIndex()
         if not selected:
             return
 
         service_name = self.ui.serviceLabel.text()
         entry_id = selected.data(Qt.ItemDataRole.UserRole)
         current_category = self.ui.categoryLabel.text()
-        dialog = CategoryPopup(service_name=service_name, parent=self, current_category=current_category)
+        settings = load_settings()
+        categories = settings["entry_categories"]
+        dialog = CategoryPopup(service_name=service_name, parent=self, current_category=current_category, categories=categories)
         if dialog.exec():
             new_category = dialog.selected_category
             if new_category == current_category:
@@ -321,6 +364,7 @@ class MainWindow(QWidget):
                 self.db.edit_category(entry_id, new_category)
                 self.update_details(selected)
                 self.load_entries()
+                self.ui.listWidget.setCurrentIndex(index)
                 QMessageBox.information(self, "Success", f"Category updated for:\n{service_name}")
 
             except Exception as e:
@@ -350,6 +394,32 @@ class MainWindow(QWidget):
             self.update_details(self.ui.listWidget.currentItem())
         except Exception as e:
             QMessageBox.critical(self, "Error", f"Failed to update service:\n{e}")
+            
+    def edit_entry_url(self):        
+        selected = self.ui.listWidget.currentItem()
+        if not selected:
+            return
+
+        entry_id = selected.data(Qt.ItemDataRole.UserRole)
+
+        current_service = self.ui.serviceLabel.text()
+        current_url = self.ui.urlLabel.text()
+        new_url, ok = QInputDialog.getText(
+            self,
+            "Edit Url",
+            f"Enter new url for service:\n\n'{current_service}'",
+            text=current_url,
+        )
+
+        if not ok or not new_url.strip():
+            return
+
+        try:
+            self.db.edit_url(entry_id, new_url.strip())
+            self.load_entries()
+            self.update_details(self.ui.listWidget.currentItem())
+        except Exception as e:
+            QMessageBox.critical(self, "Error", f"Failed to update url:\n{e}")
             
     def copy_password_to_clipboard(self):
         if not hasattr(self, "_current_plain_password"):
@@ -397,7 +467,10 @@ class MainWindow(QWidget):
     
     def open_settings(self):
         dig = SettingsWindow(self.db)
+        dig.category_deleted.connect(self.load_entries)
         dig.backup_restored.connect(self.load_entries)
+        dig.category_updated.connect(self.load_entries)
+        dig.import_successfully.connect(self.load_entries)
         dig.exec()
 
     def check_auto_backup(self):

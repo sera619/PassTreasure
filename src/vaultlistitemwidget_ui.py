@@ -26,7 +26,7 @@ class Ui_VaultListItemWidget(object):
         self.horizontalLayout = QHBoxLayout(VaultListItemWidget)
         self.horizontalLayout.setSpacing(4)
         self.horizontalLayout.setObjectName(u"horizontalLayout")
-        self.horizontalLayout.setContentsMargins(11, -1, 11, -1)
+        self.horizontalLayout.setContentsMargins(9, 6, 9, 6)
         self.textLayout = QVBoxLayout()
         self.textLayout.setObjectName(u"textLayout")
         self.labelText = QLabel(VaultListItemWidget)
@@ -36,7 +36,14 @@ class Ui_VaultListItemWidget(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.labelText.sizePolicy().hasHeightForWidth())
         self.labelText.setSizePolicy(sizePolicy)
-        self.labelText.setStyleSheet(u"font-weight: bold; background: None;")
+        font = QFont()
+        font.setFamilies([u"Segoe UI"])
+        font.setPointSize(8)
+        font.setBold(False)
+        font.setItalic(False)
+        self.labelText.setFont(font)
+        self.labelText.setStyleSheet(u" background: None;\n"
+"font: 8pt \"Segoe UI\";")
         self.labelText.setAlignment(Qt.AlignmentFlag.AlignLeading|Qt.AlignmentFlag.AlignLeft|Qt.AlignmentFlag.AlignVCenter)
 
         self.textLayout.addWidget(self.labelText)
@@ -44,14 +51,14 @@ class Ui_VaultListItemWidget(object):
 
         self.horizontalLayout.addLayout(self.textLayout)
 
-        self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+        self.horizontalSpacer = QSpacerItem(20, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.horizontalLayout.addItem(self.horizontalSpacer)
 
         self.badgeLabel = QLabel(VaultListItemWidget)
         self.badgeLabel.setObjectName(u"badgeLabel")
-        self.badgeLabel.setMinimumSize(QSize(60, 16))
-        self.badgeLabel.setMaximumSize(QSize(60, 16))
+        self.badgeLabel.setMinimumSize(QSize(110, 16))
+        self.badgeLabel.setMaximumSize(QSize(110, 16))
         self.badgeLabel.setStyleSheet(u"font: 700 8pt \"Segoe UI\"; border-radius: 5px; background: rgba(211, 211, 211, 140);")
         self.badgeLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
 

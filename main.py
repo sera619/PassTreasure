@@ -1,9 +1,9 @@
 from PySide6.QtWidgets import QApplication
 from PySide6.QtGui import QIcon
-from PySide6.QtCore import QTimer
 from gui.login_window import LoginWindow
 from gui.main_window import MainWindow
 from gui.intro_splash import IntroSplash
+import config
 from config import Styles
 import sys
 import resources_rc
@@ -41,7 +41,7 @@ def main():
     app.setStyleSheet(Styles.dark_style)
     global splash
     splash = IntroSplash()
-    speed_up = False
+    speed_up = config.IS_DEBUGGING
     if speed_up:
         splash = IntroSplash(200, 100)
     splash.setWindowIcon(QIcon(":/assets/icon.png"))
@@ -49,7 +49,7 @@ def main():
     splash.start()
     splash.intro_finished.connect(lambda: start_login(splash))
 
-    app.exec()
+    sys.exit(app.exec())
 
 if __name__ == "__main__":
     main()

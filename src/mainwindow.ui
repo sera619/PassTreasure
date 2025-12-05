@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
-    <height>500</height>
+    <width>870</width>
+    <height>535</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -37,7 +37,7 @@
      <property name="frameShadow">
       <enum>QFrame::Shadow::Raised</enum>
      </property>
-     <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0">
+     <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,0">
       <property name="leftMargin">
        <number>4</number>
       </property>
@@ -51,7 +51,7 @@
        <number>4</number>
       </property>
       <item alignment="Qt::AlignmentFlag::AlignLeft">
-       <widget class="QFrame" name="frame">
+       <widget class="QFrame" name="menuBtnFrame">
         <property name="frameShape">
          <enum>QFrame::Shape::StyledPanel</enum>
         </property>
@@ -63,7 +63,7 @@
           <number>9</number>
          </property>
          <property name="leftMargin">
-          <number>0</number>
+          <number>4</number>
          </property>
          <property name="topMargin">
           <number>0</number>
@@ -76,22 +76,36 @@
          </property>
          <item>
           <widget class="QPushButton" name="btnSettings">
-           <property name="text">
-            <string/>
+           <property name="minimumSize">
+            <size>
+             <width>60</width>
+             <height>15</height>
+            </size>
            </property>
-           <property name="icon">
-            <iconset theme="QIcon::ThemeIcon::DocumentProperties"/>
+           <property name="font">
+            <font>
+             <pointsize>9</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>Settings</string>
            </property>
            <property name="iconSize">
             <size>
-             <width>16</width>
-             <height>16</height>
+             <width>20</width>
+             <height>20</height>
             </size>
            </property>
           </widget>
          </item>
          <item>
           <widget class="QPushButton" name="btnLogout">
+           <property name="minimumSize">
+            <size>
+             <width>60</width>
+             <height>15</height>
+            </size>
+           </property>
            <property name="text">
             <string>Logout</string>
            </property>
@@ -99,6 +113,19 @@
          </item>
         </layout>
        </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Orientation::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
       </item>
       <item>
        <widget class="QFrame" name="titleFrame">
@@ -114,7 +141,7 @@
         <property name="frameShadow">
          <enum>QFrame::Shadow::Raised</enum>
         </property>
-        <layout class="QHBoxLayout" name="horizontalLayout_10">
+        <layout class="QHBoxLayout" name="horizontalLayout_10" stretch="0,1">
          <property name="spacing">
           <number>10</number>
          </property>
@@ -130,7 +157,7 @@
          <property name="bottomMargin">
           <number>0</number>
          </property>
-         <item alignment="Qt::AlignmentFlag::AlignRight">
+         <item>
           <widget class="QLabel" name="mainTitleIcon">
            <property name="text">
             <string>TextLabel</string>
@@ -165,7 +192,7 @@
     </widget>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="mainLayout">
+    <layout class="QHBoxLayout" name="mainLayout" stretch="4,3">
      <property name="spacing">
       <number>4</number>
      </property>
@@ -187,10 +214,10 @@
         <number>4</number>
        </property>
        <property name="leftMargin">
-        <number>4</number>
+        <number>2</number>
        </property>
        <property name="rightMargin">
-        <number>4</number>
+        <number>2</number>
        </property>
        <item>
         <widget class="QFrame" name="frame_2">
@@ -299,21 +326,60 @@
         </widget>
        </item>
        <item>
-        <widget class="QListWidget" name="listWidget"/>
+        <widget class="QListWidget" name="listWidget">
+         <property name="mouseTracking">
+          <bool>true</bool>
+         </property>
+         <property name="alternatingRowColors">
+          <bool>true</bool>
+         </property>
+        </widget>
        </item>
        <item>
         <layout class="QHBoxLayout" name="buttonLayout">
          <item>
-          <widget class="QPushButton" name="btnAdd">
+          <widget class="QPushButton" name="btnClearEntries">
            <property name="text">
-            <string>Add</string>
+            <string>Clear Entries</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_2">
+           <property name="orientation">
+            <enum>Qt::Orientation::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btnAdd">
+           <property name="minimumSize">
+            <size>
+             <width>80</width>
+             <height>30</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>Add New Entry</string>
            </property>
           </widget>
          </item>
          <item>
           <widget class="QPushButton" name="btnDelete">
+           <property name="minimumSize">
+            <size>
+             <width>80</width>
+             <height>30</height>
+            </size>
+           </property>
            <property name="text">
-            <string>Delete</string>
+            <string>Delete Entry</string>
            </property>
           </widget>
          </item>
@@ -324,12 +390,18 @@
      <item>
       <layout class="QVBoxLayout" name="rightLayout">
        <property name="spacing">
-        <number>0</number>
+        <number>4</number>
        </property>
        <property name="leftMargin">
         <number>4</number>
        </property>
+       <property name="topMargin">
+        <number>4</number>
+       </property>
        <property name="rightMargin">
+        <number>4</number>
+       </property>
+       <property name="bottomMargin">
         <number>4</number>
        </property>
        <item alignment="Qt::AlignmentFlag::AlignVCenter">
@@ -418,7 +490,7 @@
                </property>
               </widget>
              </item>
-             <item alignment="Qt::AlignmentFlag::AlignHCenter|Qt::AlignmentFlag::AlignVCenter">
+             <item>
               <widget class="QPushButton" name="btnEditService">
                <property name="text">
                 <string>Edit</string>
@@ -480,7 +552,7 @@
                </property>
               </widget>
              </item>
-             <item alignment="Qt::AlignmentFlag::AlignHCenter|Qt::AlignmentFlag::AlignVCenter">
+             <item>
               <widget class="QPushButton" name="btnEditUsername">
                <property name="text">
                 <string>Edit</string>
@@ -542,8 +614,82 @@
                </property>
               </widget>
              </item>
-             <item alignment="Qt::AlignmentFlag::AlignHCenter|Qt::AlignmentFlag::AlignVCenter">
+             <item>
               <widget class="QPushButton" name="btnEditPass">
+               <property name="text">
+                <string>Edit</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item>
+           <widget class="QFrame" name="urlFrame">
+            <property name="frameShape">
+             <enum>QFrame::Shape::NoFrame</enum>
+            </property>
+            <property name="frameShadow">
+             <enum>QFrame::Shadow::Raised</enum>
+            </property>
+            <layout class="QHBoxLayout" name="horizontalLayout_12">
+             <property name="leftMargin">
+              <number>2</number>
+             </property>
+             <property name="topMargin">
+              <number>2</number>
+             </property>
+             <property name="rightMargin">
+              <number>2</number>
+             </property>
+             <property name="bottomMargin">
+              <number>2</number>
+             </property>
+             <item alignment="Qt::AlignmentFlag::AlignVCenter">
+              <widget class="QLabel" name="label_7">
+               <property name="minimumSize">
+                <size>
+                 <width>80</width>
+                 <height>0</height>
+                </size>
+               </property>
+               <property name="sizeIncrement">
+                <size>
+                 <width>0</width>
+                 <height>0</height>
+                </size>
+               </property>
+               <property name="font">
+                <font>
+                 <italic>true</italic>
+                 <bold>true</bold>
+                </font>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">QLabel {
+	color:rgb(118, 0, 0);
+}</string>
+               </property>
+               <property name="text">
+                <string>Url:</string>
+               </property>
+              </widget>
+             </item>
+             <item alignment="Qt::AlignmentFlag::AlignVCenter">
+              <widget class="QLabel" name="urlLabel">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="text">
+                <string>TextLabel</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="btnEditUrl">
                <property name="text">
                 <string>Edit</string>
                </property>
@@ -677,7 +823,7 @@
                 <string>TextLabel</string>
                </property>
                <property name="alignment">
-                <set>Qt::AlignmentFlag::AlignCenter</set>
+                <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
                </property>
               </widget>
              </item>
@@ -741,7 +887,7 @@
                 <string>TextLabel</string>
                </property>
                <property name="alignment">
-                <set>Qt::AlignmentFlag::AlignCenter</set>
+                <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
                </property>
               </widget>
              </item>
@@ -860,6 +1006,13 @@
                   </property>
                  </widget>
                 </item>
+                <item>
+                 <widget class="QPushButton" name="btnCloseDetails">
+                  <property name="text">
+                   <string>Close</string>
+                  </property>
+                 </widget>
+                </item>
                </layout>
               </widget>
              </item>
@@ -886,13 +1039,13 @@
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_2">
       <property name="leftMargin">
-       <number>2</number>
+       <number>9</number>
       </property>
       <property name="topMargin">
        <number>2</number>
       </property>
       <property name="rightMargin">
-       <number>2</number>
+       <number>9</number>
       </property>
       <property name="bottomMargin">
        <number>2</number>
@@ -902,19 +1055,22 @@
         <property name="font">
          <font>
           <family>Segoe UI</family>
-          <pointsize>8</pointsize>
+          <pointsize>9</pointsize>
           <italic>false</italic>
           <bold>false</bold>
          </font>
         </property>
         <property name="styleSheet">
          <string notr="true">QLabel {
-	font: 8pt &quot;Segoe UI&quot;;
+	font: 9pt &quot;Segoe UI&quot;;
 	color: rgb(125, 125, 125);
 }</string>
         </property>
         <property name="text">
          <string>TextLabel</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
         </property>
        </widget>
       </item>

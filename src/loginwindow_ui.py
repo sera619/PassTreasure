@@ -58,11 +58,11 @@ class Ui_LoginWindowUI(object):
 
         self.frame = QFrame(LoginWindowUI)
         self.frame.setObjectName(u"frame")
-        self.frame.setFrameShape(QFrame.Shape.StyledPanel)
+        self.frame.setFrameShape(QFrame.Shape.NoFrame)
         self.frame.setFrameShadow(QFrame.Shadow.Raised)
         self.horizontalLayout = QHBoxLayout(self.frame)
         self.horizontalLayout.setObjectName(u"horizontalLayout")
-        self.horizontalLayout.setContentsMargins(0, 0, 0, 0)
+        self.horizontalLayout.setContentsMargins(4, 0, 4, 0)
         self.input_password = QLineEdit(self.frame)
         self.input_password.setObjectName(u"input_password")
         self.input_password.setEchoMode(QLineEdit.EchoMode.Password)
@@ -82,11 +82,11 @@ class Ui_LoginWindowUI(object):
 
         self.pw2Frame = QFrame(LoginWindowUI)
         self.pw2Frame.setObjectName(u"pw2Frame")
-        self.pw2Frame.setFrameShape(QFrame.Shape.StyledPanel)
+        self.pw2Frame.setFrameShape(QFrame.Shape.NoFrame)
         self.pw2Frame.setFrameShadow(QFrame.Shadow.Raised)
         self.horizontalLayout_2 = QHBoxLayout(self.pw2Frame)
         self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
-        self.horizontalLayout_2.setContentsMargins(0, 0, 0, 0)
+        self.horizontalLayout_2.setContentsMargins(4, 0, 4, 0)
         self.input_password2 = QLineEdit(self.pw2Frame)
         self.input_password2.setObjectName(u"input_password2")
 

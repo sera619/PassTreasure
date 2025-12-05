@@ -7,7 +7,7 @@ from PySide6.QtGui import QIcon, QPixmap
 import os, sys
 from backend.database import PasswordDatabase
 from src.loginwindow_ui import Ui_LoginWindowUI
-from config import  Styles, resource_path, VERSION_NUM
+from config import  Styles, resource_path, VERSION_NUM, IS_DEBUGGING
 
 
 class LoginWindow(QWidget):
@@ -25,6 +25,7 @@ class LoginWindow(QWidget):
         self.ui = Ui_LoginWindowUI()
         self.ui.setupUi(self)
         self.setStyleSheet(Styles.dark_style)
+        self.apply_styles()
         footer_text = f"PassTreasure v{VERSION_NUM} © S3R43o3 2025"
         self.ui.footer_label.setText(f"{footer_text}")
 
@@ -38,15 +39,17 @@ class LoginWindow(QWidget):
         pixmap = QPixmap(":/assets/icon.png")
         pixmap = pixmap.scaled(100, 100)
         self.ui.label_icon.setPixmap(pixmap)
-        # self.input_pw.setText("kekskeks")
+        
+        if IS_DEBUGGING:
+            self.input_pw.setText("kekskeks")
         
         self.input_pw.setFocus()
         self._pw_visible = False
         
         self.configure_mode()
-        self.ui.btn_toggle_pw.setStyleSheet("font-size: 14px;")
+        self.ui.btn_toggle_pw.font().setPointSize(18)
         self.ui.btn_toggle_pw.setText("👁️")
-        self.ui.btn_toggle_pw2.setStyleSheet("font-size: 14px;")
+        self.ui.btn_toggle_pw2.font().setPointSize(18)
         self.ui.btn_toggle_pw2.setText("👁️")
         self.ui.input_password2.setEchoMode(QLineEdit.EchoMode.Password)
 
@@ -56,8 +59,14 @@ class LoginWindow(QWidget):
         self.ui.btn_delete_vault.clicked.connect(self.handle_delete_vault)
         self.input_pw.returnPressed.connect(self.on_enter)
         self.ui.input_password2.returnPressed.connect(self.on_enter)
-        
-
+    
+    def apply_styles(self):
+        self.ui.btn_login.setStyleSheet(Styles.green_button_outlined)
+        self.ui.btn_delete_vault.setStyleSheet(Styles.red_button_outlined)
+        self.ui.btn_create.setStyleSheet(Styles.green_button_outlined)
+        self.ui.btn_toggle_pw.setStyleSheet(Styles.dark_button)            
+        self.ui.btn_toggle_pw2.setStyleSheet(Styles.dark_button)            
+            
     def configure_mode(self):
         if self.is_first_run:
             self.label.setText("Create Master Password:")
@@ -78,7 +87,7 @@ class LoginWindow(QWidget):
 
     def handle_delete_vault(self):
         confirm = QMessageBox.question(self, "Confirm Delete", "Are you sure you want to delete this vault?")
-        if confirm != QMessageBox.Yes:
+        if confirm != QMessageBox.StandardButton.Yes:
             return
         try:        
             self.db.delete_vault()
