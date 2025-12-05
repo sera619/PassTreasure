@@ -2,7 +2,7 @@ from PySide6.QtWidgets import QDialog, QMessageBox, QInputDialog, QLineEdit, QCo
 from src.settingswindow_ui import Ui_SettingsWindow
 import resources_rc
 from PySide6.QtGui import QIcon, QColor
-from PySide6.QtCore import Qt, Signal, QTimer
+from PySide6.QtCore import Qt, Signal, QTimer, QTime
 from datetime import datetime
 from gui.category_edit_dialog import CategoryEditDialog
 from gui.password_strength_indicator import PasswordStrengthIndicator
@@ -16,6 +16,8 @@ class SettingsWindow(QDialog):
     category_deleted = Signal()
     category_updated = Signal()
     import_successfully = Signal()
+    autologout_activated = Signal()
+    autologout_deactivated = Signal()
     def __init__(self, db: PasswordDatabase):
         super().__init__()
         self.ui = Ui_SettingsWindow()
@@ -26,11 +28,18 @@ class SettingsWindow(QDialog):
         self.setup_navigation()
         self.setup_about_page()
         self.setup_import_page()
+        self.setup_general_page()
         self.setWindowTitle("PassTreasure - Settings")
         self.setWindowIcon(QIcon(":/assets/icon.png"))
+        self.apply_styles()
+        
         # Master password change
         self.strength_indicator = PasswordStrengthIndicator(self)
         self.ui.indicatorHolder.addWidget(self.strength_indicator)        
+        
+        
+        self.setup_edit_category()
+        self.set_autologout_time()
         
         self.ui.new_pw1.textChanged.connect(self._update_pw_strength)
         self.ui.btn_apply_pw.clicked.connect(self.apply_master_pw)
@@ -42,9 +51,9 @@ class SettingsWindow(QDialog):
         self.ui.btnStartImport.clicked.connect(self.start_import)
         self.ui.btnSelectPath.clicked.connect(self.get_import_path)
         self.ui.stack.currentChanged.connect(self.update_sidebar_buttons)
-        self.setup_general_page()
-        self.setup_edit_category()
-        self.apply_styles()
+        
+        self.ui.autoLogoutCheckBox.toggled.connect(self.toggle_autologout)
+        self.ui.autoLogoutTimeEdit.timeChanged.connect(self.get_autologout_time)
         # self.ui.stack.setCurrentWidget(self.ui.page_security)
     
     def update_sidebar_buttons(self):
@@ -474,9 +483,39 @@ class SettingsWindow(QDialog):
         self.ui.progressLabel.clear()
         self.ui.progressFrame.hide()
         
+    # autologout
+    def toggle_autologout(self, checked: bool):
+        settings = load_settings()
+        if checked:
+            self.autologout_activated.emit()
+            # logout_ms = settings.get("auto_logouttime")
+            # print(f"Autologout started with {logout_ms} ms!")
+        else:
+            self.autologout_deactivated.emit()
+            # print(f"Autologout stopped!")
+        settings["auto_logout"] = checked
+        save_settings(settings)
         
-        
-        
+    def set_autologout_time(self):
+        settings = load_settings()
+        ms = settings.get("auto_logouttime")
+        minutes = ms // 60000
+        ms %= 60000
+        seconds = ms // 1000
+        t = QTime(0, minutes, seconds)
+        self.ui.autoLogoutTimeEdit.setTime(t)
+        self.ui.autoLogoutCheckBox.setChecked(settings.get("auto_logout"))
+    
+    def get_autologout_time(self):
+        time_value = self.ui.autoLogoutTimeEdit.time()
+        logout_ms = (
+            time_value.minute() * 60 * 1000
+            + time_value.second() * 1000
+        )
+        # print(f"Logouttime: {time_value.minute()}:{time_value.second()}\nin ms: {logout_ms}")
+        settings = load_settings()
+        settings["auto_logouttime"] = logout_ms       
+        save_settings(settings)
         
         
         

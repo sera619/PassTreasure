@@ -10,29 +10,67 @@ from gui.settings_window import SettingsWindow
 from gui.category_popup import CategoryPopup
 from gui.vault_listiem import VaultListItemWidget
 from backend.database import PasswordDatabase
-from config import VERSION_NUM, load_settings, save_settings, Styles
+from backend.inactivity_watcher import AutoLocker, InactivityWatcher
+
+from config import VERSION_NUM, load_settings, save_settings, Styles, IS_DEBUGGING
 from datetime import datetime
 
 class MainWindow(QWidget):
     logout_success = Signal()
+    auto_logout_success = Signal()
     def __init__(self, db: PasswordDatabase):
         super().__init__()
         self.db = db  # unlocked PasswordDatabase instance
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         self.entry_cache = []
+        self.watcher = None
+        self.autolock = None
+        self.settings_window = None
         self.setWindowTitle("PassTreasure - Vault")
         self.apply_dark_theme()
         self.build_ui()  
         self.apply_styles()
-        loaded_entries = self.db.get_all_entries()
-        # if len(loaded_entries) == 0:
-        #     self.db.add_test_entries()
+
+        if IS_DEBUGGING:
+            loaded_entries = self.db.get_all_entries()
+            if len(loaded_entries) == 0:
+                self.db.add_test_entries()
+
         self._block_click = False
         self.load_entries()
         self.check_auto_backup()
+        self.check_autologout()
         QTimer.singleShot(0, self.clear_initial_selection)
             
+    #autologout
+    def start_autologout(self):
+        settings = load_settings()
+        self.watcher = InactivityWatcher()
+        self.autolock = AutoLocker(settings.get("auto_logouttime"), self.logout)
+        self.installEventFilter(self.watcher)
+        self.watcher.user_active.connect(self.autolock.reset)
+    
+    def stop_autologout(self):
+        if not hasattr(self, "watcher") or self.watcher is None:
+            return False
+        self.removeEventFilter(self.watcher)        
+        if hasattr(self, "autolock") or self.autolock is not None:
+            self.autolock.timer.stop()        
+        self.watcher = None
+        self.autolock = None
+        return True
+        self.auto_logout_success.emit()
+        
+    def check_autologout(self):
+        settings = load_settings()
+        if not settings.get("auto_logout"):
+            return
+        timeout_ms = settings.get("auto_logouttime")
+        self.start_autologout()
+        print(f"Start: Autologout started with {timeout_ms} ms!")
+
+    
     # Dark Theme
     def apply_dark_theme(self):
         self.setStyleSheet(Styles.dark_style)
@@ -75,7 +113,7 @@ class MainWindow(QWidget):
         self.ui.searchLineEdit.textChanged.connect(self.filter_list)
         self.ui.btnCloseDetails.clicked.connect(self.close_details)
         self.ui.btnClearEntries.clicked.connect(self.clear_all_entries)
-        
+                
         self.ui.footerLabel.setText(f"PassTreasure v{VERSION_NUM} © S3R43o3 2025")
         self.ui.sortBox.addItems([
             "ID",
@@ -118,8 +156,15 @@ class MainWindow(QWidget):
             self.sort_list("id")          
      
     def logout(self):
-        self.logout_success.emit()
-        self.close()     
+        if self.db.disconnect():
+            self.close()     
+            if self.stop_autologout():
+                if self.settings_window:
+                    self.settings_window.close()
+                    self.settings_window = None
+                self.auto_logout_success.emit()
+            else:
+                self.logout_success.emit()
         
     def render_list(self):
         lw = self.ui.listWidget
@@ -466,12 +511,18 @@ class MainWindow(QWidget):
         QTimer.singleShot(2000, toast.close)
     
     def open_settings(self):
-        dig = SettingsWindow(self.db)
-        dig.category_deleted.connect(self.load_entries)
-        dig.backup_restored.connect(self.load_entries)
-        dig.category_updated.connect(self.load_entries)
-        dig.import_successfully.connect(self.load_entries)
-        dig.exec()
+        self.settings_window = SettingsWindow(self.db)
+        self.settings_window.category_deleted.connect(self.load_entries)
+        self.settings_window.backup_restored.connect(self.load_entries)
+        self.settings_window.category_updated.connect(self.load_entries)
+        self.settings_window.import_successfully.connect(self.load_entries)
+        self.settings_window.autologout_activated.connect(self.start_autologout)
+        self.settings_window.autologout_deactivated.connect(self.stop_autologout)
+        self.settings_window.finished.connect(self.reset_settingswindow)
+        self.settings_window.exec()
+
+    def reset_settingswindow(self):
+        self.settings_window = None
 
     def check_auto_backup(self):
         settings = load_settings()
