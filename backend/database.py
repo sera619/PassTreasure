@@ -29,7 +29,7 @@ class PasswordDatabase:
         self._init_data()
         self._init_backup()
         
-    # Backup
+
     def _init_backup(self):
         if not os.path.exists(BACKUP_PATH):
             os.makedirs(BACKUP_PATH)
@@ -69,7 +69,16 @@ class PasswordDatabase:
         self.conn = sqlite3.connect(self.path)
         self.cursor = self.conn.cursor()
         return True
-          
+    
+    def disconnect(self) -> bool:
+        if not self.conn:
+            return False
+        self.conn.close()
+        self.conn = None
+        self.cursor = None
+        return True
+    
+    # Backup
     def create_backup(self):
         if not VAULT_PATH.exists():
             raise FileNotFoundError("vault.db does not exist – nothing to backup!")
