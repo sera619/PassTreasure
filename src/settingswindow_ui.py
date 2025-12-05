@@ -129,6 +129,9 @@ class Ui_SettingsWindow(object):
         self.horizontalLayout_10.setObjectName(u"horizontalLayout_10")
         self.label_11 = QLabel(self.frame_9)
         self.label_11.setObjectName(u"label_11")
+        font2 = QFont()
+        font2.setBold(True)
+        self.label_11.setFont(font2)
 
         self.horizontalLayout_10.addWidget(self.label_11)
 
@@ -136,7 +139,7 @@ class Ui_SettingsWindow(object):
         self.autoLogoutTimeEdit.setObjectName(u"autoLogoutTimeEdit")
         self.autoLogoutTimeEdit.setWrapping(False)
         self.autoLogoutTimeEdit.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.autoLogoutTimeEdit.setCurrentSection(QDateTimeEdit.Section.SecondSection)
+        self.autoLogoutTimeEdit.setCurrentSection(QDateTimeEdit.Section.MinuteSection)
 
         self.horizontalLayout_10.addWidget(self.autoLogoutTimeEdit)
 
@@ -199,10 +202,10 @@ class Ui_SettingsWindow(object):
         self.horizontalLayout_2.setContentsMargins(4, 4, 4, 4)
         self.label_4 = QLabel(self.autoBackupFrame)
         self.label_4.setObjectName(u"label_4")
-        font2 = QFont()
-        font2.setBold(True)
-        font2.setItalic(False)
-        self.label_4.setFont(font2)
+        font3 = QFont()
+        font3.setBold(True)
+        font3.setItalic(False)
+        self.label_4.setFont(font3)
         self.label_4.setStyleSheet(u"")
 
         self.horizontalLayout_2.addWidget(self.label_4)
@@ -225,11 +228,11 @@ class Ui_SettingsWindow(object):
         self.horizontalLayout_3.setContentsMargins(4, 4, 4, 4)
         self.label_3 = QLabel(self.lastBackupFrame)
         self.label_3.setObjectName(u"label_3")
-        font3 = QFont()
-        font3.setPointSize(9)
-        font3.setBold(True)
-        font3.setItalic(False)
-        self.label_3.setFont(font3)
+        font4 = QFont()
+        font4.setPointSize(9)
+        font4.setBold(True)
+        font4.setItalic(False)
+        self.label_3.setFont(font4)
         self.label_3.setStyleSheet(u"")
 
         self.horizontalLayout_3.addWidget(self.label_3)
@@ -322,9 +325,7 @@ class Ui_SettingsWindow(object):
         self.verticalLayout_8.setContentsMargins(9, 9, 9, 9)
         self.label_5 = QLabel(self.createCategoryFrame)
         self.label_5.setObjectName(u"label_5")
-        font4 = QFont()
-        font4.setBold(True)
-        self.label_5.setFont(font4)
+        self.label_5.setFont(font2)
 
         self.verticalLayout_8.addWidget(self.label_5)
 
@@ -396,7 +397,7 @@ class Ui_SettingsWindow(object):
 
         self.label_6 = QLabel(self.categoryFrame)
         self.label_6.setObjectName(u"label_6")
-        self.label_6.setFont(font4)
+        self.label_6.setFont(font2)
 
         self.verticalLayout_4.addWidget(self.label_6)
 
@@ -568,7 +569,7 @@ class Ui_SettingsWindow(object):
         self.verticalLayout_12.setObjectName(u"verticalLayout_12")
         self.label_8 = QLabel(self.importFrame)
         self.label_8.setObjectName(u"label_8")
-        self.label_8.setFont(font4)
+        self.label_8.setFont(font2)
 
         self.verticalLayout_12.addWidget(self.label_8)
 
@@ -686,7 +687,7 @@ class Ui_SettingsWindow(object):
         self.scrollArea.setWidgetResizable(True)
         self.scrollAreaWidgetContents = QWidget()
         self.scrollAreaWidgetContents.setObjectName(u"scrollAreaWidgetContents")
-        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 481, 338))
+        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 96, 26))
         self.verticalLayout = QVBoxLayout(self.scrollAreaWidgetContents)
         self.verticalLayout.setSpacing(0)
         self.verticalLayout.setObjectName(u"verticalLayout")

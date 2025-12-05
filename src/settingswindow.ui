@@ -193,6 +193,11 @@
                 <layout class="QHBoxLayout" name="horizontalLayout_10">
                  <item>
                   <widget class="QLabel" name="label_11">
+                   <property name="font">
+                    <font>
+                     <bold>true</bold>
+                    </font>
+                   </property>
                    <property name="text">
                     <string>Logout Time (mm:ss):</string>
                    </property>
@@ -207,7 +212,7 @@
                     <set>Qt::AlignmentFlag::AlignCenter</set>
                    </property>
                    <property name="currentSection">
-                    <enum>QDateTimeEdit::Section::SecondSection</enum>
+                    <enum>QDateTimeEdit::Section::MinuteSection</enum>
                    </property>
                    <property name="displayFormat">
                     <string>mm:ss</string>
@@ -1195,8 +1200,8 @@ padding:  5px 0px 5px 0px;</string>
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>481</width>
-            <height>338</height>
+            <width>96</width>
+            <height>26</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout">
