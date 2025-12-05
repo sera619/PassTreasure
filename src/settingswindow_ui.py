@@ -687,7 +687,7 @@ class Ui_SettingsWindow(object):
         self.scrollArea.setWidgetResizable(True)
         self.scrollAreaWidgetContents = QWidget()
         self.scrollAreaWidgetContents.setObjectName(u"scrollAreaWidgetContents")
-        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 96, 26))
+        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 481, 338))
         self.verticalLayout = QVBoxLayout(self.scrollAreaWidgetContents)
         self.verticalLayout.setSpacing(0)
         self.verticalLayout.setObjectName(u"verticalLayout")
@@ -699,6 +699,7 @@ class Ui_SettingsWindow(object):
         sizePolicy4.setVerticalStretch(0)
         sizePolicy4.setHeightForWidth(self.aboutLabel.sizePolicy().hasHeightForWidth())
         self.aboutLabel.setSizePolicy(sizePolicy4)
+        self.aboutLabel.setTextFormat(Qt.TextFormat.RichText)
         self.aboutLabel.setAlignment(Qt.AlignmentFlag.AlignLeading|Qt.AlignmentFlag.AlignLeft|Qt.AlignmentFlag.AlignTop)
         self.aboutLabel.setWordWrap(True)
 

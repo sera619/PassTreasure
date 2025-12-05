@@ -23,7 +23,7 @@ class Ui_LoginWindowUI(object):
     def setupUi(self, LoginWindowUI):
         if not LoginWindowUI.objectName():
             LoginWindowUI.setObjectName(u"LoginWindowUI")
-        LoginWindowUI.resize(400, 251)
+        LoginWindowUI.resize(400, 272)
         self.verticalLayout = QVBoxLayout(LoginWindowUI)
         self.verticalLayout.setSpacing(4)
         self.verticalLayout.setObjectName(u"verticalLayout")
@@ -50,6 +50,16 @@ class Ui_LoginWindowUI(object):
 
         self.verticalLayout.addWidget(self.headerFrame)
 
+        self.label = QLabel(LoginWindowUI)
+        self.label.setObjectName(u"label")
+        font = QFont()
+        font.setPointSize(12)
+        font.setBold(True)
+        self.label.setFont(font)
+        self.label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        self.verticalLayout.addWidget(self.label)
+
         self.label_title = QLabel(LoginWindowUI)
         self.label_title.setObjectName(u"label_title")
         self.label_title.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -71,14 +81,21 @@ class Ui_LoginWindowUI(object):
 
         self.btn_toggle_pw = QPushButton(self.frame)
         self.btn_toggle_pw.setObjectName(u"btn_toggle_pw")
-        font = QFont()
-        font.setPointSize(9)
-        self.btn_toggle_pw.setFont(font)
+        font1 = QFont()
+        font1.setPointSize(9)
+        self.btn_toggle_pw.setFont(font1)
 
         self.horizontalLayout.addWidget(self.btn_toggle_pw, 0, Qt.AlignmentFlag.AlignHCenter)
 
 
         self.verticalLayout.addWidget(self.frame)
+
+        self.indicatorHolder = QVBoxLayout()
+        self.indicatorHolder.setSpacing(0)
+        self.indicatorHolder.setObjectName(u"indicatorHolder")
+        self.indicatorHolder.setContentsMargins(9, 0, 9, 0)
+
+        self.verticalLayout.addLayout(self.indicatorHolder)
 
         self.pw2Frame = QFrame(LoginWindowUI)
         self.pw2Frame.setObjectName(u"pw2Frame")
@@ -148,6 +165,7 @@ class Ui_LoginWindowUI(object):
         LoginWindowUI.setWindowTitle(QCoreApplication.translate("LoginWindowUI", u"PassTreasure - Login", None))
         self.label_icon.setText(QCoreApplication.translate("LoginWindowUI", u"TextLabel", None))
         self.label_header.setText(QCoreApplication.translate("LoginWindowUI", u"PassTreasure", None))
+        self.label.setText(QCoreApplication.translate("LoginWindowUI", u"Welcome!", None))
         self.label_title.setText(QCoreApplication.translate("LoginWindowUI", u"Enter Master Password:", None))
         self.input_password.setPlaceholderText(QCoreApplication.translate("LoginWindowUI", u"Enter password...", None))
         self.btn_toggle_pw.setText(QCoreApplication.translate("LoginWindowUI", u"Show", None))

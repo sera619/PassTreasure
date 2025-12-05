@@ -37,7 +37,6 @@ class SettingsWindow(QDialog):
         self.strength_indicator = PasswordStrengthIndicator(self)
         self.ui.indicatorHolder.addWidget(self.strength_indicator)        
         
-        
         self.setup_edit_category()
         self.set_autologout_time()
         
@@ -464,7 +463,6 @@ class SettingsWindow(QDialog):
     def on_import_finished(self):
         self.ui.progressBar.setValue(100)
         self.ui.progressLabel.setText("Import finished!")
-        # self.ui.progressBar.hide()
         self.qthread.quit()
         self.qthread.wait()
         QMessageBox.information(self, "Import", "Import finished!")
