@@ -4,6 +4,8 @@ import sys
 from pathlib import Path
 from datetime import datetime
 
+IS_DEBUGGING = False
+
 def resource_path(relative: str) -> Path:
     """
     Get absolute path to resource, works in dev and PyInstaller exe.
@@ -19,7 +21,6 @@ def resource_path(relative: str) -> Path:
             base_path = Path(__file__).parent       # dev mode
     return base_path / relative
 
-IS_DEBUGGING = False
 BASE_DIR = resource_path(".")
 DATA_PATH = resource_path("data")
 VAULT_PATH = resource_path('data/vault.db')
@@ -27,6 +28,8 @@ SETTINGS_PATH = resource_path("data/user_settings.json")
 DEFAULT_SETTINGS = {
     "auto_backup": "daily",
     "last_backup": None,
+    "auto_logout": True,
+    "auto_logouttime": 180000, # 3 min
     "entry_categories": ["General", "Arbeit", "Privat", "Finanzen", "Sonstiges", "Social Media"],
     "category_colors": {
         "General": "rgba(211, 211, 211, 140)",    # LightGray
