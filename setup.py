@@ -118,6 +118,7 @@ build_exe_options = {
     
     "include_files": include_files,
     "include_msvcr": False,
+    "silent_level": 1,
     "optimize": 2,
     "zip_exclude_packages": ["PySide6"],
     "zip_include_packages": ["*"],

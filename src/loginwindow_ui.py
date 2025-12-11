@@ -23,7 +23,7 @@ class Ui_LoginWindowUI(object):
     def setupUi(self, LoginWindowUI):
         if not LoginWindowUI.objectName():
             LoginWindowUI.setObjectName(u"LoginWindowUI")
-        LoginWindowUI.resize(400, 274)
+        LoginWindowUI.resize(400, 278)
         self.verticalLayout = QVBoxLayout(LoginWindowUI)
         self.verticalLayout.setSpacing(4)
         self.verticalLayout.setObjectName(u"verticalLayout")
@@ -177,9 +177,9 @@ class Ui_LoginWindowUI(object):
         self.label_header.setText(QCoreApplication.translate("LoginWindowUI", u"PassTreasure", None))
         self.label.setText(QCoreApplication.translate("LoginWindowUI", u"Welcome!", None))
         self.label_title.setText(QCoreApplication.translate("LoginWindowUI", u"Enter Master Password:", None))
-        self.input_password.setPlaceholderText(QCoreApplication.translate("LoginWindowUI", u"Enter password...", None))
+        self.input_password.setPlaceholderText(QCoreApplication.translate("LoginWindowUI", u"Enter master password...", None))
         self.btn_toggle_pw.setText(QCoreApplication.translate("LoginWindowUI", u"Show", None))
-        self.input_password2.setPlaceholderText(QCoreApplication.translate("LoginWindowUI", u"Repeat password...", None))
+        self.input_password2.setPlaceholderText(QCoreApplication.translate("LoginWindowUI", u"Repeat master password...", None))
         self.btn_toggle_pw2.setText(QCoreApplication.translate("LoginWindowUI", u"Show", None))
         self.label_error.setText("")
         self.btn_restore_backup.setText(QCoreApplication.translate("LoginWindowUI", u"Restore Backup", None))

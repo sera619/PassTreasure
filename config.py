@@ -13,7 +13,7 @@ class PopupType(Enum):
     ERROR = 4
     
 
-IS_DEBUGGING = False
+IS_DEBUGGING = True
 BASE_DIR = resource_path(".")
 DATA_PATH = resource_path("data")
 VAULT_PATH = resource_path('data/vault.db')

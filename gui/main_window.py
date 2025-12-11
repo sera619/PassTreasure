@@ -1,9 +1,9 @@
 from PySide6.QtWidgets import (
     QApplication,QWidget, QVBoxLayout, QHBoxLayout, QLabel, QListWidget,
-    QPushButton, QLineEdit, QInputDialog, QMessageBox, QTextEdit,QListWidgetItem, QToolTip
+    QPushButton, QLineEdit, QInputDialog, QMessageBox, QTextEdit,QListWidgetItem, QToolTip, QFrame
 )
 from PySide6.QtGui import QPixmap
-from PySide6.QtCore import Qt, QTimer, Signal
+from PySide6.QtCore import Qt, QTimer, Signal, QPropertyAnimation, QEasingCurve
 from src.mainwindow_ui import Ui_MainWindow
 from gui.change_password_popup import ChangePasswordPopup
 from gui.settings_window import SettingsWindow
@@ -33,11 +33,11 @@ class MainWindow(QWidget):
         self.db = db  # unlocked PasswordDatabase instance
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
+        self.setWindowTitle("PassTreasure - Vault")
         self.entry_cache = []
         self.watcher = None
         self.autolock = None
         self.settings_window = None
-        self.setWindowTitle("PassTreasure - Vault")
         self.apply_dark_theme()
         self.build_ui()  
         self.apply_styles()
@@ -49,6 +49,12 @@ class MainWindow(QWidget):
             if len(loaded_entries) == 0:
                 self.db.add_test_entries()
 
+        self.details_open = False
+        self.details_max_width = 377
+        self.ui.detailFrame.setMaximumWidth(0)
+        self.ui.detailFrame.hide()
+        self.ui.btnDelete.hide()
+        
         self._block_click = False
         self.load_entries()
         self.check_auto_backup()
@@ -163,11 +169,13 @@ class MainWindow(QWidget):
         self.ui.detailFrame.show()
         self.ui.btnDelete.show()
         self.ui.detailLabel.hide()
+        if not self.details_open:
+            self.toggle_details()
         
     def hide_details(self):
-        self.ui.detailFrame.hide()
+        if self.details_open:
+            self.toggle_details()
         self.ui.btnDelete.hide()
-        self.ui.detailLabel.show()
         selected = self.ui.listWidget.currentItem()
         if selected:
             self.ui.listWidget.setCurrentRow(-1)
@@ -252,8 +260,8 @@ class MainWindow(QWidget):
     # Update detail view
     # -------------------------
     def close_details(self):
-        self.ui.listWidget.setCurrentItem(None)
         self.hide_details()
+        self.ui.listWidget.setCurrentItem(None)
       
     def update_details(self, current: QListWidgetItem, previous=None):
         if not current:
@@ -635,3 +643,25 @@ class MainWindow(QWidget):
                 item.setSizeHint(widget.sizeHint())
                 self.ui.listWidget.addItem(item)
                 self.ui.listWidget.setItemWidget(item, widget)
+    
+    def hide_details_after_anim(self):
+        self.ui.detailFrame.hide()
+        self.ui.detailLabel.show()
+        self.ui.btnDelete.hide()
+        
+    def toggle_details(self):
+        frame = self.ui.detailFrame
+
+        start = frame.width()
+        end = self.details_max_width if not self.details_open else 0
+
+        self.anim = QPropertyAnimation(frame, b"maximumWidth")
+        self.anim.setDuration(350)
+        self.anim.setStartValue(start)
+        self.anim.setEndValue(end)
+        self.anim.setEasingCurve(QEasingCurve.Type.OutCubic)  
+
+        self.anim.start()
+        if self.details_open:
+            self.anim.finished.connect(self.hide_details_after_anim)
+        self.details_open = not self.details_open

@@ -1,6 +1,6 @@
 from PySide6.QtWidgets import QDialog, QDialogButtonBox
 from PySide6.QtGui import QIcon, QPixmap, QColor
-from PySide6.QtCore import QSize
+from PySide6.QtCore import QSize, Qt
 from src.dialog_popup_ui import Ui_DialogPopup
 import resources_rc
 from config import PopupType
@@ -17,7 +17,7 @@ class DialogPopup(QDialog):
         super().__init__(parent)
         self.ui = Ui_DialogPopup()
         self.ui.setupUi(self)
-        self.setWindowIcon(QIcon(":/assets/icon.png"))        
+        self.setWindowIcon(QIcon(":/assets/icon.png"))
         self.title = title
         self.text = text
         self.mode: PopupType = mode
