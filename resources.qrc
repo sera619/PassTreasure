@@ -19,5 +19,9 @@
     <file>assets/settings.png</file>
     <file>assets/export.png</file>
     <file>assets/import.png</file>
+    <file>assets/info.png</file>
+    <file>assets/warn.png</file>
+    <file>assets/error.png</file>
+    <file>assets/check_circle.png</file>
   </qresource>
 </RCC>
