@@ -1,8 +1,3 @@
-import os
-import json
-import sys
-from pathlib import Path
-from datetime import datetime
 from utils import resource_path
 from enum import Enum
 
@@ -13,7 +8,7 @@ class PopupType(Enum):
     ERROR = 4
     
 
-IS_DEBUGGING = True
+IS_DEBUGGING = False
 BASE_DIR = resource_path(".")
 DATA_PATH = resource_path("data")
 VAULT_PATH = resource_path('data/vault.db')

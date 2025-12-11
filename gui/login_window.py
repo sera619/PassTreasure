@@ -8,8 +8,9 @@ import os
 from backend.database import PasswordDatabase
 from src.loginwindow_ui import Ui_LoginWindowUI
 from gui.password_strength_indicator import PasswordStrengthIndicator
+from gui.dialog_popup import DialogPopup
 from backend.password_strength_logic import evaluate_password_strength
-from config import Styles, resource_path, VERSION_NUM, IS_DEBUGGING
+from config import Styles, resource_path, VERSION_NUM, IS_DEBUGGING, PopupType
 import utils
 
 class LoginWindow(QWidget):
@@ -67,7 +68,6 @@ class LoginWindow(QWidget):
             self.input_pw.setText("kekskeks")
             self.ui.input_password2.setText("kekskeks")
 
-    
     def apply_styles(self):
         self.ui.btn_login.setStyleSheet(Styles.green_button_outlined)
         self.ui.btn_delete_vault.setStyleSheet(Styles.red_button_outlined)
@@ -117,10 +117,11 @@ class LoginWindow(QWidget):
             self.db.apply_backup(self.db.get_latest_backup())
             self.is_first_run = not os.path.exists(self.VAULT_PATH)
             self.configure_mode()
-            QMessageBox.information(self, "Success", f"Vault backup restored successfully!")
+
+            DialogPopup("Backup Success", f"Backup restored successfully!", PopupType.SUCCESS, self).exec()        
         except Exception as e:
-            QMessageBox.critical(self, "Error", f"Failure restore backup:\n{e}")
-            
+            DialogPopup("Backup Error", f"Failure restoring backup:\n{e}", PopupType.ERROR, self).exec()        
+  
 
     def handle_delete_vault(self):
         confirm = QMessageBox.question(self, "Confirm Delete", "Are you sure you want to delete this vault?")
@@ -130,9 +131,9 @@ class LoginWindow(QWidget):
             self.db.delete_vault()
             self.is_first_run = not os.path.exists(self.VAULT_PATH)
             self.configure_mode()
-            QMessageBox.information(self, "Success", f"Vault deleted successfully!")
+            DialogPopup("Vault Success", f"Vault deleted successfully!", PopupType.SUCCESS, self).exec()        
         except Exception as e:
-            QMessageBox.critical(self, "Error", f"Failure delete vault:\n{e}")
+            DialogPopup("Vault Error", f"Failure deleting vault:\n{e}", PopupType.ERROR, self).exec()        
 
     def handle_create(self):
         pw = self.input_pw.text().strip()
@@ -148,12 +149,12 @@ class LoginWindow(QWidget):
         try:
             self.db.create_new_vault(pw)
         except Exception as e:
-            QMessageBox.critical(self, "Error", str(e))
+            DialogPopup("Vault Error", f"Failure creating vault:\n{e}", PopupType.ERROR, self).exec()        
             return
 
         self.is_first_run = not os.path.exists(self.VAULT_PATH)
         self.configure_mode()
-        QMessageBox.information(self, "Success", "Vault created successfully!")
+        DialogPopup("Vault Success", "Vault created successfully!", PopupType.SUCCESS, self).exec()        
         self.login_success.emit(self.db)
         self.close()
 
