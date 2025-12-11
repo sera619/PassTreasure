@@ -1,3 +1,5 @@
+annotated-doc==0.0.4
+annotated-types==0.7.0
 cabarchive==0.2.4
 cffi==2.0.0
 click==8.3.1
@@ -15,3 +17,5 @@ PySide6_Addons==6.10.1
 PySide6_Essentials==6.10.1
 shiboken6==6.10.1
 striprtf==0.0.29
+typing-inspection==0.4.2
+typing_extensions==4.15.0
