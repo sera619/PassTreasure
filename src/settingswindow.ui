@@ -1289,7 +1289,7 @@ padding:  5px 0px 5px 0px;</string>
              <string notr="true">font: bold 10pt &quot;Segoe UI&quot;;</string>
             </property>
             <property name="text">
-             <string>Browser Imports</string>
+             <string>Import from File</string>
             </property>
            </widget>
           </item>
@@ -1335,17 +1335,17 @@ padding:  5px 0px 5px 0px;</string>
             <item>
              <widget class="QLabel" name="label_7">
               <property name="text">
-               <string>Browser:</string>
+               <string>Import Mode</string>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QComboBox" name="browserBox">
+             <widget class="QComboBox" name="importModeBox">
               <property name="styleSheet">
                <string notr="true">font: 10pt &quot;Segoe UI&quot;;</string>
               </property>
               <property name="placeholderText">
-               <string>Select a Browser...</string>
+               <string>Select a mode...</string>
               </property>
              </widget>
             </item>

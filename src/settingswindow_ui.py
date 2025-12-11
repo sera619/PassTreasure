@@ -704,11 +704,11 @@ class Ui_SettingsWindow(object):
 
         self.horizontalLayout_7.addWidget(self.label_7)
 
-        self.browserBox = QComboBox(self.importFrame)
-        self.browserBox.setObjectName(u"browserBox")
-        self.browserBox.setStyleSheet(u"font: 10pt \"Segoe UI\";")
+        self.importModeBox = QComboBox(self.importFrame)
+        self.importModeBox.setObjectName(u"importModeBox")
+        self.importModeBox.setStyleSheet(u"font: 10pt \"Segoe UI\";")
 
-        self.horizontalLayout_7.addWidget(self.browserBox)
+        self.horizontalLayout_7.addWidget(self.importModeBox)
 
 
         self.verticalLayout_12.addLayout(self.horizontalLayout_7)
@@ -959,9 +959,9 @@ class Ui_SettingsWindow(object):
         self.showPwCheckbox.setText(QCoreApplication.translate("SettingsWindow", u"Show", None))
         self.btn_apply_pw.setText(QCoreApplication.translate("SettingsWindow", u"Change Masterkey", None))
         self.importTitle.setText(QCoreApplication.translate("SettingsWindow", u"Import", None))
-        self.label_8.setText(QCoreApplication.translate("SettingsWindow", u"Browser Imports", None))
-        self.label_7.setText(QCoreApplication.translate("SettingsWindow", u"Browser:", None))
-        self.browserBox.setPlaceholderText(QCoreApplication.translate("SettingsWindow", u"Select a Browser...", None))
+        self.label_8.setText(QCoreApplication.translate("SettingsWindow", u"Import from File", None))
+        self.label_7.setText(QCoreApplication.translate("SettingsWindow", u"Import Mode", None))
+        self.importModeBox.setPlaceholderText(QCoreApplication.translate("SettingsWindow", u"Select a mode...", None))
         self.label_9.setText(QCoreApplication.translate("SettingsWindow", u"Importfile", None))
         self.importFilePathLineEdit.setPlaceholderText(QCoreApplication.translate("SettingsWindow", u"Enter path to importfile...", None))
         self.btnSelectPath.setText(QCoreApplication.translate("SettingsWindow", u"Select File", None))
