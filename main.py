@@ -17,7 +17,13 @@ login = None
 def autologout_restart():
     global login
     login.show()
-    QMessageBox.information(login, "Autologout", "You was a long time inactive.\nYou got logged out!")
+    login.close()
+    login = None
+    login = LoginWindow()
+    login.setWindowIcon(QIcon(":/assets/icon.png"))
+    login.login_success.connect(open_main)
+    login.show()
+    QMessageBox.information(login, "PassTreasure - Autologout", "You was a long time inactive.\nFor security reasons, you got logged out!\nBye!")
     
 def open_main(db_instance):
     global main_window
@@ -48,6 +54,7 @@ def start_login(splash):
 
 def main():
     app.setStyleSheet(Styles.dark_style)
+    app.setApplicationVersion(f"v{config.VERSION_NUM}")
     global splash
     splash = IntroSplash()
     speed_up = config.IS_DEBUGGING
