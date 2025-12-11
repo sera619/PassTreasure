@@ -4,3 +4,6 @@ build
 data
 backup
 CodelineCounter.py
+passtreasure-addon
+ImageConverter.py
+server_runner.py
