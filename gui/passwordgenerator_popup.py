@@ -38,11 +38,13 @@ class PasswordGeneratorPopup(QDialog):
         use_upper = self.ui.checkUpper.isChecked()
         use_numbers = self.ui.checkNumbers.isChecked()
         use_specials = self.ui.checkSpecial.isChecked()
+        excluded_chars = self.ui.excludeCharsLineEdit.text().split(" ")
         generator = PasswordGenerator(
             length=length,
             use_upper=use_upper,
             use_numbers=use_numbers,
-            use_special=use_specials
+            use_special=use_specials,
+            excluded_chars=excluded_chars
         )
         self._password = generator.generate()
         self.ui.lineGenerated.setText(self._password)

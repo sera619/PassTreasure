@@ -6,6 +6,8 @@ from PySide6.QtCore import (
 from src.splash_window_ui import Ui_SplashWindow
 import resources_rc
 
+
+
 class IntroSplash(QWidget):
     intro_finished = Signal()
 
@@ -44,10 +46,12 @@ class IntroSplash(QWidget):
         self.fade_anim.setEndValue(1.0)
         self.fade_anim.setEasingCurve(QEasingCurve.Type.OutCubic)
         self.fade_anim.finished.connect(self._on_fade_finished)
+        self.server_process = None
+
 
     def _on_fade_finished(self):
         QTimer.singleShot(self.delay_duration, self.intro_finished.emit)
-
+        
     def start(self):
         self.loader_timer.start()
         QTimer.singleShot(10, self.fade_anim.start)

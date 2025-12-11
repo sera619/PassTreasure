@@ -1,4 +1,3 @@
-from PySide6.QtCore import Qt
 from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import QDialog, QLineEdit, QVBoxLayout, QDialogButtonBox
 from src.change_password_dialog_ui import Ui_ChangePasswordDialog
@@ -7,6 +6,7 @@ from gui.password_strength_indicator import PasswordStrengthIndicator
 from backend.password_strength_logic import evaluate_password_strength
 from config import Styles
 import resources_rc
+import utils
 
 class ChangePasswordPopup(QDialog):
     def __init__(self, parent = None):
@@ -48,12 +48,16 @@ class ChangePasswordPopup(QDialog):
         self.ui.btnGeneratePw.setStyleSheet(Styles.yellow_button_outlined)
         ok_button = self.ui.buttonBox.button(QDialogButtonBox.StandardButton.Ok)
         cancel_button = self.ui.buttonBox.button(QDialogButtonBox.StandardButton.Cancel)
-            
+        utils.colorize_icon(self.ui.btnGeneratePw, "magic", "yellow")
+        
         if ok_button:
             ok_button.setStyleSheet(Styles.green_button_outlined)
+            utils.colorize_icon(ok_button, "check", "green")
+        
         if cancel_button:
             cancel_button.setStyleSheet(Styles.red_button_outlined)
-            
+            utils.colorize_icon(cancel_button, "close", "red")
+        
     def _update_strength(self):
         pw = self.ui.lineEditPassword1.text()
         level = evaluate_password_strength(pw)

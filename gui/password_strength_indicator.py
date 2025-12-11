@@ -1,5 +1,5 @@
-from PySide6.QtCore import Qt, QPropertyAnimation, QRect, QEasingCurve, Property
-from PySide6.QtWidgets import QWidget, QLabel, QHBoxLayout, QGraphicsOpacityEffect, QGraphicsColorizeEffect, QGraphicsDropShadowEffect, QSpacerItem, QSizePolicy
+from PySide6.QtCore import Qt, QPropertyAnimation, QEasingCurve, Property
+from PySide6.QtWidgets import QWidget, QLabel, QHBoxLayout
 from PySide6.QtGui import QColor, QPainter
 import config
 

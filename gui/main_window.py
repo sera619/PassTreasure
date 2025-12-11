@@ -9,11 +9,16 @@ from gui.change_password_popup import ChangePasswordPopup
 from gui.settings_window import SettingsWindow
 from gui.category_popup import CategoryPopup
 from gui.vault_listiem import VaultListItemWidget
+from gui.new_entry_dialog import NewEntryDialog
+from gui.edit_url_dialog import EditURLDialog
+from gui.edit_note_dialog import EditNoteDialog
 from backend.database import PasswordDatabase
 from backend.inactivity_watcher import AutoLocker, InactivityWatcher
 
 from config import VERSION_NUM, load_settings, save_settings, Styles, IS_DEBUGGING
 from datetime import datetime
+import utils
+
 
 class MainWindow(QWidget):
     logout_success = Signal()
@@ -65,31 +70,46 @@ class MainWindow(QWidget):
         settings = load_settings()
         if not settings.get("auto_logout"):
             return
-        timeout_ms = settings.get("auto_logouttime")
-        self.start_autologout()
+        # timeout_ms = settings.get("auto_logouttime")
         # print(f"Start: Autologout started with {timeout_ms} ms!")
-
-    
+        self.start_autologout()
+ 
     # Dark Theme
     def apply_dark_theme(self):
         self.setStyleSheet(Styles.dark_style)
 
     def apply_styles(self):
-        self.ui.btnSettings.setStyleSheet(Styles.blue_button_outlined)
+        self.ui.btnSettings.setStyleSheet(Styles.yellow_button_outlined)
         self.ui.btnLogout.setStyleSheet(Styles.red_button_outlined)
         self.ui.btnAdd.setStyleSheet(Styles.green_button_outlined)
         self.ui.btnDelete.setStyleSheet(Styles.red_button_outlined)
+        utils.colorize_icon(self.ui.btnSettings, "settings", "yellow")
+        utils.colorize_icon(self.ui.btnLogout, "exit", "red")
+        utils.colorize_icon(self.ui.btnAdd, "add", "green")
+        utils.colorize_icon(self.ui.btnDelete, "trash", "red")
 
         self.ui.btnEditCategory.setStyleSheet(Styles.yellow_button_outlined_low)
         self.ui.btnEditPass.setStyleSheet(Styles.yellow_button_outlined_low)
         self.ui.btnEditService.setStyleSheet(Styles.yellow_button_outlined_low)
         self.ui.btnEditUsername.setStyleSheet(Styles.yellow_button_outlined_low)
         self.ui.btnEditUrl.setStyleSheet(Styles.yellow_button_outlined_low)
+        self.ui.btnEditNote.setStyleSheet(Styles.yellow_button_outlined_low)
+        utils.colorize_icon(self.ui.btnEditCategory, "pencil", "yellow")
+        utils.colorize_icon(self.ui.btnEditPass, "pencil", "yellow")
+        utils.colorize_icon(self.ui.btnEditService, "pencil", "yellow")
+        utils.colorize_icon(self.ui.btnEditUsername, "pencil", "yellow")
+        utils.colorize_icon(self.ui.btnEditUrl, "pencil", "yellow")
+        utils.colorize_icon(self.ui.btnEditNote, "pencil", "yellow")
+        
         self.ui.btnClearEntries.setStyleSheet(Styles.red_button)
-        self.ui.btnCopyPass.setStyleSheet(Styles.dark_button)
-        self.ui.btnShowPass.setStyleSheet(Styles.dark_button)
-        self.ui.listWidget.setStyleSheet(Styles.list_widget_style)
+        self.ui.btnCopyPass.setStyleSheet(Styles.dark_button_outlined)
+        self.ui.btnShowPass.setStyleSheet(Styles.dark_button_outlined)
         self.ui.btnCloseDetails.setStyleSheet(Styles.red_button_outlined)
+        utils.colorize_icon(self.ui.btnClearEntries, "trash", "dark")
+        utils.colorize_icon(self.ui.btnCopyPass, "copy", "dark")
+        utils.colorize_icon(self.ui.btnShowPass, "show", "dark")
+        utils.colorize_icon(self.ui.btnCloseDetails, "exit", "red")
+        self.ui.listWidget.setStyleSheet(Styles.list_widget_style)
     
     def build_ui(self):
         pixmap = QPixmap(":/assets/icon.png")
@@ -104,6 +124,7 @@ class MainWindow(QWidget):
         self.ui.btnEditService.clicked.connect(self.edit_entry_service)
         self.ui.btnEditPass.clicked.connect(self.edit_entry_password)
         self.ui.btnEditUrl.clicked.connect(self.edit_entry_url)
+        self.ui.btnEditNote.clicked.connect(self.edit_entry_note)
         
         self.ui.btnShowPass.clicked.connect(self.toggle_password_visibility)
         self.ui.btnCopyPass.clicked.connect(self.copy_password_to_clipboard)
@@ -118,7 +139,7 @@ class MainWindow(QWidget):
             "ID",
             "Service",
             "Username",
-            "Kategorie"
+            "Category"
         ])        
         self.ui.sortBox.currentIndexChanged.connect(self.sort_by_selection)
         self.ui.mainLayout.setStretch(4, 3)
@@ -134,10 +155,15 @@ class MainWindow(QWidget):
     def show_details(self):
         self.ui.detailFrame.show()
         self.ui.btnDelete.show()
+        self.ui.detailLabel.hide()
         
     def hide_details(self):
         self.ui.detailFrame.hide()
         self.ui.btnDelete.hide()
+        self.ui.detailLabel.show()
+        selected = self.ui.listWidget.currentItem()
+        if selected:
+            self.ui.listWidget.setCurrentRow(-1)
 
     def sort_list(self, role_key):
         self.entry_cache.sort(key= lambda e: e[role_key])
@@ -145,14 +171,7 @@ class MainWindow(QWidget):
         
     def sort_by_selection(self):
         text = self.ui.sortBox.currentText()
-        if text == "Kategorie":
-            self.sort_list("category")
-        elif text == "Service":
-            self.sort_list("service")
-        elif text == "Username":
-            self.sort_list("username")
-        elif text == "ID":
-            self.sort_list("id")          
+        self.sort_list(text.lower())
     
     def auto_logout(self):
         if self.db.disconnect():
@@ -250,8 +269,17 @@ class MainWindow(QWidget):
             self.ui.serviceLabel.setText(service)
             self.ui.usernameLabel.setText(username)
             self.ui.passLabel.setText("•" * len(pw))
+            
+            settings = load_settings()
+            colors = settings.get("category_colors")            
+            self.ui.categoryLabel.setStyleSheet(f"""
+                                           font: 700 8pt "Segoe UI"; 
+                                           border-radius: 5px; 
+                                           background: {colors[category]};
+                                           """)
             self.ui.categoryLabel.setText(category)
             self.ui.urlLabel.setText(details.get("url"))
+            self.ui.noteLabel.setText(details.get("note"))
             
             def format_datetime(dt_str):
                 try:
@@ -267,6 +295,11 @@ class MainWindow(QWidget):
             self.ui.updatedLabel.setText(f"{updated}")
             
             self.ui.detailStatus.setText("")
+            
+            auto_hide_details: bool = settings.get("auto_hide_details")
+            auto_hide_time: int = settings.get("auto_hide_details_time")
+            if auto_hide_details:
+                QTimer.singleShot(auto_hide_time, self.hide_details)
             
         except Exception as e:
             self.ui.detailStatus.setText(f"Error loading password:\n{e}")
@@ -286,30 +319,27 @@ class MainWindow(QWidget):
     # -------------------------
     # Actions
     # -------------------------
-    def add_entry(self):
-        service, ok1 = QInputDialog.getText(self, "Service", "Enter service name:")
-        if not ok1 or not service.strip():
+    def add_entry(self):        
+        enty_dialog = NewEntryDialog(self)
+        enty_dialog.exec()
+        data = enty_dialog.get_entry_data()
+        if not data:
             return
-        username, ok2 = QInputDialog.getText(self, "Username", "Enter username:")
-        if not ok2 or not username.strip():
-            return
-        pass_dialog = ChangePasswordPopup(parent=self)
-        if pass_dialog.exec():
-            password = pass_dialog.get_password()
-        
-        settings = load_settings()
-        entry_categories = settings.get("entry_categories")
-        category_dialog = CategoryPopup(service_name=service.strip(), categories=entry_categories, parent=self)
-        if category_dialog.exec():
-            category = category_dialog.selected_category
-        
+            
+        username = data["username"]
+        service = data["service"]
+        url = data["url"]
+        password = data["password"]
+        category = data["category"]
+        note = data["note"]
+
         if not password:
             import secrets, string
             chars = string.ascii_letters + string.digits + string.punctuation
             password = ''.join(secrets.choice(chars) for _ in range(16))
 
         try:
-            self.db.add_entry(service.strip(), username.strip(), password, category)
+            self.db.add_entry(service.strip(), username.strip(), password, category, url, note)
             self.load_entries()
             QMessageBox.information(self, "Success", f"Entry added!\nService: {service.strip()}")
         except Exception as e:
@@ -349,6 +379,7 @@ class MainWindow(QWidget):
             return
         
         entry_id = selected.data(Qt.ItemDataRole.UserRole)
+        service = selected.data(Qt.ItemDataRole.UserRole + 1)
         current_username = self.ui.usernameLabel.text()
         new_username, ok = QInputDialog.getText(
             self,
@@ -366,6 +397,7 @@ class MainWindow(QWidget):
             # self.ui.listWidget.setCurrentRow(self.ui.listWidget.count() - 1)
             self.update_details(selected)
             self.ui.listWidget.setCurrentIndex(index)
+            QMessageBox.information(self, "Edit Success", f"Username successfully updated for:\n\n'{service}'")
         except Exception as e:
             QMessageBox.critical(self, "ERROR", f"Failed to update username:\n{e}")
     
@@ -377,7 +409,6 @@ class MainWindow(QWidget):
             return
         service_name = self.ui.serviceLabel.text()
         entry_id = selected.data(Qt.ItemDataRole.UserRole)
-        current_password = self.db.get_password(entry_id)
 
         dialog = ChangePasswordPopup(self)
         if dialog.exec():
@@ -391,7 +422,6 @@ class MainWindow(QWidget):
                 self.update_details(selected)
                 self.ui.listWidget.setCurrentIndex(index)
                 QMessageBox.information(self, "Success", f"Password updated for:\n{service_name}")
-
             except Exception as e:
                 QMessageBox.critical(self, "ERROR", f"Failed to update password:\n{e}")
     
@@ -423,6 +453,7 @@ class MainWindow(QWidget):
     
     def edit_entry_service(self):
         selected = self.ui.listWidget.currentItem()
+        index  = self.ui.listWidget.currentIndex()
         if not selected:
             return
 
@@ -443,35 +474,57 @@ class MainWindow(QWidget):
             self.db.edit_service(entry_id, new_service.strip())
             self.load_entries()
             self.update_details(self.ui.listWidget.currentItem())
+            self.ui.listWidget.setCurrentIndex(index)
+            QMessageBox.information(self, "Edit Success", f"Service successfully updated for:\n\n'{current_service}'")
         except Exception as e:
             QMessageBox.critical(self, "Error", f"Failed to update service:\n{e}")
             
     def edit_entry_url(self):        
         selected = self.ui.listWidget.currentItem()
+        index = self.ui.listWidget.currentIndex()
         if not selected:
             return
 
         entry_id = selected.data(Qt.ItemDataRole.UserRole)
-
         current_service = self.ui.serviceLabel.text()
         current_url = self.ui.urlLabel.text()
-        new_url, ok = QInputDialog.getText(
-            self,
-            "Edit Url",
-            f"Enter new url for service:\n\n'{current_service}'",
-            text=current_url,
-        )
-
-        if not ok or not new_url.strip():
+        dialog = EditURLDialog(current_service, current_url, self)
+        if dialog.exec():
+            new_url = dialog.get_url()
+            if not new_url:
+                QMessageBox.warning(self, "Error", "No URL provided.")
+                return
+            try:
+                self.db.edit_url(entry_id, new_url.strip())
+                self.load_entries()
+                self.update_details(self.ui.listWidget.currentItem())
+                self.ui.listWidget.setCurrentIndex(index)                
+                QMessageBox.information(self, "Success", f"URL successfully updated for:\n{current_service}")
+            except Exception as e:
+                QMessageBox.critical(self, "Error", f"Failed to update url:\n{e}")
+    
+    def edit_entry_note(self):
+        selected = self.ui.listWidget.currentItem()
+        index = self.ui.listWidget.currentIndex()
+        if not selected:
             return
 
-        try:
-            self.db.edit_url(entry_id, new_url.strip())
-            self.load_entries()
-            self.update_details(self.ui.listWidget.currentItem())
-        except Exception as e:
-            QMessageBox.critical(self, "Error", f"Failed to update url:\n{e}")
-            
+        entry_id = selected.data(Qt.ItemDataRole.UserRole)
+        details = self.db.get_entry_details(entry_id)
+        old_note = details.get("note")
+        current_service = self.ui.serviceLabel.text()
+        dialog = EditNoteDialog(current_service, old_note, self)
+        if dialog.exec():
+            new_note = dialog.get_note()
+            try:
+                self.db.edit_note(entry_id, new_note.strip())
+                self.load_entries()
+                self.update_details(self.ui.listWidget.currentItem())
+                self.ui.listWidget.setCurrentIndex(index)
+                QMessageBox.information(self, "Edit Success", f"Note successfully updated for:\n\n'{current_service}'")
+            except Exception as e:
+                QMessageBox.critical(self, "Error", f"Failed to update note:\n{e}")        
+    
     def copy_password_to_clipboard(self):
         if not hasattr(self, "_current_plain_password"):
             self.show_toast("No password loaded!")

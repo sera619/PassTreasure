@@ -8,8 +8,11 @@ from gui.category_edit_dialog import CategoryEditDialog
 from gui.password_strength_indicator import PasswordStrengthIndicator
 from backend.import_worker import CsvImportWorker
 from backend.password_strength_logic import evaluate_password_strength
-from config import ABOUT_TEXT, load_settings, save_settings, format_last_backup, Styles, VAULT_PATH
+from config import ABOUT_TEXT, load_settings, save_settings, format_last_backup, Styles, VAULT_PATH, resource_path
 from backend.database import PasswordDatabase
+import utils
+import os, csv
+
 
 class SettingsWindow(QDialog):
     backup_restored = Signal(object)
@@ -29,6 +32,7 @@ class SettingsWindow(QDialog):
         self.setup_about_page()
         self.setup_import_page()
         self.setup_general_page()
+        self.setup_export_page()
         self.setWindowTitle("PassTreasure - Settings")
         self.setWindowIcon(QIcon(":/assets/icon.png"))
         self.apply_styles()
@@ -39,6 +43,7 @@ class SettingsWindow(QDialog):
         
         self.setup_edit_category()
         self.set_autologout_time()
+        self.set_auto_hide_details_time()
         
         self.ui.new_pw1.textChanged.connect(self._update_pw_strength)
         self.ui.btn_apply_pw.clicked.connect(self.apply_master_pw)
@@ -53,6 +58,7 @@ class SettingsWindow(QDialog):
         
         self.ui.autoLogoutCheckBox.toggled.connect(self.toggle_autologout)
         self.ui.autoLogoutTimeEdit.timeChanged.connect(self.get_autologout_time)
+        self.ui.autoHideDetailsTimeEdit.timeChanged.connect(self.get_auto_hide_details_time)
         # self.ui.stack.setCurrentWidget(self.ui.page_security)
     
     def update_sidebar_buttons(self):
@@ -62,21 +68,33 @@ class SettingsWindow(QDialog):
             self.ui.btn_security.setStyleSheet(Styles.blue_button)
             self.ui.btn_general.setStyleSheet(Styles.blue_button)
             self.ui.btn_import.setStyleSheet(Styles.blue_button)
+            self.ui.btn_export.setStyleSheet(Styles.blue_button)
         elif current == self.ui.page_general:
             self.ui.btn_general.setStyleSheet(Styles.blue_button_outlined)
             self.ui.btn_about.setStyleSheet(Styles.blue_button)
             self.ui.btn_security.setStyleSheet(Styles.blue_button)
             self.ui.btn_import.setStyleSheet(Styles.blue_button)
+            self.ui.btn_export.setStyleSheet(Styles.blue_button)
         elif current == self.ui.page_security:
             self.ui.btn_security.setStyleSheet(Styles.blue_button_outlined)
             self.ui.btn_general.setStyleSheet(Styles.blue_button)
             self.ui.btn_about.setStyleSheet(Styles.blue_button)
             self.ui.btn_import.setStyleSheet(Styles.blue_button)
+            self.ui.btn_export.setStyleSheet(Styles.blue_button)
         elif current == self.ui.page_import:
             self.ui.btn_import.setStyleSheet(Styles.blue_button_outlined)
             self.ui.btn_security.setStyleSheet(Styles.blue_button)
             self.ui.btn_general.setStyleSheet(Styles.blue_button)
             self.ui.btn_about.setStyleSheet(Styles.blue_button)
+            self.ui.btn_export.setStyleSheet(Styles.blue_button)
+        elif current == self.ui.page_export:
+            self.ui.btn_export.setStyleSheet(Styles.blue_button_outlined)
+            self.ui.btn_import.setStyleSheet(Styles.blue_button)
+            self.ui.btn_security.setStyleSheet(Styles.blue_button)
+            self.ui.btn_general.setStyleSheet(Styles.blue_button)
+            self.ui.btn_about.setStyleSheet(Styles.blue_button)
+            
+
     
     def apply_styles(self):
         childs = self.ui.sidebar.children()
@@ -87,17 +105,33 @@ class SettingsWindow(QDialog):
             if isinstance(child, QPushButton):
                 child.setStyleSheet(Styles.blue_button)
         self.ui.btn_general.setStyleSheet(Styles.blue_button_outlined)
-        self.ui.btnEditCategory.setStyleSheet(Styles.yellow_button_outlined)
         self.ui.btnCreateBackup.setStyleSheet(Styles.green_button_outlined)
         self.ui.btnRestoreBackup.setStyleSheet(Styles.yellow_button_outlined)
         self.ui.btnDeleteBackup.setStyleSheet(Styles.red_button_outlined)
         self.ui.btnClearBackup.setStyleSheet(Styles.red_button)
+        utils.colorize_icon(self.ui.btnCreateBackup, "add", "green")
+        utils.colorize_icon(self.ui.btnRestoreBackup, "reset", "yellow")
+        utils.colorize_icon(self.ui.btnDeleteBackup, "trash", "red")
+        utils.colorize_icon(self.ui.btnClearBackup, "trash", "dark")
+        
+        self.ui.btnEditCategory.setStyleSheet(Styles.yellow_button_outlined)
         self.ui.btnCreateCategory.setStyleSheet(Styles.green_button_outlined)
-        self.ui.btnDeleteCategory.setStyleSheet(Styles.red_button)
+        self.ui.btnDeleteCategory.setStyleSheet(Styles.red_button_outlined)
         self.ui.btnCategpryColor.setStyleSheet(Styles.yellow_button_outlined)
+        utils.colorize_icon(self.ui.btnEditCategory, "pencil", "yellow")
+        utils.colorize_icon(self.ui.btnCreateCategory, "add", "green")
+        utils.colorize_icon(self.ui.btnDeleteCategory, "trash", "red")
+        utils.colorize_icon(self.ui.btnCategpryColor, "eyedropper", "yellow")        
+        
         self.ui.btn_apply_pw.setStyleSheet(Styles.green_button_outlined)
+        utils.colorize_icon(self.ui.btn_apply_pw, "check", "green")
+        
         self.ui.btnSelectPath.setStyleSheet(Styles.yellow_button_outlined)
+        utils.colorize_icon(self.ui.btnSelectPath, "open", "yellow")
+        
         self.ui.btnStartImport.setStyleSheet(Styles.green_button_outlined)
+        utils.colorize_icon(self.ui.btnStartImport, "import", "green")
+        
     
     def _update_pw_strength(self):
         pw = self.ui.new_pw1.text()
@@ -218,6 +252,9 @@ class SettingsWindow(QDialog):
         )
         self.ui.btn_import.clicked.connect(
             lambda: self.ui.stack.setCurrentWidget(self.ui.page_import)
+        )
+        self.ui.btn_export.clicked.connect(
+            lambda: self.ui.stack.setCurrentWidget(self.ui.page_export)
         )
     
     def apply_master_pw(self):
@@ -406,12 +443,13 @@ class SettingsWindow(QDialog):
             self.new_category_color = selected_color
             r, g, b, a = selected_color.getRgb()            
             self.ui.btnPreviewCatColor.setStyleSheet(
+                "QPushButton:disabled{"
                 f"background-color: {selected_color.name()};"
                 f"color: white;" 
+                "}"
             )
         else:
-            # Der Benutzer hat 'Abbrechen' geklickt
-            print("Farbauswahl abgebrochen.")
+            return
         
     # Import
     def setup_import_page(self):
@@ -423,14 +461,14 @@ class SettingsWindow(QDialog):
         file_path, _ = QFileDialog.getOpenFileName(self, "Import CSV", filter="*.csv")
         if not file_path:
             return
-        self.ui.exportFilePathLineEdit.setText(file_path)
+        self.ui.importFilePathLineEdit.setText(file_path)
     
     def start_import(self):
         mode = self.ui.browserBox.currentText().lower()
         if not mode:
             QMessageBox.warning(self, "Missing Import Mode", "No import mode selected!\nPlease select a browser.")
             return
-        file_path = self.ui.exportFilePathLineEdit.text().strip()
+        file_path = self.ui.importFilePathLineEdit.text().strip()
         if not file_path:
             QMessageBox.warning(self, "Missing File Path", "No filepath found! Please enter a path.")
             return
@@ -475,7 +513,7 @@ class SettingsWindow(QDialog):
         self.qthread.wait()
 
     def reset_import_ui(self):
-        self.ui.exportFilePathLineEdit.clear()
+        self.ui.importFilePathLineEdit.clear()
         self.ui.browserBox.setCurrentIndex(-1)
         self.ui.progressBar.setValue(0)
         self.ui.progressLabel.clear()
@@ -514,6 +552,90 @@ class SettingsWindow(QDialog):
         settings = load_settings()
         settings["auto_logouttime"] = logout_ms       
         save_settings(settings)
+
+    def toggle_auto_hide_details(self, checked: bool):
+        settings = load_settings()
+        settings["auto_hide_details"] = checked
+        save_settings(settings)
+
+    def set_auto_hide_details_time(self):
+        settings = load_settings()
+        ms = settings.get("auto_hide_details_time")
+        minutes = ms // 60000
+        ms %= 60000
+        seconds = ms // 1000
+        t = QTime(0, minutes, seconds)
+        self.ui.autoHideDetailsTimeEdit.setTime(t)
+        self.ui.autoHideDetailsCheckBox.setChecked(settings.get("auto_hide_details"))
         
-        
-        
+    def get_auto_hide_details_time(self):
+        settings = load_settings()
+        time_value = self.ui.autoHideDetailsTimeEdit.time()
+        hide_ms = (
+            time_value.minute() * 60 * 1000
+            + time_value.second() * 1000
+        )
+        settings["auto_hide_details_time"] = hide_ms
+        save_settings(settings)
+    
+    
+    # export    
+    def setup_export_page(self):
+        self.ui.btnStartExport.setStyleSheet(Styles.green_button_outlined)
+        self.ui.btnExportPath.setStyleSheet(Styles.yellow_button_outlined)
+        utils.colorize_icon(self.ui.btnExportPath, "open", "yellow")
+        utils.colorize_icon(self.ui.btnStartExport, "export", "green")
+        self.ui.btnExportPath.clicked.connect(self._get_file_path)
+        self.ui.btnStartExport.clicked.connect(self.start_export)
+    
+    def start_export(self):
+        filename = self.ui.exportFilenameLineEdit.text()
+        if not filename:
+            filename = "FileTreasure-PasswordExport"
+        filename = filename + ".csv"
+        dir_path = self.ui.exportFileLineEdit.text()
+        if not dir_path:
+            QMessageBox.information(self, "No Directory", "Please select a directory to save.")
+            return
+        file_path = os.path.join(os.path.abspath(dir_path), filename)
+        try:
+            entries = self.db.get_export_entries()
+            export_entries = []
+            field_names = ["id", "service", "username", "password", "category", "url", "note"]
+            for entry in entries:
+                export_entry = {}
+                entry_id, service, username, category, url, note = entry
+                export_entry["id"] = entry_id            
+                export_entry["service"] = service
+                export_entry["username"] = username
+                export_entry["category"] = category
+                export_entry["url"] = url
+                export_entry["note"] = note            
+                
+                password = self.db.get_password(entry_id)
+                if password:
+                    export_entry["password"] = password
+                
+                export_entries.append(export_entry)
+            if len(export_entries) == 0:
+                QMessageBox.information(self, "No Entries", "No entries to export found.")
+                return
+            
+            with open(file_path, mode="w", newline='') as file:
+                writer = csv.DictWriter(file, fieldnames=field_names)
+                writer.writeheader()
+                writer.writerows(export_entries)
+            self.ui.exportFilenameLineEdit.clear()
+            self.ui.exportFileLineEdit.clear()
+            QMessageBox.information(self, "Export success", "Export successfully finished!")
+        except Exception as e:
+            QMessageBox.critical(self, "Error", f"Failure at export to csv:\n{e}")
+    
+    def _get_file_path(self):
+        file_path = QFileDialog.getExistingDirectory(
+            parent=self,
+            caption="Select directory."
+        )        
+        if not file_path:
+            return
+        self.ui.exportFileLineEdit.setText(file_path)

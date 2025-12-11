@@ -2,15 +2,15 @@ from PySide6.QtWidgets import (QApplication,
     QWidget, QVBoxLayout, QLabel, QLineEdit,
     QPushButton, QMessageBox
 )
-from PySide6.QtCore import Qt, Signal
-from PySide6.QtGui import QIcon, QPixmap
-import os, sys
+from PySide6.QtCore import Signal
+from PySide6.QtGui import QPixmap
+import os
 from backend.database import PasswordDatabase
 from src.loginwindow_ui import Ui_LoginWindowUI
 from gui.password_strength_indicator import PasswordStrengthIndicator
 from backend.password_strength_logic import evaluate_password_strength
 from config import Styles, resource_path, VERSION_NUM, IS_DEBUGGING
-
+import utils
 
 class LoginWindow(QWidget):
     login_success = Signal(object)
@@ -59,19 +59,26 @@ class LoginWindow(QWidget):
 
         self.ui.btn_delete_vault.clicked.connect(self.handle_delete_vault)
         self.input_pw.returnPressed.connect(self.on_enter)
-        self.input_pw.textChanged.connect(self._update_strength)
+        self.input_pw.textChanged.connect(self._update_strength)        
         self.ui.input_password2.returnPressed.connect(self.on_enter)
+        self.ui.btn_restore_backup.clicked.connect(self._restore_backup)
         
         if IS_DEBUGGING:
             self.input_pw.setText("kekskeks")
-        
+            self.ui.input_password2.setText("kekskeks")
+
     
     def apply_styles(self):
         self.ui.btn_login.setStyleSheet(Styles.green_button_outlined)
         self.ui.btn_delete_vault.setStyleSheet(Styles.red_button_outlined)
         self.ui.btn_create.setStyleSheet(Styles.green_button_outlined)
-        self.ui.btn_toggle_pw.setStyleSheet(Styles.dark_button)            
-        self.ui.btn_toggle_pw2.setStyleSheet(Styles.dark_button)            
+        self.ui.btn_toggle_pw.setStyleSheet(Styles.dark_button)
+        self.ui.btn_restore_backup.setStyleSheet(Styles.yellow_button_outlined)            
+        self.ui.btn_toggle_pw2.setStyleSheet(Styles.dark_button)
+        utils.colorize_icon(self.ui.btn_login, "login", "green")
+        utils.colorize_icon(self.ui.btn_delete_vault, "trash", "red")   
+        utils.colorize_icon(self.ui.btn_create, "magic", "green")
+        utils.colorize_icon(self.ui.btn_restore_backup, "reset", "yellow");                      
     
     def _update_strength(self):
         pw = self.ui.input_password.text()
@@ -79,6 +86,10 @@ class LoginWindow(QWidget):
         self.strength_indicator.set_strength(level)
                 
     def configure_mode(self):
+        if self.db.get_latest_backup():
+            self.ui.btn_restore_backup.show()
+        else:
+            self.ui.btn_restore_backup.hide()
         if self.is_first_run:
             self.label.setText("Create Master Password:")
             self.btn_login.hide()
@@ -97,6 +108,19 @@ class LoginWindow(QWidget):
             self.btn_login.clicked.connect(self.handle_login)
 
         self.error_label.setText("")
+    
+    def _restore_backup(self):
+        confirm = QMessageBox.question(self, "Confirm Restore Backup", "Are you sure to restore the backup?")
+        if confirm != QMessageBox.StandardButton.Yes:
+            return
+        try:
+            self.db.apply_backup(self.db.get_latest_backup())
+            self.is_first_run = not os.path.exists(self.VAULT_PATH)
+            self.configure_mode()
+            QMessageBox.information(self, "Success", f"Vault backup restored successfully!")
+        except Exception as e:
+            QMessageBox.critical(self, "Error", f"Failure restore backup:\n{e}")
+            
 
     def handle_delete_vault(self):
         confirm = QMessageBox.question(self, "Confirm Delete", "Are you sure you want to delete this vault?")
@@ -127,6 +151,8 @@ class LoginWindow(QWidget):
             QMessageBox.critical(self, "Error", str(e))
             return
 
+        self.is_first_run = not os.path.exists(self.VAULT_PATH)
+        self.configure_mode()
         QMessageBox.information(self, "Success", "Vault created successfully!")
         self.login_success.emit(self.db)
         self.close()
