@@ -94,7 +94,7 @@ class Ui_SettingsWindow(object):
         self.scrollAreaGeneral.setWidgetResizable(True)
         self.scrollAreaWidgetContents_2 = QWidget()
         self.scrollAreaWidgetContents_2.setObjectName(u"scrollAreaWidgetContents_2")
-        self.scrollAreaWidgetContents_2.setGeometry(QRect(0, 0, 489, 687))
+        self.scrollAreaWidgetContents_2.setGeometry(QRect(0, -208, 489, 830))
         self.verticalLayout_3 = QVBoxLayout(self.scrollAreaWidgetContents_2)
         self.verticalLayout_3.setSpacing(14)
         self.verticalLayout_3.setObjectName(u"verticalLayout_3")
@@ -320,50 +320,136 @@ class Ui_SettingsWindow(object):
 
         self.horizontalLayout_3.addWidget(self.label_3)
 
-        self.backUpPathLabel = QLabel(self.lastBackupFrame)
-        self.backUpPathLabel.setObjectName(u"backUpPathLabel")
+        self.lastBackupLabel = QLabel(self.lastBackupFrame)
+        self.lastBackupLabel.setObjectName(u"lastBackupLabel")
 
-        self.horizontalLayout_3.addWidget(self.backUpPathLabel)
+        self.horizontalLayout_3.addWidget(self.lastBackupLabel)
 
 
         self.verticalLayout_2.addWidget(self.lastBackupFrame)
+
+        self.frame_14 = QFrame(self.backupFrame)
+        self.frame_14.setObjectName(u"frame_14")
+        self.frame_14.setFrameShape(QFrame.Shape.NoFrame)
+        self.frame_14.setFrameShadow(QFrame.Shadow.Raised)
+        self.verticalLayout_21 = QVBoxLayout(self.frame_14)
+        self.verticalLayout_21.setSpacing(6)
+        self.verticalLayout_21.setObjectName(u"verticalLayout_21")
+        self.verticalLayout_21.setContentsMargins(9, 4, 9, 4)
+        self.label_18 = QLabel(self.frame_14)
+        self.label_18.setObjectName(u"label_18")
+        self.label_18.setFont(font2)
+
+        self.verticalLayout_21.addWidget(self.label_18)
+
+        self.backupPathFrame = QFrame(self.frame_14)
+        self.backupPathFrame.setObjectName(u"backupPathFrame")
+        self.backupPathFrame.setFrameShape(QFrame.Shape.NoFrame)
+        self.backupPathFrame.setFrameShadow(QFrame.Shadow.Raised)
+        self.horizontalLayout_13 = QHBoxLayout(self.backupPathFrame)
+        self.horizontalLayout_13.setSpacing(6)
+        self.horizontalLayout_13.setObjectName(u"horizontalLayout_13")
+        self.horizontalLayout_13.setContentsMargins(0, 4, 0, 4)
+        self.backupPathLineEdit = QLineEdit(self.backupPathFrame)
+        self.backupPathLineEdit.setObjectName(u"backupPathLineEdit")
+
+        self.horizontalLayout_13.addWidget(self.backupPathLineEdit)
+
+        self.btnClearBackupPathLineEdit = QPushButton(self.backupPathFrame)
+        self.btnClearBackupPathLineEdit.setObjectName(u"btnClearBackupPathLineEdit")
+
+        self.horizontalLayout_13.addWidget(self.btnClearBackupPathLineEdit)
+
+
+        self.verticalLayout_21.addWidget(self.backupPathFrame)
+
+        self.frame_15 = QFrame(self.frame_14)
+        self.frame_15.setObjectName(u"frame_15")
+        self.frame_15.setFrameShape(QFrame.Shape.NoFrame)
+        self.frame_15.setFrameShadow(QFrame.Shadow.Raised)
+        self.horizontalLayout_14 = QHBoxLayout(self.frame_15)
+        self.horizontalLayout_14.setSpacing(6)
+        self.horizontalLayout_14.setObjectName(u"horizontalLayout_14")
+        self.horizontalLayout_14.setContentsMargins(0, 0, 0, 0)
+        self.horizontalSpacer_6 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+
+        self.horizontalLayout_14.addItem(self.horizontalSpacer_6)
+
+        self.btnGetBackupPath = QPushButton(self.frame_15)
+        self.btnGetBackupPath.setObjectName(u"btnGetBackupPath")
+        self.btnGetBackupPath.setMinimumSize(QSize(100, 0))
+
+        self.horizontalLayout_14.addWidget(self.btnGetBackupPath)
+
+        self.btnSetBackupPath = QPushButton(self.frame_15)
+        self.btnSetBackupPath.setObjectName(u"btnSetBackupPath")
+        self.btnSetBackupPath.setMinimumSize(QSize(100, 0))
+
+        self.horizontalLayout_14.addWidget(self.btnSetBackupPath)
+
+
+        self.verticalLayout_21.addWidget(self.frame_15)
+
+
+        self.verticalLayout_2.addWidget(self.frame_14)
+
+        self.backupDeleteFrame = QFrame(self.backupFrame)
+        self.backupDeleteFrame.setObjectName(u"backupDeleteFrame")
+        self.backupDeleteFrame.setFrameShape(QFrame.Shape.NoFrame)
+        self.backupDeleteFrame.setFrameShadow(QFrame.Shadow.Raised)
+        self.horizontalLayout_15 = QHBoxLayout(self.backupDeleteFrame)
+        self.horizontalLayout_15.setObjectName(u"horizontalLayout_15")
+        self.horizontalLayout_15.setContentsMargins(-1, 4, -1, 4)
+        self.backupDeleteBox = QComboBox(self.backupDeleteFrame)
+        self.backupDeleteBox.setObjectName(u"backupDeleteBox")
+        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+        sizePolicy1.setHorizontalStretch(0)
+        sizePolicy1.setVerticalStretch(0)
+        sizePolicy1.setHeightForWidth(self.backupDeleteBox.sizePolicy().hasHeightForWidth())
+        self.backupDeleteBox.setSizePolicy(sizePolicy1)
+        self.backupDeleteBox.setStyleSheet(u"font: 10pt \"Segoe UI\";")
+
+        self.horizontalLayout_15.addWidget(self.backupDeleteBox)
+
+        self.btnDeleteBackup = QPushButton(self.backupDeleteFrame)
+        self.btnDeleteBackup.setObjectName(u"btnDeleteBackup")
+        self.btnDeleteBackup.setMinimumSize(QSize(100, 0))
+
+        self.horizontalLayout_15.addWidget(self.btnDeleteBackup)
+
+
+        self.verticalLayout_2.addWidget(self.backupDeleteFrame)
 
         self.backupBtnFrame = QFrame(self.backupFrame)
         self.backupBtnFrame.setObjectName(u"backupBtnFrame")
         self.horizontalLayout = QHBoxLayout(self.backupBtnFrame)
         self.horizontalLayout.setObjectName(u"horizontalLayout")
-        self.horizontalLayout.setContentsMargins(4, 4, 4, 4)
+        self.horizontalLayout.setContentsMargins(9, 4, 9, 4)
         self.horizontalSpacer_4 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.horizontalLayout.addItem(self.horizontalSpacer_4)
 
         self.btnClearBackup = QPushButton(self.backupBtnFrame)
         self.btnClearBackup.setObjectName(u"btnClearBackup")
-        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
-        sizePolicy1.setHorizontalStretch(0)
-        sizePolicy1.setVerticalStretch(0)
-        sizePolicy1.setHeightForWidth(self.btnClearBackup.sizePolicy().hasHeightForWidth())
-        self.btnClearBackup.setSizePolicy(sizePolicy1)
-        self.btnClearBackup.setMinimumSize(QSize(80, 0))
+        sizePolicy2 = QSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
+        sizePolicy2.setHorizontalStretch(0)
+        sizePolicy2.setVerticalStretch(0)
+        sizePolicy2.setHeightForWidth(self.btnClearBackup.sizePolicy().hasHeightForWidth())
+        self.btnClearBackup.setSizePolicy(sizePolicy2)
+        self.btnClearBackup.setMinimumSize(QSize(100, 0))
         self.btnClearBackup.setStyleSheet(u"background: rgb(170, 0, 0);")
 
         self.horizontalLayout.addWidget(self.btnClearBackup)
 
-        self.btnDeleteBackup = QPushButton(self.backupBtnFrame)
-        self.btnDeleteBackup.setObjectName(u"btnDeleteBackup")
-        self.btnDeleteBackup.setMinimumSize(QSize(80, 0))
-
-        self.horizontalLayout.addWidget(self.btnDeleteBackup)
-
         self.btnRestoreBackup = QPushButton(self.backupBtnFrame)
         self.btnRestoreBackup.setObjectName(u"btnRestoreBackup")
-        self.btnRestoreBackup.setMinimumSize(QSize(80, 0))
+        self.btnRestoreBackup.setMinimumSize(QSize(100, 0))
 
         self.horizontalLayout.addWidget(self.btnRestoreBackup)
 
         self.btnCreateBackup = QPushButton(self.backupBtnFrame)
         self.btnCreateBackup.setObjectName(u"btnCreateBackup")
-        self.btnCreateBackup.setMinimumSize(QSize(80, 0))
+        self.btnCreateBackup.setMinimumSize(QSize(100, 0))
 
         self.horizontalLayout.addWidget(self.btnCreateBackup)
 
@@ -512,11 +598,8 @@ class Ui_SettingsWindow(object):
         self.horizontalLayout_5.setContentsMargins(9, 9, 9, 9)
         self.editCategoryBox = QComboBox(self.editCategoryFrae)
         self.editCategoryBox.setObjectName(u"editCategoryBox")
-        sizePolicy2 = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
-        sizePolicy2.setHorizontalStretch(0)
-        sizePolicy2.setVerticalStretch(0)
-        sizePolicy2.setHeightForWidth(self.editCategoryBox.sizePolicy().hasHeightForWidth())
-        self.editCategoryBox.setSizePolicy(sizePolicy2)
+        sizePolicy1.setHeightForWidth(self.editCategoryBox.sizePolicy().hasHeightForWidth())
+        self.editCategoryBox.setSizePolicy(sizePolicy1)
         self.editCategoryBox.setStyleSheet(u"font: 10pt \"Segoe UI\";")
 
         self.horizontalLayout_5.addWidget(self.editCategoryBox)
@@ -878,7 +961,7 @@ class Ui_SettingsWindow(object):
         self.scrollArea.setWidgetResizable(True)
         self.scrollAreaWidgetContents = QWidget()
         self.scrollAreaWidgetContents.setObjectName(u"scrollAreaWidgetContents")
-        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 497, 348))
+        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 96, 26))
         self.verticalLayout = QVBoxLayout(self.scrollAreaWidgetContents)
         self.verticalLayout.setSpacing(0)
         self.verticalLayout.setObjectName(u"verticalLayout")
@@ -932,9 +1015,15 @@ class Ui_SettingsWindow(object):
         self.backupTitleLabel.setText(QCoreApplication.translate("SettingsWindow", u"Backups", None))
         self.label_4.setText(QCoreApplication.translate("SettingsWindow", u"Auto. Backups:", None))
         self.label_3.setText(QCoreApplication.translate("SettingsWindow", u"Last Backup:", None))
-        self.backUpPathLabel.setText(QCoreApplication.translate("SettingsWindow", u"TextLabel", None))
-        self.btnClearBackup.setText(QCoreApplication.translate("SettingsWindow", u"Clear", None))
+        self.lastBackupLabel.setText(QCoreApplication.translate("SettingsWindow", u"TextLabel", None))
+        self.label_18.setText(QCoreApplication.translate("SettingsWindow", u"Backup Path:", None))
+        self.backupPathLineEdit.setPlaceholderText(QCoreApplication.translate("SettingsWindow", u"Enter a backup savepath ...", None))
+        self.btnClearBackupPathLineEdit.setText("")
+        self.btnGetBackupPath.setText(QCoreApplication.translate("SettingsWindow", u"Select Path", None))
+        self.btnSetBackupPath.setText(QCoreApplication.translate("SettingsWindow", u"Set Path", None))
+        self.backupDeleteBox.setPlaceholderText(QCoreApplication.translate("SettingsWindow", u"Select a backup to delete...", None))
         self.btnDeleteBackup.setText(QCoreApplication.translate("SettingsWindow", u"Delete", None))
+        self.btnClearBackup.setText(QCoreApplication.translate("SettingsWindow", u"Clear", None))
         self.btnRestoreBackup.setText(QCoreApplication.translate("SettingsWindow", u"Restore ", None))
         self.btnCreateBackup.setText(QCoreApplication.translate("SettingsWindow", u"Create ", None))
         self.categpryTitleLabel.setText(QCoreApplication.translate("SettingsWindow", u"Categories", None))

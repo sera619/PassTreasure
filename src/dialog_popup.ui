@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>310</width>
-    <height>206</height>
+    <height>180</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -39,13 +39,13 @@
        <number>9</number>
       </property>
       <property name="leftMargin">
-       <number>4</number>
+       <number>6</number>
       </property>
       <property name="topMargin">
-       <number>4</number>
+       <number>0</number>
       </property>
       <property name="rightMargin">
-       <number>4</number>
+       <number>6</number>
       </property>
       <property name="bottomMargin">
        <number>4</number>
@@ -71,16 +71,16 @@
          <widget class="QFrame" name="iconFrame">
           <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,3">
            <property name="spacing">
-            <number>24</number>
+            <number>16</number>
            </property>
            <property name="leftMargin">
-            <number>6</number>
+            <number>9</number>
            </property>
            <property name="topMargin">
             <number>6</number>
            </property>
            <property name="rightMargin">
-            <number>6</number>
+            <number>9</number>
            </property>
            <property name="bottomMargin">
             <number>6</number>
@@ -129,13 +129,13 @@
            <number>0</number>
           </property>
           <property name="leftMargin">
-           <number>0</number>
+           <number>16</number>
           </property>
           <property name="topMargin">
            <number>0</number>
           </property>
           <property name="rightMargin">
-           <number>0</number>
+           <number>16</number>
           </property>
           <property name="bottomMargin">
            <number>0</number>

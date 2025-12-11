@@ -696,6 +696,55 @@ font: bold 12pt &quot;Segoe UI&quot;;</string>
                </widget>
               </item>
               <item>
+               <widget class="QFrame" name="passSecurityFrame">
+                <layout class="QHBoxLayout" name="passEditLayout_2" stretch="0,2">
+                 <property name="leftMargin">
+                  <number>2</number>
+                 </property>
+                 <property name="topMargin">
+                  <number>2</number>
+                 </property>
+                 <property name="rightMargin">
+                  <number>2</number>
+                 </property>
+                 <property name="bottomMargin">
+                  <number>2</number>
+                 </property>
+                 <item alignment="Qt::AlignmentFlag::AlignVCenter">
+                  <widget class="QLabel" name="label_9">
+                   <property name="minimumSize">
+                    <size>
+                     <width>80</width>
+                     <height>0</height>
+                    </size>
+                   </property>
+                   <property name="font">
+                    <font>
+                     <italic>true</italic>
+                     <bold>true</bold>
+                    </font>
+                   </property>
+                   <property name="styleSheet">
+                    <string notr="true">QLabel {
+	color:rgb(118, 0, 0);
+}</string>
+                   </property>
+                   <property name="text">
+                    <string>Security:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <layout class="QVBoxLayout" name="indicatorHolder">
+                   <property name="spacing">
+                    <number>0</number>
+                   </property>
+                  </layout>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item>
                <widget class="QFrame" name="urlFrame">
                 <property name="frameShape">
                  <enum>QFrame::Shape::NoFrame</enum>

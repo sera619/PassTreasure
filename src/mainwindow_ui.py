@@ -355,6 +355,33 @@ class Ui_MainWindow(object):
 
         self.verticalLayout.addWidget(self.passFrame, 0, Qt.AlignmentFlag.AlignVCenter)
 
+        self.passSecurityFrame = QFrame(self.detailFrame)
+        self.passSecurityFrame.setObjectName(u"passSecurityFrame")
+        self.passEditLayout_2 = QHBoxLayout(self.passSecurityFrame)
+        self.passEditLayout_2.setSpacing(6)
+        self.passEditLayout_2.setContentsMargins(11, 11, 11, 11)
+        self.passEditLayout_2.setObjectName(u"passEditLayout_2")
+        self.passEditLayout_2.setContentsMargins(2, 2, 2, 2)
+        self.label_9 = QLabel(self.passSecurityFrame)
+        self.label_9.setObjectName(u"label_9")
+        self.label_9.setMinimumSize(QSize(80, 0))
+        self.label_9.setFont(font3)
+        self.label_9.setStyleSheet(u"QLabel {\n"
+"	color:rgb(118, 0, 0);\n"
+"}")
+
+        self.passEditLayout_2.addWidget(self.label_9, 0, Qt.AlignmentFlag.AlignVCenter)
+
+        self.indicatorHolder = QVBoxLayout()
+        self.indicatorHolder.setSpacing(0)
+        self.indicatorHolder.setObjectName(u"indicatorHolder")
+
+        self.passEditLayout_2.addLayout(self.indicatorHolder)
+
+        self.passEditLayout_2.setStretch(1, 2)
+
+        self.verticalLayout.addWidget(self.passSecurityFrame)
+
         self.urlFrame = QFrame(self.detailFrame)
         self.urlFrame.setObjectName(u"urlFrame")
         self.urlFrame.setFrameShape(QFrame.Shape.NoFrame)
@@ -674,6 +701,7 @@ class Ui_MainWindow(object):
         self.label_3.setText(QCoreApplication.translate("MainWindow", u"Password:", None))
         self.passLabel.setText(QCoreApplication.translate("MainWindow", u"TextLabel", None))
         self.btnEditPass.setText("")
+        self.label_9.setText(QCoreApplication.translate("MainWindow", u"Security:", None))
         self.label_7.setText(QCoreApplication.translate("MainWindow", u"Url:", None))
         self.urlLabel.setText(QCoreApplication.translate("MainWindow", u"TextLabel", None))
         self.btnEditUrl.setText("")
