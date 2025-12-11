@@ -23,5 +23,6 @@
     <file>assets/warn.png</file>
     <file>assets/error.png</file>
     <file>assets/check_circle.png</file>
+    <file>assets/hiden.png</file>
   </qresource>
 </RCC>

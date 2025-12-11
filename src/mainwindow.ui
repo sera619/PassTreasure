@@ -1252,7 +1252,7 @@ QTextEdit:focus {
                     <item>
                      <widget class="QPushButton" name="btnCloseDetails">
                       <property name="text">
-                       <string>Close</string>
+                       <string>Hide</string>
                       </property>
                      </widget>
                     </item>

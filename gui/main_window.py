@@ -94,11 +94,11 @@ class MainWindow(QWidget):
     def apply_styles(self):
         self.ui.btnSettings.setStyleSheet(Styles.yellow_button_outlined)
         self.ui.btnLogout.setStyleSheet(Styles.red_button_outlined)
-        self.ui.btnAdd.setStyleSheet(Styles.green_button_outlined)
+        self.ui.btnAdd.setStyleSheet(Styles.green_button)
         self.ui.btnDelete.setStyleSheet(Styles.red_button_outlined)
         utils.colorize_icon(self.ui.btnSettings, "settings", "yellow")
         utils.colorize_icon(self.ui.btnLogout, "exit", "red")
-        utils.colorize_icon(self.ui.btnAdd, "add", "green")
+        utils.colorize_icon(self.ui.btnAdd, "add", "dark")
         utils.colorize_icon(self.ui.btnDelete, "trash", "red")
 
         self.ui.btnEditCategory.setStyleSheet(Styles.yellow_button_outlined_low)
@@ -114,14 +114,14 @@ class MainWindow(QWidget):
         utils.colorize_icon(self.ui.btnEditUrl, "pencil", "yellow")
         utils.colorize_icon(self.ui.btnEditNote, "pencil", "yellow")
         
-        self.ui.btnClearEntries.setStyleSheet(Styles.red_button)
+        self.ui.btnClearEntries.setStyleSheet(Styles.red_button_outlined)
         self.ui.btnCopyPass.setStyleSheet(Styles.dark_button_outlined)
         self.ui.btnShowPass.setStyleSheet(Styles.dark_button_outlined)
         self.ui.btnCloseDetails.setStyleSheet(Styles.red_button_outlined)
-        utils.colorize_icon(self.ui.btnClearEntries, "trash", "dark")
+        utils.colorize_icon(self.ui.btnClearEntries, "trash", "red")
         utils.colorize_icon(self.ui.btnCopyPass, "copy", "dark")
         utils.colorize_icon(self.ui.btnShowPass, "show", "dark")
-        utils.colorize_icon(self.ui.btnCloseDetails, "exit", "red")
+        utils.colorize_icon(self.ui.btnCloseDetails, "hiden", "red")
         self.ui.listWidget.setStyleSheet(Styles.list_widget_style)
     
     def build_ui(self):
@@ -647,7 +647,6 @@ class MainWindow(QWidget):
     def hide_details_after_anim(self):
         self.ui.detailFrame.hide()
         self.ui.detailLabel.show()
-        self.ui.btnDelete.hide()
         
     def toggle_details(self):
         frame = self.ui.detailFrame
@@ -661,7 +660,7 @@ class MainWindow(QWidget):
         self.anim.setEndValue(end)
         self.anim.setEasingCurve(QEasingCurve.Type.OutCubic)  
 
-        self.anim.start()
         if self.details_open:
             self.anim.finished.connect(self.hide_details_after_anim)
+        self.anim.start()
         self.details_open = not self.details_open

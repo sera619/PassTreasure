@@ -724,7 +724,7 @@ class Ui_MainWindow(object):
         self.detailStatus.setText(QCoreApplication.translate("MainWindow", u"TextLabel", None))
         self.btnShowPass.setText(QCoreApplication.translate("MainWindow", u"Show Password", None))
         self.btnCopyPass.setText(QCoreApplication.translate("MainWindow", u"Copy Password", None))
-        self.btnCloseDetails.setText(QCoreApplication.translate("MainWindow", u"Close", None))
+        self.btnCloseDetails.setText(QCoreApplication.translate("MainWindow", u"Hide", None))
         self.footerLabel.setText(QCoreApplication.translate("MainWindow", u"TextLabel", None))
     # retranslateUi
 
