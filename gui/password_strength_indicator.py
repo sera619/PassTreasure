@@ -27,7 +27,7 @@ class AnimatedDot(QWidget):
         
     def _set_color(self, color):
         self.current_color = color
-        self.update()  # Neuzeichnen
+        self.update() 
         
     color = Property(QColor, _get_color, _set_color)
         
@@ -125,9 +125,7 @@ class PasswordStrengthIndicator(QWidget):
         layout.addWidget(self.label)
 
         # rechts ein Spacer, nicht links
-        # layout.addStretch(-1)
-
-    
+        # layout.addStretch(-1)    
     
     def set_strength(self, level: int):
         for i, dot in enumerate(self.dots):

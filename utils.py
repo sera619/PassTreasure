@@ -2,7 +2,11 @@ from PySide6.QtGui import QPixmap, QPainter, QColor, QIcon
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QPushButton
 import config
+import json
 import resources_rc
+import sys
+from pathlib import Path
+from datetime import datetime
 
 
 def tint_pixmap(pix: QPixmap, color: QColor) -> QPixmap:
@@ -24,3 +28,57 @@ def colorize_icon(btn: QPushButton, icon: str, color: str) -> QPushButton:
     icon = QIcon(colored)
     btn.setIcon(icon);
     return btn;
+
+
+def resource_path(relative: str) -> Path:
+    """
+    Get absolute path to resource, works in dev and PyInstaller exe.
+    """
+    try:
+        # PyInstaller temp folder
+        base_path = Path(sys._MEIPASS)
+    except AttributeError:
+        # normal script
+        if getattr(sys, 'frozen', False):
+            base_path = Path(sys.executable).parent  # exe mode
+        else:
+            base_path = Path(__file__).parent       # dev mode
+    return base_path / relative
+
+def load_settings():
+    if not config.SETTINGS_PATH.exists():
+        save_settings(config.DEFAULT_SETTINGS)
+        return config.DEFAULT_SETTINGS
+    try:
+        return json.loads(config.SETTINGS_PATH.read_text())
+    except:
+        return config.DEFAULT_SETTINGS
+    
+def save_settings(data):
+    config.SETTINGS_PATH.write_text(json.dumps(data, indent=4))
+
+def format_last_backup(iso_str: str) -> str:
+    if not iso_str:
+        return "Never"
+    try:
+        dt = datetime.fromisoformat(iso_str)
+        return dt.strftime("%d.%m.%Y %H:%M:%S")
+    except Exception:
+        return "Invalid"
+
+def clean_url(url: str) -> str:
+    if not url:
+        return url
+
+    url = url.strip()
+
+    for prefix in ("https://", "http://", "www."):
+        if url.startswith(prefix):
+            url = url[len(prefix):]
+
+    return url
+
+def limit_text(text: str, max_len: int = 20) -> str:
+    if len(text) <= max_len:
+        return text
+    return text[:max_len] + "..."

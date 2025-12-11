@@ -1,5 +1,5 @@
 from PySide6.QtCore import QObject, Signal
-from config import clean_url
+from utils import clean_url
 
 
 class CsvImportWorker(QObject):
@@ -33,14 +33,27 @@ class CsvImportWorker(QObject):
                     service = clean_url(row.get("url")) or ""
                     username = row.get("username") or row.get("login") or ""
                     password = row.get("password") or ""
+                    category = row.get("category") or "General"
                     url = row.get("url") or ""
+                    note = row.get("note") or "" 
                 elif self.mode == "chrome":
                     service = row.get("name") or ""
                     username = row.get("username") or ""
                     password = row.get("password") or ""
+                    category = row.get("category") or "General"
                     url = row.get("url") or ""
+                    note = row.get("note") or ""                     
+                elif self.mode == "passtreasure":
+                    # id,service,username,password,category,url,note
+                    service = row.get("service") or ""
+                    username = row.get("username") or ""
+                    password = row.get("password") or ""
+                    category = row.get("category") or "General"
+                    url = row.get("url") or ""
+                    note = row.get("note") or ""                     
+
                 if password:
-                    db.add_entry(service, username, password, "General", url)
+                    db.add_entry(service, username, password, category, url, note)
 
                 count += 1
                 self.progress.emit(count, total)

@@ -37,7 +37,7 @@ class NewEntryDialog(QDialog):
 
 
     def _build_ui(self):
-        settings = config.load_settings()
+        settings = utils.load_settings()
         categories = list(settings.get("entry_categories"))
         self.ui.categoryComboBox.addItems(categories)
         self.ui.labelError.setText("")

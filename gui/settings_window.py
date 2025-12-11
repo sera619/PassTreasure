@@ -6,10 +6,12 @@ from PySide6.QtCore import Qt, Signal, QTimer, QTime
 from datetime import datetime
 from gui.category_edit_dialog import CategoryEditDialog
 from gui.password_strength_indicator import PasswordStrengthIndicator
+from gui.dialog_popup import DialogPopup
 from backend.import_worker import CsvImportWorker
 from backend.password_strength_logic import evaluate_password_strength
-from config import ABOUT_TEXT, load_settings, save_settings, format_last_backup, Styles, VAULT_PATH, resource_path
+from config import TextStorage, Styles, VAULT_PATH, PopupType
 from backend.database import PasswordDatabase
+from utils import load_settings, save_settings, format_last_backup
 import utils
 import os, csv
 
@@ -159,7 +161,7 @@ class SettingsWindow(QDialog):
         settings = load_settings()
         settings["auto_backup"] = mode
         save_settings(settings)
-        QMessageBox.information(self, "Backup Setting", f"Automatic backups set to: {mode}")
+        DialogPopup("Backup Information", f"Automatic backups set to: '{mode}'!", PopupType.INFO, self).exec()        
         
     def update_general_page(self):
         lates_backup = self.db.get_latest_backup()
@@ -183,29 +185,29 @@ class SettingsWindow(QDialog):
         self.db.create_backup()
         settings["last_backup"] = now.isoformat()
         save_settings(settings) 
-        lates_backup = self.db.get_latest_backup()
+        latest_backup = self.db.get_latest_backup()
         
-        if not lates_backup:
-            QMessageBox.critical(self, "Error", f"Cant find any backup!")
+        if not latest_backup:
+            DialogPopup("Create Error", f"Cant find any backup!", PopupType.ERROR, self).exec()
             return
         self.update_general_page()
-        QMessageBox.information(self, "Success", f"Backup:\n{lates_backup}\n created successfully!")
+        DialogPopup("Create Success", f"Backup:\n{latest_backup}\n created successfully!", PopupType.SUCCESS, self).exec()        
 
     def restore_backup(self):
-        lates_backup = self.db.get_latest_backup()
-        if not lates_backup:
-            QMessageBox.critical(self, "Error", f"Cant find any backup!")
+        latest_backup = self.db.get_latest_backup()
+        if not latest_backup:
+            DialogPopup("Restore Error", f"Cant find any backup!", PopupType.ERROR, self).exec()
             return
         confirm = QMessageBox.question(self, "Confirm Restore", "Are you sure you want to restore the backup?")
         if confirm != QMessageBox.StandardButton.Yes:
             return
         try:  
-            self.db.apply_backup(lates_backup)
+            self.db.apply_backup(latest_backup)
             self.db.reload_after_backup(self.ask_master_password)
             self.backup_restored.emit(self.db)
-            QMessageBox.information(self, "Success", f"Backup:\n{lates_backup}\n restored successfully!")
+            DialogPopup("Restore Success", f"Backup:\n{latest_backup}\n restored successfully!", PopupType.SUCCESS, self).exec()        
         except Exception as e:
-            QMessageBox.critical(self, "Error", f"Failed to restore backup:\n{e}")
+            DialogPopup("Restore Error", f"Failed to restore backup({latest_backup}):\n{e}", PopupType.ERROR, self).exec()    
         
     def delete_backup(self):
         latest_backup = self.db.get_latest_backup()
@@ -216,20 +218,20 @@ class SettingsWindow(QDialog):
             try:        
                 self.db.delete_backup(latest_backup)
                 self.update_general_page()
-                QMessageBox.information(self, "Success", f"Backup:\n{latest_backup}\n deleted successfully!")
+                DialogPopup("Delete Success", f"Backup:\n{latest_backup}\n deleted successfully!", PopupType.SUCCESS, self).exec()        
             except Exception as e:
-                QMessageBox.critical(self, "Error", f"Failed to delete backup:\n{e}")
-    
+                DialogPopup("Delete Error", f"Failed to delete backup:\n{e}", PopupType.ERROR, self).exec()    
+
     def clear_backups(self):
         confirm = QMessageBox.question(self, "Confirm Delete", "Are you sure you want to delete this backup?")
         if confirm != QMessageBox.StandardButton.Yes:
             return
         try:
             removed = self.db.clear_backups()
-            self.update_general_page()      
-            QMessageBox.information(self, "Success", f"{removed} backups deleted successfully!")
+            self.update_general_page()
+            DialogPopup("Clear Success", f"Removed {removed}x backups deleted successfully", PopupType.SUCCESS, self).exec()        
         except Exception as e:
-                QMessageBox.critical(self, "Error", f"Failed to delete backup:\n{e}")
+            DialogPopup("Clear Error", f"Failed to clear backups:\n{e}", PopupType.ERROR, self).exec()    
 
     def ask_master_password(self):        
         pw, ok = QInputDialog.getText(
@@ -263,16 +265,16 @@ class SettingsWindow(QDialog):
         new2 = self.ui.new_pw2.text().strip()
 
         if new1 != new2:
-            QMessageBox.warning(self, "Error", "New passwords do not match!")
+            DialogPopup("Edit Error", "New passwords do not match!", PopupType.ERROR, self).exec()
             return
 
         if len(new1) <= 6:
-            QMessageBox.warning(self, "Error", "Password need min. 6 characters!")
+            DialogPopup("Edit Error", "Password need min. 6 characters!", PopupType.ERROR, self).exec()
             return
 
         # Check old password
         if not self.db.unlock_vault(old):
-            QMessageBox.warning(self, "Error", "Old password incorrect!")
+            DialogPopup("Edit Error", "Old master password incorrect!", PopupType.ERROR, self).exec()
             return
 
         try:
@@ -280,10 +282,10 @@ class SettingsWindow(QDialog):
             self.ui.old_pw.clear()
             self.ui.new_pw1.clear()
             self.ui.new_pw2.clear()
-            
-            QMessageBox.information(self, "Success", "Master password updated!")
+            DialogPopup("Edit Success", f"Master Password successfully changed!", PopupType.SUCCESS, self).exec()        
         except Exception as e:
-            QMessageBox.critical(self, "Error", str(e))
+            DialogPopup("Error", f"Failed to change master password:\n{e}", PopupType.ERROR, self).exec()    
+
     
     def toggle_masterpw_visibility(self, checked: bool):
         mode = QLineEdit.EchoMode.Normal if checked else QLineEdit.EchoMode.Password
@@ -292,7 +294,7 @@ class SettingsWindow(QDialog):
         self.ui.old_pw.setEchoMode(mode)
             
     def setup_about_page(self):
-        self.ui.aboutLabel.setText(ABOUT_TEXT)
+        self.ui.aboutLabel.setText(TextStorage.ABOUT_TEXT)
     
     
     # Edit & Create category
@@ -314,18 +316,18 @@ class SettingsWindow(QDialog):
         categories: list = settings["entry_categories"]
         cat_name = self.ui.categoryCreatLineEdit.text().strip().capitalize()
         if not cat_name:
-            QMessageBox.warning(self, "Warning", f"Please enter a category name!")
+            DialogPopup("Create Warning", "Please enter a categoryname!", PopupType.WARNING, self).exec()
             return
         
         if cat_name in categories:
-            QMessageBox.warning(self, "Warning", f"Category with name {cat_name} already exists!")
+            DialogPopup("Create Warning", f"Category with name {cat_name} already exists!", PopupType.WARNING, self).exec()
             return
         
         categories.append(cat_name)
         settings["entry_categories"] = categories
         
         if not self.new_category_color:
-            QMessageBox.warning(self, "Warning", "No new category color selected!")
+            DialogPopup("Create Warning", "No new category color selected!", PopupType.WARNING, self).exec()
             return
         r, g, b, a = self.new_category_color.getRgb()
         color_string = f"rgba({r}, {g}, {b}, {a})"
@@ -341,9 +343,10 @@ class SettingsWindow(QDialog):
                 f"color: white;"
             )
             self.update_edit_category()
-            QMessageBox.information(self, "Success", f"New category:\n'{cat_name}'\nsuccessfully created!")
+            DialogPopup("Create Success", f"New category:\n'{cat_name}'\nsuccessfully created!", PopupType.SUCCESS, self).exec()        
         except Exception as e:
-            QMessageBox.critical(self, "Error!", f"Cant create category '{cat_name}':\n{e}")
+            DialogPopup("Create Error",  f"Cant create category '{cat_name}':\n{e}", PopupType.ERROR, self).exec()    
+
            
     def delete_category(self):
         settings = load_settings()
@@ -351,15 +354,15 @@ class SettingsWindow(QDialog):
         cat_colors: dict = settings.get("category_colors")
         cat = self.ui.editCategoryBox.currentText()
         if not cat:
-            QMessageBox.warning(self, "Error", f"No category selected!")
+            DialogPopup("Delete Warning", f"No category selected!", PopupType.WARNING, self).exec()
             return
         
         if cat not in user_categories:
-            QMessageBox.warning(self, "Error", f"Category '{cat}' didnt exists!")
+            DialogPopup("Delete Warning", f"Category '{cat}' didnt exists!", PopupType.WARNING, self).exec()
             return
         
         if not cat_colors[cat]:
-            QMessageBox.warning(self, "Error", f"Color for category '{cat}' didnt exists!")
+            DialogPopup("Delete Warning", f"Color for category '{cat}' didnt exists!", PopupType.WARNING, self).exec()
             return
         try:
             user_categories.remove(cat)
@@ -373,14 +376,14 @@ class SettingsWindow(QDialog):
             save_settings(settings)
             self.update_edit_category()
             self.category_deleted.emit()
-            QMessageBox.information(self, "Success", f"Category:\n{cat}'\nsuccessfully removed!")
+            DialogPopup("Delete Success", f"Category:\n{cat}'\nsuccessfully removed!", PopupType.SUCCESS, self).exec()        
         except Exception as e:
-            QMessageBox.critical(self, "Error!", f"Cant remove category '{cat}':\n{e}")
+            DialogPopup("Delete Error", f"Cant remove category '{cat}':\n{e}", PopupType.ERROR, self).exec()    
         
     def edit_category(self):
         cat = self.ui.editCategoryBox.currentText()
         if not cat:
-            QMessageBox.warning(self, "Error", f"No category selected!")
+            DialogPopup("Edit Warning", f"No category selected!", PopupType.WARNING, self).exec()
             return
         try:
             settings = load_settings()
@@ -388,7 +391,7 @@ class SettingsWindow(QDialog):
             cat_colors: dict = settings.get("category_colors")
             
             if not cat in user_categories:
-                QMessageBox.warning(self, "Error", f"Category '{cat}' didnt exists!")
+                DialogPopup("Edit Error", f"Category '{cat}' didnt exists!", PopupType.ERROR, self).exec() 
                 return
             
             old_name = cat
@@ -405,7 +408,7 @@ class SettingsWindow(QDialog):
             
             if new_name != old_name:
                 if new_name in user_categories:
-                    QMessageBox.warning(self, "Error", "Category name already exists!")
+                    DialogPopup("Edit Error", "Category name already exists!", PopupType.ERROR, self).exec()        
                     return
                 
                 index = user_categories.index(old_name)
@@ -428,10 +431,10 @@ class SettingsWindow(QDialog):
             self.category_updated.emit()
             self.update_general_page()
             self.ui.editCategoryBox.setCurrentIndex(-1)
-            QMessageBox.information(self, "Success", f"Category\n'{last_name}'\nupdated!")
+            DialogPopup("Edit Success",  f"Category\n'{last_name}'\nupdated to\n'{new_name}'\n successfully!", PopupType.SUCCESS, self).exec()        
         except Exception as e:
-            QMessageBox.critical(self, "Error!", f"Cant edit category '{cat}':\n{e}")
-           
+            DialogPopup("Edit Error", f"Cant edit category '{cat}':\n{e}", PopupType.ERROR, self).exec()    
+
     def show_color_dialog(self):        
         dialog = QColorDialog(QColor(211, 211, 211, 140))
         dialog.setOptions(QColorDialog.ColorDialogOption.ShowAlphaChannel | 
@@ -453,8 +456,8 @@ class SettingsWindow(QDialog):
         
     # Import
     def setup_import_page(self):
-        browsers = ["Firefox", "Chrome", "Opera"]
-        self.ui.browserBox.addItems(browsers)
+        import_modes = ["Firefox", "Chrome", "PassTreasure"]
+        self.ui.importModeBox.addItems(import_modes)
         self.ui.progressFrame.hide()
     
     def get_import_path(self):
@@ -464,13 +467,13 @@ class SettingsWindow(QDialog):
         self.ui.importFilePathLineEdit.setText(file_path)
     
     def start_import(self):
-        mode = self.ui.browserBox.currentText().lower()
+        mode = self.ui.importModeBox.currentText().lower()
         if not mode:
-            QMessageBox.warning(self, "Missing Import Mode", "No import mode selected!\nPlease select a browser.")
+            DialogPopup("Import Warning", f"Missing importmode. No importmode selected!\nPlease select a importmode!.", PopupType.WARNING, self).exec()        
             return
         file_path = self.ui.importFilePathLineEdit.text().strip()
         if not file_path:
-            QMessageBox.warning(self, "Missing File Path", "No filepath found! Please enter a path.")
+            DialogPopup("Import Warning", "Missing import filepath. No filepath set!\nPlease enter a filepath to import from.", PopupType.WARNING, self).exec()        
             return
         pw = self.ask_master_password()
         if not pw:
@@ -503,18 +506,18 @@ class SettingsWindow(QDialog):
         self.ui.progressLabel.setText("Import finished!")
         self.qthread.quit()
         self.qthread.wait()
-        QMessageBox.information(self, "Import", "Import finished!")
+        DialogPopup("Import Success", f"Import finished!", PopupType.SUCCESS, self).exec()        
         self.import_successfully.emit()
         QTimer.singleShot(1000, self.reset_import_ui)
 
     def on_import_error(self, err):
-        QMessageBox.critical(self, "Error at import", err)
+        DialogPopup("Import Error", f"Error at import:\n{err}", PopupType.ERROR, self).exec()
         self.qthread.quit()
         self.qthread.wait()
 
     def reset_import_ui(self):
         self.ui.importFilePathLineEdit.clear()
-        self.ui.browserBox.setCurrentIndex(-1)
+        self.ui.importModeBox.setCurrentIndex(-1)
         self.ui.progressBar.setValue(0)
         self.ui.progressLabel.clear()
         self.ui.progressFrame.hide()
@@ -595,7 +598,7 @@ class SettingsWindow(QDialog):
         filename = filename + ".csv"
         dir_path = self.ui.exportFileLineEdit.text()
         if not dir_path:
-            QMessageBox.information(self, "No Directory", "Please select a directory to save.")
+            DialogPopup("Export Error", f"No directory found! Please select a directory to export.", PopupType.ERROR, self).exec()        
             return
         file_path = os.path.join(os.path.abspath(dir_path), filename)
         try:
@@ -618,7 +621,7 @@ class SettingsWindow(QDialog):
                 
                 export_entries.append(export_entry)
             if len(export_entries) == 0:
-                QMessageBox.information(self, "No Entries", "No entries to export found.")
+                DialogPopup("Export Information", "No entries to export found.", PopupType.INFO, self).exec()
                 return
             
             with open(file_path, mode="w", newline='') as file:
@@ -627,9 +630,9 @@ class SettingsWindow(QDialog):
                 writer.writerows(export_entries)
             self.ui.exportFilenameLineEdit.clear()
             self.ui.exportFileLineEdit.clear()
-            QMessageBox.information(self, "Export success", "Export successfully finished!")
+            DialogPopup("Export Success", f"Exporting {filename} successfully!\nPath:{file_path}", PopupType.SUCCESS, self).exec()        
         except Exception as e:
-            QMessageBox.critical(self, "Error", f"Failure at export to csv:\n{e}")
+            DialogPopup("Export Error", f"Failure at export to csv:\n{e}", PopupType.ERROR, self).exec()        
     
     def _get_file_path(self):
         file_path = QFileDialog.getExistingDirectory(

@@ -3,9 +3,10 @@ from PySide6.QtGui import QIcon
 from gui.login_window import LoginWindow
 from gui.main_window import MainWindow
 from gui.intro_splash import IntroSplash
+from gui.dialog_popup import DialogPopup
 
 import config
-from config import Styles
+from config import Styles, PopupType
 import sys
 import resources_rc
 
@@ -23,7 +24,8 @@ def autologout_restart():
     login.setWindowIcon(QIcon(":/assets/icon.png"))
     login.login_success.connect(open_main)
     login.show()
-    QMessageBox.information(login, "PassTreasure - Autologout", "You was a long time inactive.\nFor security reasons, you got logged out!\nBye!")
+    dialog = DialogPopup("Caution Autologout!", "You was a long time inactive.\nFor security reasons, you got logged out!\nBye!", PopupType.INFO, login)
+    dialog.exec()
     
 def open_main(db_instance):
     global main_window

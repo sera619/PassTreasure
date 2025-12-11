@@ -5,7 +5,8 @@ import csv
 from datetime import datetime, timezone 
 from typing import Optional, List, Tuple
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
-from config import TEST_ENTRIES, resource_path, load_settings, save_settings, clean_url
+from config import TEST_ENTRIES
+from utils import load_settings, save_settings, clean_url, resource_path
 import shutil
 from backend.kdf import (
     generate_salt,

@@ -12,13 +12,16 @@ from gui.vault_listiem import VaultListItemWidget
 from gui.new_entry_dialog import NewEntryDialog
 from gui.edit_url_dialog import EditURLDialog
 from gui.edit_note_dialog import EditNoteDialog
+from gui.dialog_popup import DialogPopup
+from gui.get_text_dialog_popup import GetTextDialogPopup
+
 from backend.database import PasswordDatabase
 from backend.inactivity_watcher import AutoLocker, InactivityWatcher
 
-from config import VERSION_NUM, load_settings, save_settings, Styles, IS_DEBUGGING
+from config import VERSION_NUM, Styles, IS_DEBUGGING, PopupType
 from datetime import datetime
+from utils import load_settings, save_settings
 import utils
-
 
 class MainWindow(QWidget):
     logout_success = Signal()
@@ -237,10 +240,9 @@ class MainWindow(QWidget):
                 item.setData(Qt.ItemDataRole.UserRole + 3, category)
                 item.setSizeHint(widget.sizeHint())
                 self.ui.listWidget.addItem(item)
-                self.ui.listWidget.setItemWidget(item, widget)
-                
+                self.ui.listWidget.setItemWidget(item, widget)                
         except Exception as e:
-            QMessageBox.critical(self, "Error", f"Failed to load entries:\n{e}")
+            DialogPopup("Error", f"Failed to load entries:\n{e}", PopupType.ERROR, self).exec()    
 
     # -------------------------
     # Update detail view
@@ -341,9 +343,9 @@ class MainWindow(QWidget):
         try:
             self.db.add_entry(service.strip(), username.strip(), password, category, url, note)
             self.load_entries()
-            QMessageBox.information(self, "Success", f"Entry added!\nService: {service.strip()}")
+            DialogPopup("Add Success", f"New entry:\n\n'{service}\n\nsuccessfully created.'", PopupType.SUCCESS, self).exec()        
         except Exception as e:
-            QMessageBox.critical(self, "Error", f"Failed to add entry:\n{e}")
+            DialogPopup("Error", f"Failed to add entry:\n{e}", PopupType.ERROR, self).exec()
 
     def delete_entry(self):
         selected = self.ui.listWidget.currentItem()
@@ -357,8 +359,9 @@ class MainWindow(QWidget):
             self.db.delete_entry(entry_id)
             self.load_entries()
             self.hide_details()
+            DialogPopup("Edit Success", f"Entry with id: {entry_id} successfully deleted!", PopupType.SUCCESS, self).exec()        
         except Exception as e:
-            QMessageBox.critical(self, "Error", f"Failed to delete entry:\n{e}")
+            DialogPopup("Error", f"Failed to delete entry:\n{e}", PopupType.ERROR, self).exec()    
          
     def clear_all_entries(self):
         confirm = QMessageBox.question(self, "Confirm Clear", "Are you sure you want delete ALL entries?")
@@ -368,10 +371,10 @@ class MainWindow(QWidget):
             self.db.clear_entries()
             self.load_entries()
             self.hide_details()
-            QMessageBox.information(self, "Clear Successfully", "Entries successfully cleared!")
+            DialogPopup("Clear Success", f"Entries successfully cleared!", PopupType.SUCCESS, self).exec()        
         except Exception as e:
-            QMessageBox.critical(self, "Error", f"Failed to clear entries:\n{e}")
-    
+            DialogPopup("Error", f"Failed to clear entries:\n{e}", PopupType.ERROR, self).exec()    
+ 
     def edit_entry_username(self):
         selected =  self.ui.listWidget.currentItem()
         index = self.ui.listWidget.currentIndex()
@@ -379,27 +382,22 @@ class MainWindow(QWidget):
             return
         
         entry_id = selected.data(Qt.ItemDataRole.UserRole)
-        service = selected.data(Qt.ItemDataRole.UserRole + 1)
-        current_username = self.ui.usernameLabel.text()
-        new_username, ok = QInputDialog.getText(
-            self,
-            "Edit Username",
-            f"Enter new username:\n(current: {current_username})",
-            text=current_username
-        )
-        
-        if not ok or not new_username.strip():
-            return
-        
-        try:
-            self.db.edit_username(entry_id, new_username.strip())
-            self.load_entries()
-            # self.ui.listWidget.setCurrentRow(self.ui.listWidget.count() - 1)
-            self.update_details(selected)
-            self.ui.listWidget.setCurrentIndex(index)
-            QMessageBox.information(self, "Edit Success", f"Username successfully updated for:\n\n'{service}'")
-        except Exception as e:
-            QMessageBox.critical(self, "ERROR", f"Failed to update username:\n{e}")
+        service = selected.data(Qt.ItemDataRole.UserRole + 1)        
+        dialog = GetTextDialogPopup("Edit Username", f"Please enter a new username for service:\n{service}.", "username", self)
+        if dialog.exec():
+            new_username = dialog.get_value()
+            if not new_username.strip():
+                return
+            
+            try:
+                self.db.edit_username(entry_id, new_username.strip())
+                self.load_entries()
+                # self.ui.listWidget.setCurrentRow(self.ui.listWidget.count() - 1)
+                self.update_details(selected)
+                self.ui.listWidget.setCurrentIndex(index)
+                DialogPopup("Edit Success", f"Username successfully updated for:\n\n'{service}'", PopupType.SUCCESS, self).exec()        
+            except Exception as e:
+                DialogPopup("Error", f"Failed to update username:\n{e}", PopupType.ERROR, self).exec()    
     
     def edit_entry_password(self):
         selected = self.ui.listWidget.currentItem()
@@ -421,9 +419,9 @@ class MainWindow(QWidget):
                 self.db.edit_password(entry_id, new_password)
                 self.update_details(selected)
                 self.ui.listWidget.setCurrentIndex(index)
-                QMessageBox.information(self, "Success", f"Password updated for:\n{service_name}")
+                DialogPopup("Edit Success", f"Password successfully updated for:\n\n'{service_name}'", PopupType.SUCCESS, self).exec()        
             except Exception as e:
-                QMessageBox.critical(self, "ERROR", f"Failed to update password:\n{e}")
+                DialogPopup("Error", f"Failed to update oassword:\n{e}", PopupType.ERROR, self).exec()    
     
     def edit_entry_category(self):
         selected = self.ui.listWidget.currentItem()
@@ -446,10 +444,9 @@ class MainWindow(QWidget):
                 self.update_details(selected)
                 self.load_entries()
                 self.ui.listWidget.setCurrentIndex(index)
-                QMessageBox.information(self, "Success", f"Category updated for:\n{service_name}")
-
+                DialogPopup("Edit Success", f"Category successfully updated for:\n\n'{service_name}'", PopupType.SUCCESS, self).exec()
             except Exception as e:
-                QMessageBox.critical(self, "ERROR", f"Failed to update category:\n{e}")            
+                DialogPopup("Error", f"Failed to update category:\n{e}", PopupType.ERROR, self).exec()        
     
     def edit_entry_service(self):
         selected = self.ui.listWidget.currentItem()
@@ -458,26 +455,20 @@ class MainWindow(QWidget):
             return
 
         entry_id = selected.data(Qt.ItemDataRole.UserRole)
-
         current_service = self.ui.serviceLabel.text()
-        new_service, ok = QInputDialog.getText(
-            self,
-            "Edit Service",
-            "Enter new service name:",
-            text=current_service
-        )
-
-        if not ok or not new_service.strip():
-            return
-
-        try:
-            self.db.edit_service(entry_id, new_service.strip())
-            self.load_entries()
-            self.update_details(self.ui.listWidget.currentItem())
-            self.ui.listWidget.setCurrentIndex(index)
-            QMessageBox.information(self, "Edit Success", f"Service successfully updated for:\n\n'{current_service}'")
-        except Exception as e:
-            QMessageBox.critical(self, "Error", f"Failed to update service:\n{e}")
+        dialog = GetTextDialogPopup("Edit Service", f"Please enter a new servicename for service:\n{current_service}.", "service", self)
+        if dialog.exec():
+            new_service = dialog.get_value()
+            if not new_service.strip():
+                return
+            try:
+                self.db.edit_service(entry_id, new_service.strip())
+                self.load_entries()
+                self.update_details(self.ui.listWidget.currentItem())
+                self.ui.listWidget.setCurrentIndex(index)
+                DialogPopup("Edit Success", f"Service successfully updated for:\n\n'{current_service}' => '{new_service}'", PopupType.SUCCESS, self).exec()
+            except Exception as e:
+                DialogPopup("Error", f"Failed to update service:\n{e}", PopupType.ERROR, self).exec()        
             
     def edit_entry_url(self):        
         selected = self.ui.listWidget.currentItem()
@@ -498,10 +489,10 @@ class MainWindow(QWidget):
                 self.db.edit_url(entry_id, new_url.strip())
                 self.load_entries()
                 self.update_details(self.ui.listWidget.currentItem())
-                self.ui.listWidget.setCurrentIndex(index)                
-                QMessageBox.information(self, "Success", f"URL successfully updated for:\n{current_service}")
+                self.ui.listWidget.setCurrentIndex(index)
+                DialogPopup("Edit Success", f"URL successfully updated for:\n\n'{current_service}'", PopupType.SUCCESS, self).exec()        
             except Exception as e:
-                QMessageBox.critical(self, "Error", f"Failed to update url:\n{e}")
+                DialogPopup("Error", f"Failed to update url:\n{e}", PopupType.ERROR, self).exec()        
     
     def edit_entry_note(self):
         selected = self.ui.listWidget.currentItem()
@@ -521,9 +512,9 @@ class MainWindow(QWidget):
                 self.load_entries()
                 self.update_details(self.ui.listWidget.currentItem())
                 self.ui.listWidget.setCurrentIndex(index)
-                QMessageBox.information(self, "Edit Success", f"Note successfully updated for:\n\n'{current_service}'")
+                DialogPopup("Edit Success", f"Note successfully updated for:\n\n'{current_service}'", PopupType.SUCCESS, self).exec()
             except Exception as e:
-                QMessageBox.critical(self, "Error", f"Failed to update note:\n{e}")        
+                DialogPopup("Error", f"Failed to update note:\n{e}", PopupType.ERROR, self).exec()        
     
     def copy_password_to_clipboard(self):
         if not hasattr(self, "_current_plain_password"):
