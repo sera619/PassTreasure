@@ -14,7 +14,9 @@ from gui.edit_url_dialog import EditURLDialog
 from gui.edit_note_dialog import EditNoteDialog
 from gui.dialog_popup import DialogPopup
 from gui.get_text_dialog_popup import GetTextDialogPopup
+from gui.password_strength_indicator import PasswordStrengthIndicator
 
+from backend.password_strength_logic import evaluate_password_strength
 from backend.database import PasswordDatabase
 from backend.inactivity_watcher import AutoLocker, InactivityWatcher
 
@@ -39,6 +41,8 @@ class MainWindow(QWidget):
         self.apply_dark_theme()
         self.build_ui()  
         self.apply_styles()
+        self.strength_indicator = PasswordStrengthIndicator(self)
+        self.ui.indicatorHolder.addWidget(self.strength_indicator)  
 
         if IS_DEBUGGING:
             loaded_entries = self.db.get_all_entries()
@@ -267,7 +271,8 @@ class MainWindow(QWidget):
             self._current_plain_password = pw
             self._password_visible = False
             details = self.db.get_entry_details(entry_id)
-            
+            level = evaluate_password_strength(pw)
+            self.strength_indicator.set_strength(level)
             self.ui.serviceLabel.setText(service)
             self.ui.usernameLabel.setText(username)
             self.ui.passLabel.setText("•" * len(pw))
