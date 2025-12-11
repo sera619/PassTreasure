@@ -17,13 +17,13 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QAbstractButton, QApplication, QCheckBox, QDialog,
     QDialogButtonBox, QLabel, QLineEdit, QPushButton,
-    QSizePolicy, QVBoxLayout, QWidget)
+    QSizePolicy, QSpacerItem, QVBoxLayout, QWidget)
 
 class Ui_ChangePasswordDialog(object):
     def setupUi(self, ChangePasswordDialog):
         if not ChangePasswordDialog.objectName():
             ChangePasswordDialog.setObjectName(u"ChangePasswordDialog")
-        ChangePasswordDialog.resize(243, 206)
+        ChangePasswordDialog.resize(243, 230)
         self.vboxLayout = QVBoxLayout(ChangePasswordDialog)
         self.vboxLayout.setObjectName(u"vboxLayout")
         self.labelInfo = QLabel(ChangePasswordDialog)
@@ -51,12 +51,18 @@ class Ui_ChangePasswordDialog(object):
         self.btnGeneratePw = QPushButton(ChangePasswordDialog)
         self.btnGeneratePw.setObjectName(u"btnGeneratePw")
 
-        self.vboxLayout.addWidget(self.btnGeneratePw)
+        self.vboxLayout.addWidget(self.btnGeneratePw, 0, Qt.AlignmentFlag.AlignRight)
 
         self.labelError = QLabel(ChangePasswordDialog)
         self.labelError.setObjectName(u"labelError")
+        self.labelError.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.labelError.setWordWrap(True)
 
         self.vboxLayout.addWidget(self.labelError)
+
+        self.verticalSpacer = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+
+        self.vboxLayout.addItem(self.verticalSpacer)
 
         self.buttonBox = QDialogButtonBox(ChangePasswordDialog)
         self.buttonBox.setObjectName(u"buttonBox")
@@ -73,9 +79,9 @@ class Ui_ChangePasswordDialog(object):
     def retranslateUi(self, ChangePasswordDialog):
         ChangePasswordDialog.setWindowTitle(QCoreApplication.translate("ChangePasswordDialog", u"Change Password", None))
         self.labelInfo.setText(QCoreApplication.translate("ChangePasswordDialog", u"Please enter your new password twice:", None))
-        self.lineEditPassword1.setPlaceholderText(QCoreApplication.translate("ChangePasswordDialog", u"New password", None))
-        self.lineEditPassword2.setPlaceholderText(QCoreApplication.translate("ChangePasswordDialog", u"Repeat password", None))
-        self.check_show_pass.setText(QCoreApplication.translate("ChangePasswordDialog", u"show", None))
+        self.lineEditPassword1.setPlaceholderText(QCoreApplication.translate("ChangePasswordDialog", u"Enter new  password...", None))
+        self.lineEditPassword2.setPlaceholderText(QCoreApplication.translate("ChangePasswordDialog", u"Repeat new password...", None))
+        self.check_show_pass.setText(QCoreApplication.translate("ChangePasswordDialog", u"Show Password", None))
         self.btnGeneratePw.setText(QCoreApplication.translate("ChangePasswordDialog", u"Generate Password", None))
         self.labelError.setStyleSheet(QCoreApplication.translate("ChangePasswordDialog", u"#labelError { color: red; }", None))
         self.labelError.setText("")

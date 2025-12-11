@@ -16,14 +16,14 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QApplication, QFrame, QHBoxLayout, QLabel,
-    QLineEdit, QPushButton, QSizePolicy, QVBoxLayout,
-    QWidget)
+    QLineEdit, QPushButton, QSizePolicy, QSpacerItem,
+    QVBoxLayout, QWidget)
 
 class Ui_LoginWindowUI(object):
     def setupUi(self, LoginWindowUI):
         if not LoginWindowUI.objectName():
             LoginWindowUI.setObjectName(u"LoginWindowUI")
-        LoginWindowUI.resize(400, 272)
+        LoginWindowUI.resize(400, 274)
         self.verticalLayout = QVBoxLayout(LoginWindowUI)
         self.verticalLayout.setSpacing(4)
         self.verticalLayout.setObjectName(u"verticalLayout")
@@ -126,13 +126,17 @@ class Ui_LoginWindowUI(object):
         self.verticalLayout.addWidget(self.label_error)
 
         self.buttonLayout = QHBoxLayout()
+        self.buttonLayout.setSpacing(9)
         self.buttonLayout.setObjectName(u"buttonLayout")
-        self.buttonLayout.setContentsMargins(4, 4, 4, 4)
-        self.btn_create = QPushButton(LoginWindowUI)
-        self.btn_create.setObjectName(u"btn_create")
-        self.btn_create.setVisible(True)
+        self.buttonLayout.setContentsMargins(6, 6, 6, 6)
+        self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
-        self.buttonLayout.addWidget(self.btn_create)
+        self.buttonLayout.addItem(self.horizontalSpacer)
+
+        self.btn_restore_backup = QPushButton(LoginWindowUI)
+        self.btn_restore_backup.setObjectName(u"btn_restore_backup")
+
+        self.buttonLayout.addWidget(self.btn_restore_backup)
 
         self.btn_delete_vault = QPushButton(LoginWindowUI)
         self.btn_delete_vault.setObjectName(u"btn_delete_vault")
@@ -144,6 +148,12 @@ class Ui_LoginWindowUI(object):
         self.btn_login.setVisible(True)
 
         self.buttonLayout.addWidget(self.btn_login)
+
+        self.btn_create = QPushButton(LoginWindowUI)
+        self.btn_create.setObjectName(u"btn_create")
+        self.btn_create.setVisible(True)
+
+        self.buttonLayout.addWidget(self.btn_create)
 
 
         self.verticalLayout.addLayout(self.buttonLayout)
@@ -169,12 +179,13 @@ class Ui_LoginWindowUI(object):
         self.label_title.setText(QCoreApplication.translate("LoginWindowUI", u"Enter Master Password:", None))
         self.input_password.setPlaceholderText(QCoreApplication.translate("LoginWindowUI", u"Enter password...", None))
         self.btn_toggle_pw.setText(QCoreApplication.translate("LoginWindowUI", u"Show", None))
-        self.input_password2.setPlaceholderText(QCoreApplication.translate("LoginWindowUI", u"Repeat  password...", None))
+        self.input_password2.setPlaceholderText(QCoreApplication.translate("LoginWindowUI", u"Repeat password...", None))
         self.btn_toggle_pw2.setText(QCoreApplication.translate("LoginWindowUI", u"Show", None))
         self.label_error.setText("")
-        self.btn_create.setText(QCoreApplication.translate("LoginWindowUI", u"Create Vault", None))
+        self.btn_restore_backup.setText(QCoreApplication.translate("LoginWindowUI", u"Restore Backup", None))
         self.btn_delete_vault.setText(QCoreApplication.translate("LoginWindowUI", u"Delete Vault", None))
         self.btn_login.setText(QCoreApplication.translate("LoginWindowUI", u"Login", None))
+        self.btn_create.setText(QCoreApplication.translate("LoginWindowUI", u"Create Vault", None))
         self.footer_label.setText(QCoreApplication.translate("LoginWindowUI", u"TextLabel", None))
     # retranslateUi
 

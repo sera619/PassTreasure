@@ -33,7 +33,9 @@ class Ui_SettingsWindow(object):
         self.sidebar.setObjectName(u"sidebar")
         self.sidebar.setFrameShape(QFrame.Shape.StyledPanel)
         self.vboxLayout = QVBoxLayout(self.sidebar)
+        self.vboxLayout.setSpacing(4)
         self.vboxLayout.setObjectName(u"vboxLayout")
+        self.vboxLayout.setContentsMargins(6, 6, 6, 6)
         self.btn_general = QPushButton(self.sidebar)
         self.btn_general.setObjectName(u"btn_general")
 
@@ -48,6 +50,11 @@ class Ui_SettingsWindow(object):
         self.btn_import.setObjectName(u"btn_import")
 
         self.vboxLayout.addWidget(self.btn_import)
+
+        self.btn_export = QPushButton(self.sidebar)
+        self.btn_export.setObjectName(u"btn_export")
+
+        self.vboxLayout.addWidget(self.btn_export)
 
         self.btn_about = QPushButton(self.sidebar)
         self.btn_about.setObjectName(u"btn_about")
@@ -67,12 +74,16 @@ class Ui_SettingsWindow(object):
         self.page_general.setObjectName(u"page_general")
         self.vboxLayout1 = QVBoxLayout(self.page_general)
         self.vboxLayout1.setObjectName(u"vboxLayout1")
+        self.vboxLayout1.setContentsMargins(4, 4, 4, 4)
         self.label_2 = QLabel(self.page_general)
         self.label_2.setObjectName(u"label_2")
         font = QFont()
+        font.setFamilies([u"Segoe UI"])
         font.setPointSize(14)
         font.setBold(True)
+        font.setItalic(False)
         self.label_2.setFont(font)
+        self.label_2.setStyleSheet(u"font: bold 14pt \"Segoe UI\";")
         self.label_2.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.vboxLayout1.addWidget(self.label_2, 0, Qt.AlignmentFlag.AlignTop)
@@ -83,9 +94,9 @@ class Ui_SettingsWindow(object):
         self.scrollAreaGeneral.setWidgetResizable(True)
         self.scrollAreaWidgetContents_2 = QWidget()
         self.scrollAreaWidgetContents_2.setObjectName(u"scrollAreaWidgetContents_2")
-        self.scrollAreaWidgetContents_2.setGeometry(QRect(0, 0, 473, 607))
+        self.scrollAreaWidgetContents_2.setGeometry(QRect(0, 0, 489, 687))
         self.verticalLayout_3 = QVBoxLayout(self.scrollAreaWidgetContents_2)
-        self.verticalLayout_3.setSpacing(40)
+        self.verticalLayout_3.setSpacing(14)
         self.verticalLayout_3.setObjectName(u"verticalLayout_3")
         self.verticalLayout_3.setContentsMargins(0, 0, 0, 0)
         self.autoLogoutFrame = QFrame(self.scrollAreaWidgetContents_2)
@@ -97,9 +108,12 @@ class Ui_SettingsWindow(object):
         self.label_10 = QLabel(self.autoLogoutFrame)
         self.label_10.setObjectName(u"label_10")
         font1 = QFont()
-        font1.setPointSize(12)
+        font1.setFamilies([u"Segoe UI"])
+        font1.setPointSize(10)
         font1.setBold(True)
+        font1.setItalic(False)
         self.label_10.setFont(font1)
+        self.label_10.setStyleSheet(u"font: bold 10pt \"Segoe UI\";")
 
         self.verticalLayout_15.addWidget(self.label_10)
 
@@ -129,6 +143,7 @@ class Ui_SettingsWindow(object):
         self.horizontalLayout_10.setObjectName(u"horizontalLayout_10")
         self.label_11 = QLabel(self.frame_9)
         self.label_11.setObjectName(u"label_11")
+        self.label_11.setMinimumSize(QSize(130, 0))
         font2 = QFont()
         font2.setBold(True)
         self.label_11.setFont(font2)
@@ -158,6 +173,73 @@ class Ui_SettingsWindow(object):
 
         self.verticalLayout_3.addWidget(self.autoLogoutFrame)
 
+        self.autoHideDetailsFrame = QFrame(self.scrollAreaWidgetContents_2)
+        self.autoHideDetailsFrame.setObjectName(u"autoHideDetailsFrame")
+        self.autoHideDetailsFrame.setFrameShape(QFrame.Shape.StyledPanel)
+        self.autoHideDetailsFrame.setFrameShadow(QFrame.Shadow.Raised)
+        self.verticalLayout_17 = QVBoxLayout(self.autoHideDetailsFrame)
+        self.verticalLayout_17.setObjectName(u"verticalLayout_17")
+        self.label_12 = QLabel(self.autoHideDetailsFrame)
+        self.label_12.setObjectName(u"label_12")
+        self.label_12.setFont(font1)
+        self.label_12.setStyleSheet(u"font: bold 10pt \"Segoe UI\";")
+
+        self.verticalLayout_17.addWidget(self.label_12)
+
+        self.frame_11 = QFrame(self.autoHideDetailsFrame)
+        self.frame_11.setObjectName(u"frame_11")
+        self.frame_11.setFrameShape(QFrame.Shape.NoFrame)
+        self.frame_11.setFrameShadow(QFrame.Shadow.Raised)
+        self.verticalLayout_16 = QVBoxLayout(self.frame_11)
+        self.verticalLayout_16.setObjectName(u"verticalLayout_16")
+        self.verticalLayout_16.setContentsMargins(0, 5, 0, 5)
+        self.line_7 = QFrame(self.frame_11)
+        self.line_7.setObjectName(u"line_7")
+        self.line_7.setStyleSheet(u"background:rgb(170, 0, 0)")
+        self.line_7.setFrameShape(QFrame.Shape.HLine)
+        self.line_7.setFrameShadow(QFrame.Shadow.Sunken)
+
+        self.verticalLayout_16.addWidget(self.line_7)
+
+
+        self.verticalLayout_17.addWidget(self.frame_11)
+
+        self.frame_12 = QFrame(self.autoHideDetailsFrame)
+        self.frame_12.setObjectName(u"frame_12")
+        self.frame_12.setFrameShape(QFrame.Shape.NoFrame)
+        self.frame_12.setFrameShadow(QFrame.Shadow.Raised)
+        self.horizontalLayout_11 = QHBoxLayout(self.frame_12)
+        self.horizontalLayout_11.setObjectName(u"horizontalLayout_11")
+        self.label_13 = QLabel(self.frame_12)
+        self.label_13.setObjectName(u"label_13")
+        self.label_13.setMinimumSize(QSize(130, 0))
+        self.label_13.setFont(font2)
+
+        self.horizontalLayout_11.addWidget(self.label_13)
+
+        self.autoHideDetailsTimeEdit = QTimeEdit(self.frame_12)
+        self.autoHideDetailsTimeEdit.setObjectName(u"autoHideDetailsTimeEdit")
+        self.autoHideDetailsTimeEdit.setWrapping(False)
+        self.autoHideDetailsTimeEdit.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.autoHideDetailsTimeEdit.setCurrentSection(QDateTimeEdit.Section.MinuteSection)
+
+        self.horizontalLayout_11.addWidget(self.autoHideDetailsTimeEdit)
+
+        self.horizontalSpacer_3 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+
+        self.horizontalLayout_11.addItem(self.horizontalSpacer_3)
+
+        self.autoHideDetailsCheckBox = QCheckBox(self.frame_12)
+        self.autoHideDetailsCheckBox.setObjectName(u"autoHideDetailsCheckBox")
+
+        self.horizontalLayout_11.addWidget(self.autoHideDetailsCheckBox)
+
+
+        self.verticalLayout_17.addWidget(self.frame_12)
+
+
+        self.verticalLayout_3.addWidget(self.autoHideDetailsFrame)
+
         self.backupFrame = QFrame(self.scrollAreaWidgetContents_2)
         self.backupFrame.setObjectName(u"backupFrame")
         sizePolicy = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
@@ -172,6 +254,7 @@ class Ui_SettingsWindow(object):
         self.backupTitleLabel = QLabel(self.backupFrame)
         self.backupTitleLabel.setObjectName(u"backupTitleLabel")
         self.backupTitleLabel.setFont(font1)
+        self.backupTitleLabel.setStyleSheet(u"font: bold 10pt \"Segoe UI\";")
 
         self.verticalLayout_2.addWidget(self.backupTitleLabel)
 
@@ -199,7 +282,7 @@ class Ui_SettingsWindow(object):
         self.autoBackupFrame.setFrameShadow(QFrame.Shadow.Raised)
         self.horizontalLayout_2 = QHBoxLayout(self.autoBackupFrame)
         self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
-        self.horizontalLayout_2.setContentsMargins(4, 4, 4, 4)
+        self.horizontalLayout_2.setContentsMargins(9, 4, 9, 4)
         self.label_4 = QLabel(self.autoBackupFrame)
         self.label_4.setObjectName(u"label_4")
         font3 = QFont()
@@ -225,7 +308,7 @@ class Ui_SettingsWindow(object):
         self.lastBackupFrame.setFrameShadow(QFrame.Shadow.Raised)
         self.horizontalLayout_3 = QHBoxLayout(self.lastBackupFrame)
         self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
-        self.horizontalLayout_3.setContentsMargins(4, 4, 4, 4)
+        self.horizontalLayout_3.setContentsMargins(9, 4, 9, 4)
         self.label_3 = QLabel(self.lastBackupFrame)
         self.label_3.setObjectName(u"label_3")
         font4 = QFont()
@@ -250,23 +333,9 @@ class Ui_SettingsWindow(object):
         self.horizontalLayout = QHBoxLayout(self.backupBtnFrame)
         self.horizontalLayout.setObjectName(u"horizontalLayout")
         self.horizontalLayout.setContentsMargins(4, 4, 4, 4)
-        self.btnCreateBackup = QPushButton(self.backupBtnFrame)
-        self.btnCreateBackup.setObjectName(u"btnCreateBackup")
-        self.btnCreateBackup.setMinimumSize(QSize(80, 0))
+        self.horizontalSpacer_4 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
-        self.horizontalLayout.addWidget(self.btnCreateBackup)
-
-        self.btnRestoreBackup = QPushButton(self.backupBtnFrame)
-        self.btnRestoreBackup.setObjectName(u"btnRestoreBackup")
-        self.btnRestoreBackup.setMinimumSize(QSize(80, 0))
-
-        self.horizontalLayout.addWidget(self.btnRestoreBackup)
-
-        self.btnDeleteBackup = QPushButton(self.backupBtnFrame)
-        self.btnDeleteBackup.setObjectName(u"btnDeleteBackup")
-        self.btnDeleteBackup.setMinimumSize(QSize(80, 0))
-
-        self.horizontalLayout.addWidget(self.btnDeleteBackup)
+        self.horizontalLayout.addItem(self.horizontalSpacer_4)
 
         self.btnClearBackup = QPushButton(self.backupBtnFrame)
         self.btnClearBackup.setObjectName(u"btnClearBackup")
@@ -280,8 +349,30 @@ class Ui_SettingsWindow(object):
 
         self.horizontalLayout.addWidget(self.btnClearBackup)
 
+        self.btnDeleteBackup = QPushButton(self.backupBtnFrame)
+        self.btnDeleteBackup.setObjectName(u"btnDeleteBackup")
+        self.btnDeleteBackup.setMinimumSize(QSize(80, 0))
+
+        self.horizontalLayout.addWidget(self.btnDeleteBackup)
+
+        self.btnRestoreBackup = QPushButton(self.backupBtnFrame)
+        self.btnRestoreBackup.setObjectName(u"btnRestoreBackup")
+        self.btnRestoreBackup.setMinimumSize(QSize(80, 0))
+
+        self.horizontalLayout.addWidget(self.btnRestoreBackup)
+
+        self.btnCreateBackup = QPushButton(self.backupBtnFrame)
+        self.btnCreateBackup.setObjectName(u"btnCreateBackup")
+        self.btnCreateBackup.setMinimumSize(QSize(80, 0))
+
+        self.horizontalLayout.addWidget(self.btnCreateBackup)
+
 
         self.verticalLayout_2.addWidget(self.backupBtnFrame)
+
+        self.verticalSpacer_3 = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+
+        self.verticalLayout_2.addItem(self.verticalSpacer_3)
 
 
         self.verticalLayout_3.addWidget(self.backupFrame)
@@ -295,6 +386,7 @@ class Ui_SettingsWindow(object):
         self.categpryTitleLabel = QLabel(self.categoryFrame)
         self.categpryTitleLabel.setObjectName(u"categpryTitleLabel")
         self.categpryTitleLabel.setFont(font1)
+        self.categpryTitleLabel.setStyleSheet(u"font: bold 10pt \"Segoe UI\";")
 
         self.verticalLayout_4.addWidget(self.categpryTitleLabel)
 
@@ -316,6 +408,12 @@ class Ui_SettingsWindow(object):
 
         self.verticalLayout_4.addWidget(self.frame_2)
 
+        self.label_5 = QLabel(self.categoryFrame)
+        self.label_5.setObjectName(u"label_5")
+        self.label_5.setFont(font2)
+
+        self.verticalLayout_4.addWidget(self.label_5)
+
         self.createCategoryFrame = QFrame(self.categoryFrame)
         self.createCategoryFrame.setObjectName(u"createCategoryFrame")
         self.createCategoryFrame.setFrameShape(QFrame.Shape.NoFrame)
@@ -323,12 +421,6 @@ class Ui_SettingsWindow(object):
         self.verticalLayout_8 = QVBoxLayout(self.createCategoryFrame)
         self.verticalLayout_8.setObjectName(u"verticalLayout_8")
         self.verticalLayout_8.setContentsMargins(9, 9, 9, 9)
-        self.label_5 = QLabel(self.createCategoryFrame)
-        self.label_5.setObjectName(u"label_5")
-        self.label_5.setFont(font2)
-
-        self.verticalLayout_8.addWidget(self.label_5)
-
         self.frame_4 = QFrame(self.createCategoryFrame)
         self.frame_4.setObjectName(u"frame_4")
         self.frame_4.setFrameShape(QFrame.Shape.NoFrame)
@@ -342,8 +434,18 @@ class Ui_SettingsWindow(object):
 
         self.horizontalLayout_4.addWidget(self.btnCategpryColor)
 
+        self.horizontalSpacer_5 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+
+        self.horizontalLayout_4.addItem(self.horizontalSpacer_5)
+
+        self.label_14 = QLabel(self.frame_4)
+        self.label_14.setObjectName(u"label_14")
+
+        self.horizontalLayout_4.addWidget(self.label_14, 0, Qt.AlignmentFlag.AlignRight)
+
         self.btnPreviewCatColor = QPushButton(self.frame_4)
         self.btnPreviewCatColor.setObjectName(u"btnPreviewCatColor")
+        self.btnPreviewCatColor.setEnabled(False)
 
         self.horizontalLayout_4.addWidget(self.btnPreviewCatColor)
 
@@ -407,7 +509,7 @@ class Ui_SettingsWindow(object):
         self.editCategoryFrae.setFrameShadow(QFrame.Shadow.Raised)
         self.horizontalLayout_5 = QHBoxLayout(self.editCategoryFrae)
         self.horizontalLayout_5.setObjectName(u"horizontalLayout_5")
-        self.horizontalLayout_5.setContentsMargins(0, 0, 0, 0)
+        self.horizontalLayout_5.setContentsMargins(9, 9, 9, 9)
         self.editCategoryBox = QComboBox(self.editCategoryFrae)
         self.editCategoryBox.setObjectName(u"editCategoryBox")
         sizePolicy2 = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
@@ -454,9 +556,11 @@ class Ui_SettingsWindow(object):
         self.page_security.setObjectName(u"page_security")
         self.vboxLayout2 = QVBoxLayout(self.page_security)
         self.vboxLayout2.setObjectName(u"vboxLayout2")
+        self.vboxLayout2.setContentsMargins(4, 4, 4, 4)
         self.securityTitle = QLabel(self.page_security)
         self.securityTitle.setObjectName(u"securityTitle")
         self.securityTitle.setFont(font)
+        self.securityTitle.setStyleSheet(u"font: bold 14pt \"Segoe UI\";")
         self.securityTitle.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.vboxLayout2.addWidget(self.securityTitle)
@@ -468,10 +572,8 @@ class Ui_SettingsWindow(object):
         self.verticalLayout_10.setObjectName(u"verticalLayout_10")
         self.label = QLabel(self.pw_frame)
         self.label.setObjectName(u"label")
-        font5 = QFont()
-        font5.setPointSize(10)
-        font5.setBold(True)
-        self.label.setFont(font5)
+        self.label.setFont(font1)
+        self.label.setStyleSheet(u"font: bold 10pt \"Segoe UI\";")
 
         self.verticalLayout_10.addWidget(self.label)
 
@@ -553,9 +655,11 @@ class Ui_SettingsWindow(object):
         self.page_import.setObjectName(u"page_import")
         self.verticalLayout_13 = QVBoxLayout(self.page_import)
         self.verticalLayout_13.setObjectName(u"verticalLayout_13")
+        self.verticalLayout_13.setContentsMargins(4, 4, 4, 4)
         self.importTitle = QLabel(self.page_import)
         self.importTitle.setObjectName(u"importTitle")
-        self.importTitle.setFont(font1)
+        self.importTitle.setFont(font)
+        self.importTitle.setStyleSheet(u"font: bold 14pt \"Segoe UI\";")
         self.importTitle.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.verticalLayout_13.addWidget(self.importTitle)
@@ -569,7 +673,8 @@ class Ui_SettingsWindow(object):
         self.verticalLayout_12.setObjectName(u"verticalLayout_12")
         self.label_8 = QLabel(self.importFrame)
         self.label_8.setObjectName(u"label_8")
-        self.label_8.setFont(font2)
+        self.label_8.setFont(font1)
+        self.label_8.setStyleSheet(u"font: bold 10pt \"Segoe UI\";")
 
         self.verticalLayout_12.addWidget(self.label_8)
 
@@ -615,10 +720,10 @@ class Ui_SettingsWindow(object):
 
         self.horizontalLayout_8.addWidget(self.label_9)
 
-        self.exportFilePathLineEdit = QLineEdit(self.importFrame)
-        self.exportFilePathLineEdit.setObjectName(u"exportFilePathLineEdit")
+        self.importFilePathLineEdit = QLineEdit(self.importFrame)
+        self.importFilePathLineEdit.setObjectName(u"importFilePathLineEdit")
 
-        self.horizontalLayout_8.addWidget(self.exportFilePathLineEdit)
+        self.horizontalLayout_8.addWidget(self.importFilePathLineEdit)
 
         self.btnSelectPath = QPushButton(self.importFrame)
         self.btnSelectPath.setObjectName(u"btnSelectPath")
@@ -671,13 +776,99 @@ class Ui_SettingsWindow(object):
         self.verticalLayout_13.addItem(self.verticalSpacer)
 
         self.stack.addWidget(self.page_import)
+        self.page_export = QWidget()
+        self.page_export.setObjectName(u"page_export")
+        self.verticalLayout_18 = QVBoxLayout(self.page_export)
+        self.verticalLayout_18.setObjectName(u"verticalLayout_18")
+        self.verticalLayout_18.setContentsMargins(4, 4, 4, 4)
+        self.label_17 = QLabel(self.page_export)
+        self.label_17.setObjectName(u"label_17")
+        self.label_17.setStyleSheet(u"font: bold 14pt \"Segoe UI\";")
+        self.label_17.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        self.verticalLayout_18.addWidget(self.label_17)
+
+        self.frame_10 = QFrame(self.page_export)
+        self.frame_10.setObjectName(u"frame_10")
+        self.frame_10.setFrameShape(QFrame.Shape.StyledPanel)
+        self.frame_10.setFrameShadow(QFrame.Shadow.Raised)
+        self.verticalLayout_20 = QVBoxLayout(self.frame_10)
+        self.verticalLayout_20.setSpacing(12)
+        self.verticalLayout_20.setObjectName(u"verticalLayout_20")
+        self.label_16 = QLabel(self.frame_10)
+        self.label_16.setObjectName(u"label_16")
+        self.label_16.setFont(font1)
+        self.label_16.setStyleSheet(u"font: bold 10pt \"Segoe UI\";")
+
+        self.verticalLayout_20.addWidget(self.label_16)
+
+        self.frame_13 = QFrame(self.frame_10)
+        self.frame_13.setObjectName(u"frame_13")
+        self.frame_13.setFrameShape(QFrame.Shape.NoFrame)
+        self.frame_13.setFrameShadow(QFrame.Shadow.Raised)
+        self.verticalLayout_19 = QVBoxLayout(self.frame_13)
+        self.verticalLayout_19.setSpacing(0)
+        self.verticalLayout_19.setObjectName(u"verticalLayout_19")
+        self.verticalLayout_19.setContentsMargins(0, 2, 0, 2)
+        self.line_8 = QFrame(self.frame_13)
+        self.line_8.setObjectName(u"line_8")
+        self.line_8.setStyleSheet(u"background:rgb(170, 0, 0)")
+        self.line_8.setFrameShape(QFrame.Shape.HLine)
+        self.line_8.setFrameShadow(QFrame.Shadow.Sunken)
+
+        self.verticalLayout_19.addWidget(self.line_8)
+
+
+        self.verticalLayout_20.addWidget(self.frame_13)
+
+        self.exportFilenameLineEdit = QLineEdit(self.frame_10)
+        self.exportFilenameLineEdit.setObjectName(u"exportFilenameLineEdit")
+
+        self.verticalLayout_20.addWidget(self.exportFilenameLineEdit)
+
+        self.horizontalLayout_12 = QHBoxLayout()
+        self.horizontalLayout_12.setObjectName(u"horizontalLayout_12")
+        self.horizontalLayout_12.setContentsMargins(0, 0, 0, 0)
+        self.label_15 = QLabel(self.frame_10)
+        self.label_15.setObjectName(u"label_15")
+
+        self.horizontalLayout_12.addWidget(self.label_15)
+
+        self.exportFileLineEdit = QLineEdit(self.frame_10)
+        self.exportFileLineEdit.setObjectName(u"exportFileLineEdit")
+
+        self.horizontalLayout_12.addWidget(self.exportFileLineEdit)
+
+        self.btnExportPath = QPushButton(self.frame_10)
+        self.btnExportPath.setObjectName(u"btnExportPath")
+
+        self.horizontalLayout_12.addWidget(self.btnExportPath)
+
+
+        self.verticalLayout_20.addLayout(self.horizontalLayout_12)
+
+        self.btnStartExport = QPushButton(self.frame_10)
+        self.btnStartExport.setObjectName(u"btnStartExport")
+
+        self.verticalLayout_20.addWidget(self.btnStartExport, 0, Qt.AlignmentFlag.AlignRight)
+
+
+        self.verticalLayout_18.addWidget(self.frame_10)
+
+        self.verticalSpacer_2 = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+
+        self.verticalLayout_18.addItem(self.verticalSpacer_2)
+
+        self.stack.addWidget(self.page_export)
         self.page_about = QWidget()
         self.page_about.setObjectName(u"page_about")
         self.vboxLayout3 = QVBoxLayout(self.page_about)
         self.vboxLayout3.setObjectName(u"vboxLayout3")
+        self.vboxLayout3.setContentsMargins(4, 4, 4, 4)
         self.aboutTitle = QLabel(self.page_about)
         self.aboutTitle.setObjectName(u"aboutTitle")
         self.aboutTitle.setFont(font)
+        self.aboutTitle.setStyleSheet(u"font: bold 14pt \"Segoe UI\";")
         self.aboutTitle.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.vboxLayout3.addWidget(self.aboutTitle, 0, Qt.AlignmentFlag.AlignTop)
@@ -687,7 +878,7 @@ class Ui_SettingsWindow(object):
         self.scrollArea.setWidgetResizable(True)
         self.scrollAreaWidgetContents = QWidget()
         self.scrollAreaWidgetContents.setObjectName(u"scrollAreaWidgetContents")
-        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 481, 338))
+        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 497, 348))
         self.verticalLayout = QVBoxLayout(self.scrollAreaWidgetContents)
         self.verticalLayout.setSpacing(0)
         self.verticalLayout.setObjectName(u"verticalLayout")
@@ -727,23 +918,29 @@ class Ui_SettingsWindow(object):
         self.btn_general.setText(QCoreApplication.translate("SettingsWindow", u"General", None))
         self.btn_security.setText(QCoreApplication.translate("SettingsWindow", u"Security", None))
         self.btn_import.setText(QCoreApplication.translate("SettingsWindow", u"Import", None))
+        self.btn_export.setText(QCoreApplication.translate("SettingsWindow", u"Export", None))
         self.btn_about.setText(QCoreApplication.translate("SettingsWindow", u"About", None))
         self.label_2.setText(QCoreApplication.translate("SettingsWindow", u"General", None))
         self.label_10.setText(QCoreApplication.translate("SettingsWindow", u"Auto. Logout", None))
         self.label_11.setText(QCoreApplication.translate("SettingsWindow", u"Logout Time (mm:ss):", None))
         self.autoLogoutTimeEdit.setDisplayFormat(QCoreApplication.translate("SettingsWindow", u"mm:ss", None))
         self.autoLogoutCheckBox.setText(QCoreApplication.translate("SettingsWindow", u"Active", None))
+        self.label_12.setText(QCoreApplication.translate("SettingsWindow", u"Auto Hide Details", None))
+        self.label_13.setText(QCoreApplication.translate("SettingsWindow", u"Hide Time (mm:ss):", None))
+        self.autoHideDetailsTimeEdit.setDisplayFormat(QCoreApplication.translate("SettingsWindow", u"mm:ss", None))
+        self.autoHideDetailsCheckBox.setText(QCoreApplication.translate("SettingsWindow", u"Active", None))
         self.backupTitleLabel.setText(QCoreApplication.translate("SettingsWindow", u"Backups", None))
         self.label_4.setText(QCoreApplication.translate("SettingsWindow", u"Auto. Backups:", None))
         self.label_3.setText(QCoreApplication.translate("SettingsWindow", u"Last Backup:", None))
         self.backUpPathLabel.setText(QCoreApplication.translate("SettingsWindow", u"TextLabel", None))
-        self.btnCreateBackup.setText(QCoreApplication.translate("SettingsWindow", u"Create ", None))
-        self.btnRestoreBackup.setText(QCoreApplication.translate("SettingsWindow", u"Restore ", None))
-        self.btnDeleteBackup.setText(QCoreApplication.translate("SettingsWindow", u"Delete", None))
         self.btnClearBackup.setText(QCoreApplication.translate("SettingsWindow", u"Clear", None))
+        self.btnDeleteBackup.setText(QCoreApplication.translate("SettingsWindow", u"Delete", None))
+        self.btnRestoreBackup.setText(QCoreApplication.translate("SettingsWindow", u"Restore ", None))
+        self.btnCreateBackup.setText(QCoreApplication.translate("SettingsWindow", u"Create ", None))
         self.categpryTitleLabel.setText(QCoreApplication.translate("SettingsWindow", u"Categories", None))
         self.label_5.setText(QCoreApplication.translate("SettingsWindow", u"Create new category.", None))
         self.btnCategpryColor.setText(QCoreApplication.translate("SettingsWindow", u"Pick Color", None))
+        self.label_14.setText(QCoreApplication.translate("SettingsWindow", u"Preview:", None))
         self.btnPreviewCatColor.setText("")
         self.categoryCreatLineEdit.setPlaceholderText(QCoreApplication.translate("SettingsWindow", u"Enter category name...", None))
         self.btnCreateCategory.setText(QCoreApplication.translate("SettingsWindow", u"Create", None))
@@ -753,23 +950,30 @@ class Ui_SettingsWindow(object):
         self.btnDeleteCategory.setText(QCoreApplication.translate("SettingsWindow", u"Delete", None))
         self.securityTitle.setText(QCoreApplication.translate("SettingsWindow", u"Security", None))
         self.label.setText(QCoreApplication.translate("SettingsWindow", u"Change Master Password", None))
-        self.oldPwLabel.setText(QCoreApplication.translate("SettingsWindow", u"Old Password:", None))
+        self.oldPwLabel.setText(QCoreApplication.translate("SettingsWindow", u"Password:", None))
         self.old_pw.setPlaceholderText(QCoreApplication.translate("SettingsWindow", u"Enter current masterkey...", None))
         self.newPwLabel.setText(QCoreApplication.translate("SettingsWindow", u"New Password:", None))
         self.new_pw1.setPlaceholderText(QCoreApplication.translate("SettingsWindow", u"Enter new masterkey...", None))
-        self.repeatPwLabel.setText(QCoreApplication.translate("SettingsWindow", u"Repeat Password:", None))
+        self.repeatPwLabel.setText(QCoreApplication.translate("SettingsWindow", u"Repeat New Password:", None))
         self.new_pw2.setPlaceholderText(QCoreApplication.translate("SettingsWindow", u"Repeat new masterkey...", None))
         self.showPwCheckbox.setText(QCoreApplication.translate("SettingsWindow", u"Show", None))
-        self.btn_apply_pw.setText(QCoreApplication.translate("SettingsWindow", u"Apply Master Password", None))
+        self.btn_apply_pw.setText(QCoreApplication.translate("SettingsWindow", u"Change Masterkey", None))
         self.importTitle.setText(QCoreApplication.translate("SettingsWindow", u"Import", None))
         self.label_8.setText(QCoreApplication.translate("SettingsWindow", u"Browser Imports", None))
         self.label_7.setText(QCoreApplication.translate("SettingsWindow", u"Browser:", None))
         self.browserBox.setPlaceholderText(QCoreApplication.translate("SettingsWindow", u"Select a Browser...", None))
-        self.label_9.setText(QCoreApplication.translate("SettingsWindow", u"Exportfile Path:", None))
-        self.exportFilePathLineEdit.setPlaceholderText(QCoreApplication.translate("SettingsWindow", u"Enter path to exportfile...", None))
-        self.btnSelectPath.setText(QCoreApplication.translate("SettingsWindow", u"Select Path", None))
+        self.label_9.setText(QCoreApplication.translate("SettingsWindow", u"Importfile", None))
+        self.importFilePathLineEdit.setPlaceholderText(QCoreApplication.translate("SettingsWindow", u"Enter path to importfile...", None))
+        self.btnSelectPath.setText(QCoreApplication.translate("SettingsWindow", u"Select File", None))
         self.progressLabel.setText(QCoreApplication.translate("SettingsWindow", u"TextLabel", None))
         self.btnStartImport.setText(QCoreApplication.translate("SettingsWindow", u"Start Import", None))
+        self.label_17.setText(QCoreApplication.translate("SettingsWindow", u"Export", None))
+        self.label_16.setText(QCoreApplication.translate("SettingsWindow", u"Export", None))
+        self.exportFilenameLineEdit.setPlaceholderText(QCoreApplication.translate("SettingsWindow", u"Enter a filename to export...", None))
+        self.label_15.setText(QCoreApplication.translate("SettingsWindow", u"Exportfile", None))
+        self.exportFileLineEdit.setPlaceholderText(QCoreApplication.translate("SettingsWindow", u"Enter path to export directory...", None))
+        self.btnExportPath.setText(QCoreApplication.translate("SettingsWindow", u"Select Path", None))
+        self.btnStartExport.setText(QCoreApplication.translate("SettingsWindow", u"Start Export", None))
         self.aboutTitle.setText(QCoreApplication.translate("SettingsWindow", u"About", None))
         self.aboutLabel.setText(QCoreApplication.translate("SettingsWindow", u"PassTreasure v1.0", None))
     # retranslateUi

@@ -6,12 +6,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>275</width>
-    <height>137</height>
+    <width>286</width>
+    <height>153</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Kategorie wählen</string>
+   <string>PassTreasure - Change Category</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <property name="leftMargin">
@@ -39,21 +39,21 @@
        <number>12</number>
       </property>
       <property name="leftMargin">
-       <number>4</number>
+       <number>9</number>
       </property>
       <property name="topMargin">
        <number>9</number>
       </property>
       <property name="rightMargin">
-       <number>4</number>
+       <number>9</number>
       </property>
       <property name="bottomMargin">
-       <number>4</number>
+       <number>9</number>
       </property>
       <item>
        <widget class="QLabel" name="label">
         <property name="text">
-         <string>Wähle eine Kategorie:</string>
+         <string>Choose a category.</string>
         </property>
        </widget>
       </item>
@@ -62,16 +62,16 @@
         <property name="font">
          <font>
           <family>Segoe UI</family>
-          <pointsize>12</pointsize>
+          <pointsize>10</pointsize>
           <italic>false</italic>
           <bold>false</bold>
          </font>
         </property>
         <property name="styleSheet">
-         <string notr="true">font: 12pt &quot;Segoe UI&quot;;</string>
+         <string notr="true">font: 10pt &quot;Segoe UI&quot;;</string>
         </property>
         <property name="placeholderText">
-         <string>select category</string>
+         <string>Select a category...</string>
         </property>
        </widget>
       </item>
@@ -91,6 +91,31 @@
       <item>
        <widget class="QFrame" name="btnFrame">
         <layout class="QHBoxLayout" name="horizontalLayout">
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <spacer name="horizontalSpacer">
+           <property name="orientation">
+            <enum>Qt::Orientation::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
          <item>
           <widget class="QPushButton" name="btnOK">
            <property name="text">
@@ -101,7 +126,7 @@
          <item>
           <widget class="QPushButton" name="btnCancel">
            <property name="text">
-            <string>Abbrechen</string>
+            <string>Cancel</string>
            </property>
           </widget>
          </item>

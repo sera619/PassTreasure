@@ -23,7 +23,7 @@ class Ui_CategoryPopup(object):
     def setupUi(self, CategoryPopup):
         if not CategoryPopup.objectName():
             CategoryPopup.setObjectName(u"CategoryPopup")
-        CategoryPopup.resize(275, 137)
+        CategoryPopup.resize(286, 153)
         self.verticalLayout = QVBoxLayout(CategoryPopup)
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.verticalLayout.setContentsMargins(0, 0, 0, 0)
@@ -34,7 +34,7 @@ class Ui_CategoryPopup(object):
         self.verticalLayout_2 = QVBoxLayout(self.frame)
         self.verticalLayout_2.setSpacing(12)
         self.verticalLayout_2.setObjectName(u"verticalLayout_2")
-        self.verticalLayout_2.setContentsMargins(4, 9, 4, 4)
+        self.verticalLayout_2.setContentsMargins(9, 9, 9, 9)
         self.label = QLabel(self.frame)
         self.label.setObjectName(u"label")
 
@@ -44,11 +44,11 @@ class Ui_CategoryPopup(object):
         self.comboBoxCategory.setObjectName(u"comboBoxCategory")
         font = QFont()
         font.setFamilies([u"Segoe UI"])
-        font.setPointSize(12)
+        font.setPointSize(10)
         font.setBold(False)
         font.setItalic(False)
         self.comboBoxCategory.setFont(font)
-        self.comboBoxCategory.setStyleSheet(u"font: 12pt \"Segoe UI\";")
+        self.comboBoxCategory.setStyleSheet(u"font: 10pt \"Segoe UI\";")
 
         self.verticalLayout_2.addWidget(self.comboBoxCategory)
 
@@ -60,6 +60,11 @@ class Ui_CategoryPopup(object):
         self.btnFrame.setObjectName(u"btnFrame")
         self.horizontalLayout = QHBoxLayout(self.btnFrame)
         self.horizontalLayout.setObjectName(u"horizontalLayout")
+        self.horizontalLayout.setContentsMargins(0, 0, 0, 0)
+        self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+
+        self.horizontalLayout.addItem(self.horizontalSpacer)
+
         self.btnOK = QPushButton(self.btnFrame)
         self.btnOK.setObjectName(u"btnOK")
 
@@ -83,10 +88,10 @@ class Ui_CategoryPopup(object):
     # setupUi
 
     def retranslateUi(self, CategoryPopup):
-        CategoryPopup.setWindowTitle(QCoreApplication.translate("CategoryPopup", u"Kategorie w\u00e4hlen", None))
-        self.label.setText(QCoreApplication.translate("CategoryPopup", u"W\u00e4hle eine Kategorie:", None))
-        self.comboBoxCategory.setPlaceholderText(QCoreApplication.translate("CategoryPopup", u"select category", None))
+        CategoryPopup.setWindowTitle(QCoreApplication.translate("CategoryPopup", u"PassTreasure - Change Category", None))
+        self.label.setText(QCoreApplication.translate("CategoryPopup", u"Choose a category.", None))
+        self.comboBoxCategory.setPlaceholderText(QCoreApplication.translate("CategoryPopup", u"Select a category...", None))
         self.btnOK.setText(QCoreApplication.translate("CategoryPopup", u"OK", None))
-        self.btnCancel.setText(QCoreApplication.translate("CategoryPopup", u"Abbrechen", None))
+        self.btnCancel.setText(QCoreApplication.translate("CategoryPopup", u"Cancel", None))
     # retranslateUi
 

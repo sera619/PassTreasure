@@ -17,14 +17,15 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QApplication, QComboBox, QFrame, QHBoxLayout,
     QLabel, QLineEdit, QListWidget, QListWidgetItem,
-    QPushButton, QSizePolicy, QSpacerItem, QVBoxLayout,
-    QWidget)
+    QPushButton, QScrollArea, QSizePolicy, QSpacerItem,
+    QTextEdit, QVBoxLayout, QWidget)
+import resources_rc
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(870, 535)
+        MainWindow.resize(900, 572)
         self.verticalLayout_2 = QVBoxLayout(MainWindow)
         self.verticalLayout_2.setSpacing(6)
         self.verticalLayout_2.setContentsMargins(11, 11, 11, 11)
@@ -55,18 +56,11 @@ class Ui_MainWindow(object):
         font = QFont()
         font.setPointSize(9)
         self.btnSettings.setFont(font)
-        self.btnSettings.setIconSize(QSize(20, 20))
 
         self.horizontalLayout_4.addWidget(self.btnSettings)
 
-        self.btnLogout = QPushButton(self.menuBtnFrame)
-        self.btnLogout.setObjectName(u"btnLogout")
-        self.btnLogout.setMinimumSize(QSize(60, 15))
 
-        self.horizontalLayout_4.addWidget(self.btnLogout)
-
-
-        self.horizontalLayout.addWidget(self.menuBtnFrame, 0, Qt.AlignmentFlag.AlignLeft)
+        self.horizontalLayout.addWidget(self.menuBtnFrame)
 
         self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
@@ -104,6 +98,12 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_10.addWidget(self.mainTitleLabel, 0, Qt.AlignmentFlag.AlignLeft)
 
+        self.btnLogout = QPushButton(self.titleFrame)
+        self.btnLogout.setObjectName(u"btnLogout")
+        self.btnLogout.setMinimumSize(QSize(60, 15))
+
+        self.horizontalLayout_10.addWidget(self.btnLogout)
+
         self.horizontalLayout_10.setStretch(1, 1)
 
         self.horizontalLayout.addWidget(self.titleFrame)
@@ -112,29 +112,14 @@ class Ui_MainWindow(object):
         self.verticalLayout_2.addWidget(self.headerFrame)
 
         self.mainLayout = QHBoxLayout()
-        self.mainLayout.setSpacing(8)
+        self.mainLayout.setSpacing(6)
         self.mainLayout.setObjectName(u"mainLayout")
         self.mainLayout.setContentsMargins(0, 0, 0, 0)
         self.leftLayout = QVBoxLayout()
         self.leftLayout.setSpacing(4)
         self.leftLayout.setObjectName(u"leftLayout")
-        self.leftLayout.setContentsMargins(0, -1, 0, -1)
-        self.frame_2 = QFrame(MainWindow)
-        self.frame_2.setObjectName(u"frame_2")
-        self.frame_2.setFrameShape(QFrame.Shape.NoFrame)
-        self.frame_2.setFrameShadow(QFrame.Shadow.Plain)
-        self.horizontalLayout_9 = QHBoxLayout(self.frame_2)
-        self.horizontalLayout_9.setSpacing(6)
-        self.horizontalLayout_9.setContentsMargins(11, 11, 11, 11)
-        self.horizontalLayout_9.setObjectName(u"horizontalLayout_9")
-        self.horizontalLayout_9.setContentsMargins(0, 0, 0, 0)
-        self.detailLabel = QLabel(self.frame_2)
-        self.detailLabel.setObjectName(u"detailLabel")
-        self.detailLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
-
-        self.horizontalLayout_9.addWidget(self.detailLabel)
-
-        self.sortFrame = QFrame(self.frame_2)
+        self.leftLayout.setContentsMargins(4, 4, 4, 4)
+        self.sortFrame = QFrame(MainWindow)
         self.sortFrame.setObjectName(u"sortFrame")
         self.sortFrame.setFrameShape(QFrame.Shape.NoFrame)
         self.sortFrame.setFrameShadow(QFrame.Shadow.Plain)
@@ -142,7 +127,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout_8.setSpacing(6)
         self.horizontalLayout_8.setContentsMargins(11, 11, 11, 11)
         self.horizontalLayout_8.setObjectName(u"horizontalLayout_8")
-        self.horizontalLayout_8.setContentsMargins(2, 2, 2, 2)
+        self.horizontalLayout_8.setContentsMargins(6, 2, 6, 2)
         self.sortByLabel = QLabel(self.sortFrame)
         self.sortByLabel.setObjectName(u"sortByLabel")
 
@@ -150,17 +135,15 @@ class Ui_MainWindow(object):
 
         self.sortBox = QComboBox(self.sortFrame)
         self.sortBox.setObjectName(u"sortBox")
-        self.sortBox.setStyleSheet(u"font: 9pt \"Segoe UI\";")
+        self.sortBox.setStyleSheet(u"font: 10pt \"Segoe UI\";")
 
         self.horizontalLayout_8.addWidget(self.sortBox)
 
+        self.horizontalSpacer_4 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
-        self.horizontalLayout_9.addWidget(self.sortFrame)
+        self.horizontalLayout_8.addItem(self.horizontalSpacer_4)
 
-
-        self.leftLayout.addWidget(self.frame_2)
-
-        self.searchFrame = QFrame(MainWindow)
+        self.searchFrame = QFrame(self.sortFrame)
         self.searchFrame.setObjectName(u"searchFrame")
         self.searchFrame.setFrameShape(QFrame.Shape.NoFrame)
         self.searchFrame.setFrameShadow(QFrame.Shadow.Raised)
@@ -176,12 +159,16 @@ class Ui_MainWindow(object):
         self.horizontalLayout_11.addWidget(self.searchLineEdit)
 
 
-        self.leftLayout.addWidget(self.searchFrame)
+        self.horizontalLayout_8.addWidget(self.searchFrame)
+
+
+        self.leftLayout.addWidget(self.sortFrame)
 
         self.listWidget = QListWidget(MainWindow)
         self.listWidget.setObjectName(u"listWidget")
         self.listWidget.setMouseTracking(True)
         self.listWidget.setAlternatingRowColors(True)
+        self.listWidget.setSpacing(2)
 
         self.leftLayout.addWidget(self.listWidget)
 
@@ -207,6 +194,9 @@ class Ui_MainWindow(object):
         self.btnDelete = QPushButton(MainWindow)
         self.btnDelete.setObjectName(u"btnDelete")
         self.btnDelete.setMinimumSize(QSize(80, 30))
+        self.btnDelete.setStyleSheet(u"QPushButton::icon{\n"
+"color: #fff;\n"
+"}")
 
         self.buttonLayout.addWidget(self.btnDelete)
 
@@ -217,12 +207,39 @@ class Ui_MainWindow(object):
         self.mainLayout.addLayout(self.leftLayout)
 
         self.rightLayout = QVBoxLayout()
-        self.rightLayout.setSpacing(4)
+        self.rightLayout.setSpacing(0)
         self.rightLayout.setObjectName(u"rightLayout")
         self.rightLayout.setContentsMargins(0, 0, 0, 0)
-        self.detailFrame = QFrame(MainWindow)
+        self.scrollArea = QScrollArea(MainWindow)
+        self.scrollArea.setObjectName(u"scrollArea")
+        self.scrollArea.setFrameShape(QFrame.Shape.NoFrame)
+        self.scrollArea.setWidgetResizable(True)
+        self.scrollAreaWidgetContents = QWidget()
+        self.scrollAreaWidgetContents.setObjectName(u"scrollAreaWidgetContents")
+        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 377, 485))
+        self.verticalLayout_3 = QVBoxLayout(self.scrollAreaWidgetContents)
+        self.verticalLayout_3.setSpacing(6)
+        self.verticalLayout_3.setContentsMargins(11, 11, 11, 11)
+        self.verticalLayout_3.setObjectName(u"verticalLayout_3")
+        self.verticalLayout_3.setContentsMargins(0, 0, 0, 0)
+        self.detailLabel = QLabel(self.scrollAreaWidgetContents)
+        self.detailLabel.setObjectName(u"detailLabel")
+        font2 = QFont()
+        font2.setFamilies([u"Segoe UI"])
+        font2.setPointSize(12)
+        font2.setBold(True)
+        font2.setItalic(False)
+        self.detailLabel.setFont(font2)
+        self.detailLabel.setStyleSheet(u"	color:rgb(118, 0, 0);	\n"
+"font: bold 12pt \"Segoe UI\";")
+        self.detailLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        self.verticalLayout_3.addWidget(self.detailLabel, 0, Qt.AlignmentFlag.AlignHCenter|Qt.AlignmentFlag.AlignVCenter)
+
+        self.detailFrame = QFrame(self.scrollAreaWidgetContents)
         self.detailFrame.setObjectName(u"detailFrame")
         self.detailFrame.setEnabled(True)
+        self.detailFrame.setMinimumSize(QSize(363, 0))
         self.detailFrame.setFrameShape(QFrame.Shape.StyledPanel)
         self.detailFrame.setFrameShadow(QFrame.Shadow.Raised)
         self.detailFrame.setLineWidth(0)
@@ -230,12 +247,11 @@ class Ui_MainWindow(object):
         self.verticalLayout.setSpacing(6)
         self.verticalLayout.setContentsMargins(11, 11, 11, 11)
         self.verticalLayout.setObjectName(u"verticalLayout")
+        self.verticalLayout.setContentsMargins(5, 5, 5, 5)
         self.detailTitle = QLabel(self.detailFrame)
         self.detailTitle.setObjectName(u"detailTitle")
-        font2 = QFont()
-        font2.setPointSize(12)
-        font2.setBold(True)
         self.detailTitle.setFont(font2)
+        self.detailTitle.setStyleSheet(u"font: bold 12pt \"Segoe UI\";")
         self.detailTitle.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.verticalLayout.addWidget(self.detailTitle)
@@ -397,8 +413,15 @@ class Ui_MainWindow(object):
         self.categoryLabel.setObjectName(u"categoryLabel")
         sizePolicy.setHeightForWidth(self.categoryLabel.sizePolicy().hasHeightForWidth())
         self.categoryLabel.setSizePolicy(sizePolicy)
+        self.categoryLabel.setMinimumSize(QSize(110, 0))
+        self.categoryLabel.setStyleSheet(u"font: 700 8pt \"Segoe UI\"; border-radius: 5px; background: rgba(211, 211, 211, 140);")
+        self.categoryLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.horizontalLayout_7.addWidget(self.categoryLabel)
+
+        self.horizontalSpacer_3 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+
+        self.horizontalLayout_7.addItem(self.horizontalSpacer_3)
 
         self.btnEditCategory = QPushButton(self.categoryFrame)
         self.btnEditCategory.setObjectName(u"btnEditCategory")
@@ -468,9 +491,58 @@ class Ui_MainWindow(object):
 
         self.verticalLayout.addWidget(self.updatedFrame)
 
-        self.verticalSpacer = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+        self.noteFrame = QFrame(self.detailFrame)
+        self.noteFrame.setObjectName(u"noteFrame")
+        self.noteFrame.setFrameShape(QFrame.Shape.NoFrame)
+        self.noteFrame.setFrameShadow(QFrame.Shadow.Raised)
+        self.horizontalLayout_13 = QHBoxLayout(self.noteFrame)
+        self.horizontalLayout_13.setSpacing(6)
+        self.horizontalLayout_13.setContentsMargins(11, 11, 11, 11)
+        self.horizontalLayout_13.setObjectName(u"horizontalLayout_13")
+        self.horizontalLayout_13.setContentsMargins(2, 2, 2, 2)
+        self.label_8 = QLabel(self.noteFrame)
+        self.label_8.setObjectName(u"label_8")
+        self.label_8.setMinimumSize(QSize(80, 0))
+        self.label_8.setFont(font3)
+        self.label_8.setStyleSheet(u"QLabel {\n"
+"	color:rgb(118, 0, 0);\n"
+"}")
 
-        self.verticalLayout.addItem(self.verticalSpacer)
+        self.horizontalLayout_13.addWidget(self.label_8, 0, Qt.AlignmentFlag.AlignLeft|Qt.AlignmentFlag.AlignTop)
+
+        self.noteLabel = QTextEdit(self.noteFrame)
+        self.noteLabel.setObjectName(u"noteLabel")
+        self.noteLabel.setEnabled(True)
+        sizePolicy.setHeightForWidth(self.noteLabel.sizePolicy().hasHeightForWidth())
+        self.noteLabel.setSizePolicy(sizePolicy)
+        self.noteLabel.setStyleSheet(u"QTextEdit {\n"
+"    border: 1px solid rgb(60, 60, 60);      /* Subtle border */\n"
+"    border-radius: 6px;\n"
+"    selection-background-color: rgb(38, 79, 120);  /* VSCode-like selection */\n"
+"    selection-color: #ffffff;\n"
+"	font: 9pt \"Segoe UI\";\n"
+"    padding: 0px;\n"
+"	margin: 0px;\n"
+"}\n"
+"\n"
+"QTextEdit:focus {\n"
+"    border: 1px solid rgb(0, 222, 222);      /* Blue accent on focus */\n"
+"}\n"
+"")
+        self.noteLabel.setFrameShape(QFrame.Shape.StyledPanel)
+        self.noteLabel.setFrameShadow(QFrame.Shadow.Sunken)
+        self.noteLabel.setReadOnly(True)
+        self.noteLabel.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
+
+        self.horizontalLayout_13.addWidget(self.noteLabel)
+
+        self.btnEditNote = QPushButton(self.noteFrame)
+        self.btnEditNote.setObjectName(u"btnEditNote")
+
+        self.horizontalLayout_13.addWidget(self.btnEditNote, 0, Qt.AlignmentFlag.AlignTop)
+
+
+        self.verticalLayout.addWidget(self.noteFrame)
 
         self.detailBtnFrame = QFrame(self.detailFrame)
         self.detailBtnFrame.setObjectName(u"detailBtnFrame")
@@ -531,7 +603,11 @@ class Ui_MainWindow(object):
         self.verticalLayout.addWidget(self.detailBtnFrame)
 
 
-        self.rightLayout.addWidget(self.detailFrame)
+        self.verticalLayout_3.addWidget(self.detailFrame)
+
+        self.scrollArea.setWidget(self.scrollAreaWidgetContents)
+
+        self.rightLayout.addWidget(self.scrollArea)
 
 
         self.mainLayout.addLayout(self.rightLayout)
@@ -579,35 +655,38 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"PassTreasure - Vault", None))
         self.btnSettings.setText(QCoreApplication.translate("MainWindow", u"Settings", None))
-        self.btnLogout.setText(QCoreApplication.translate("MainWindow", u"Logout", None))
         self.mainTitleIcon.setText(QCoreApplication.translate("MainWindow", u"TextLabel", None))
         self.mainTitleLabel.setText(QCoreApplication.translate("MainWindow", u"PassTreasure", None))
-        self.detailLabel.setText(QCoreApplication.translate("MainWindow", u"Select an entry to see details", None))
+        self.btnLogout.setText(QCoreApplication.translate("MainWindow", u"Logout", None))
         self.sortByLabel.setText(QCoreApplication.translate("MainWindow", u"Sorted By:", None))
         self.searchLineEdit.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Search...", None))
         self.btnClearEntries.setText(QCoreApplication.translate("MainWindow", u"Clear Entries", None))
         self.btnAdd.setText(QCoreApplication.translate("MainWindow", u"Add New Entry", None))
         self.btnDelete.setText(QCoreApplication.translate("MainWindow", u"Delete Entry", None))
+        self.detailLabel.setText(QCoreApplication.translate("MainWindow", u"Select an entry to see details", None))
         self.detailTitle.setText(QCoreApplication.translate("MainWindow", u"Details", None))
         self.label.setText(QCoreApplication.translate("MainWindow", u"Service:", None))
         self.serviceLabel.setText(QCoreApplication.translate("MainWindow", u"TextLabel", None))
-        self.btnEditService.setText(QCoreApplication.translate("MainWindow", u"Edit", None))
+        self.btnEditService.setText("")
         self.label_4.setText(QCoreApplication.translate("MainWindow", u"Username:", None))
         self.usernameLabel.setText(QCoreApplication.translate("MainWindow", u"TextLabel", None))
-        self.btnEditUsername.setText(QCoreApplication.translate("MainWindow", u"Edit", None))
+        self.btnEditUsername.setText("")
         self.label_3.setText(QCoreApplication.translate("MainWindow", u"Password:", None))
         self.passLabel.setText(QCoreApplication.translate("MainWindow", u"TextLabel", None))
-        self.btnEditPass.setText(QCoreApplication.translate("MainWindow", u"Edit", None))
+        self.btnEditPass.setText("")
         self.label_7.setText(QCoreApplication.translate("MainWindow", u"Url:", None))
         self.urlLabel.setText(QCoreApplication.translate("MainWindow", u"TextLabel", None))
-        self.btnEditUrl.setText(QCoreApplication.translate("MainWindow", u"Edit", None))
+        self.btnEditUrl.setText("")
         self.label_5.setText(QCoreApplication.translate("MainWindow", u"Category:", None))
         self.categoryLabel.setText(QCoreApplication.translate("MainWindow", u"TextLabel", None))
-        self.btnEditCategory.setText(QCoreApplication.translate("MainWindow", u"Edit", None))
+        self.btnEditCategory.setText("")
         self.label_2.setText(QCoreApplication.translate("MainWindow", u"Created At", None))
         self.createdLabel.setText(QCoreApplication.translate("MainWindow", u"TextLabel", None))
         self.label_6.setText(QCoreApplication.translate("MainWindow", u"Updated At:", None))
         self.updatedLabel.setText(QCoreApplication.translate("MainWindow", u"TextLabel", None))
+        self.label_8.setText(QCoreApplication.translate("MainWindow", u"Note:", None))
+        self.noteLabel.setPlaceholderText(QCoreApplication.translate("MainWindow", u"No notice set...", None))
+        self.btnEditNote.setText("")
         self.detailStatus.setText(QCoreApplication.translate("MainWindow", u"TextLabel", None))
         self.btnShowPass.setText(QCoreApplication.translate("MainWindow", u"Show Password", None))
         self.btnCopyPass.setText(QCoreApplication.translate("MainWindow", u"Copy Password", None))

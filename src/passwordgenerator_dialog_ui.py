@@ -17,13 +17,14 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QApplication, QCheckBox, QDialog, QFormLayout,
     QHBoxLayout, QLabel, QLineEdit, QPushButton,
-    QSizePolicy, QSpinBox, QVBoxLayout, QWidget)
+    QSizePolicy, QSpacerItem, QSpinBox, QVBoxLayout,
+    QWidget)
 
 class Ui_PasswordGeneratorDialog(object):
     def setupUi(self, PasswordGeneratorDialog):
         if not PasswordGeneratorDialog.objectName():
             PasswordGeneratorDialog.setObjectName(u"PasswordGeneratorDialog")
-        PasswordGeneratorDialog.resize(291, 245)
+        PasswordGeneratorDialog.resize(325, 325)
         self.verticalLayout = QVBoxLayout(PasswordGeneratorDialog)
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.label = QLabel(PasswordGeneratorDialog)
@@ -79,6 +80,21 @@ class Ui_PasswordGeneratorDialog(object):
 
         self.optionsLayout.addWidget(self.checkSpecial)
 
+        self.verticalLayout_2 = QVBoxLayout()
+        self.verticalLayout_2.setObjectName(u"verticalLayout_2")
+        self.label_2 = QLabel(PasswordGeneratorDialog)
+        self.label_2.setObjectName(u"label_2")
+
+        self.verticalLayout_2.addWidget(self.label_2)
+
+        self.excludeCharsLineEdit = QLineEdit(PasswordGeneratorDialog)
+        self.excludeCharsLineEdit.setObjectName(u"excludeCharsLineEdit")
+
+        self.verticalLayout_2.addWidget(self.excludeCharsLineEdit)
+
+
+        self.optionsLayout.addLayout(self.verticalLayout_2)
+
 
         self.formLayout.setLayout(1, QFormLayout.ItemRole.FieldRole, self.optionsLayout)
 
@@ -95,6 +111,10 @@ class Ui_PasswordGeneratorDialog(object):
         self.indicatorHolder.setObjectName(u"indicatorHolder")
 
         self.verticalLayout.addLayout(self.indicatorHolder)
+
+        self.verticalSpacer = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+
+        self.verticalLayout.addItem(self.verticalSpacer)
 
         self.buttonLayout = QHBoxLayout()
         self.buttonLayout.setObjectName(u"buttonLayout")
@@ -130,6 +150,7 @@ class Ui_PasswordGeneratorDialog(object):
         self.checkUpper.setText(QCoreApplication.translate("PasswordGeneratorDialog", u"Include Uppercase", None))
         self.checkNumbers.setText(QCoreApplication.translate("PasswordGeneratorDialog", u"Include Numbers", None))
         self.checkSpecial.setText(QCoreApplication.translate("PasswordGeneratorDialog", u"Include Special Characters", None))
+        self.label_2.setText(QCoreApplication.translate("PasswordGeneratorDialog", u"Exclude Chars(sep. with space):", None))
         self.lineGenerated.setPlaceholderText(QCoreApplication.translate("PasswordGeneratorDialog", u"Generated Password", None))
         self.btnGenerate.setText(QCoreApplication.translate("PasswordGeneratorDialog", u"Generate", None))
         self.btnCopy.setText(QCoreApplication.translate("PasswordGeneratorDialog", u"Copy", None))

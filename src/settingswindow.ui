@@ -26,6 +26,21 @@
       <enum>QFrame::Shape::StyledPanel</enum>
      </property>
      <layout class="QVBoxLayout">
+      <property name="spacing">
+       <number>4</number>
+      </property>
+      <property name="leftMargin">
+       <number>6</number>
+      </property>
+      <property name="topMargin">
+       <number>6</number>
+      </property>
+      <property name="rightMargin">
+       <number>6</number>
+      </property>
+      <property name="bottomMargin">
+       <number>6</number>
+      </property>
       <item>
        <widget class="QPushButton" name="btn_general">
         <property name="text">
@@ -44,6 +59,13 @@
        <widget class="QPushButton" name="btn_import">
         <property name="text">
          <string>Import</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btn_export">
+        <property name="text">
+         <string>Export</string>
         </property>
        </widget>
       </item>
@@ -77,13 +99,30 @@
      </property>
      <widget class="QWidget" name="page_general">
       <layout class="QVBoxLayout">
+       <property name="leftMargin">
+        <number>4</number>
+       </property>
+       <property name="topMargin">
+        <number>4</number>
+       </property>
+       <property name="rightMargin">
+        <number>4</number>
+       </property>
+       <property name="bottomMargin">
+        <number>4</number>
+       </property>
        <item alignment="Qt::AlignmentFlag::AlignTop">
         <widget class="QLabel" name="label_2">
          <property name="font">
           <font>
+           <family>Segoe UI</family>
            <pointsize>14</pointsize>
+           <italic>false</italic>
            <bold>true</bold>
           </font>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">font: bold 14pt &quot;Segoe UI&quot;;</string>
          </property>
          <property name="text">
           <string>General</string>
@@ -106,13 +145,13 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>473</width>
-            <height>607</height>
+            <width>489</width>
+            <height>687</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_3">
            <property name="spacing">
-            <number>40</number>
+            <number>14</number>
            </property>
            <property name="leftMargin">
             <number>0</number>
@@ -139,9 +178,14 @@
                <widget class="QLabel" name="label_10">
                 <property name="font">
                  <font>
-                  <pointsize>12</pointsize>
+                  <family>Segoe UI</family>
+                  <pointsize>10</pointsize>
+                  <italic>false</italic>
                   <bold>true</bold>
                  </font>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">font: bold 10pt &quot;Segoe UI&quot;;</string>
                 </property>
                 <property name="text">
                  <string>Auto. Logout</string>
@@ -193,6 +237,12 @@
                 <layout class="QHBoxLayout" name="horizontalLayout_10">
                  <item>
                   <widget class="QLabel" name="label_11">
+                   <property name="minimumSize">
+                    <size>
+                     <width>130</width>
+                     <height>0</height>
+                    </size>
+                   </property>
                    <property name="font">
                     <font>
                      <bold>true</bold>
@@ -246,6 +296,136 @@
             </widget>
            </item>
            <item>
+            <widget class="QFrame" name="autoHideDetailsFrame">
+             <property name="frameShape">
+              <enum>QFrame::Shape::StyledPanel</enum>
+             </property>
+             <property name="frameShadow">
+              <enum>QFrame::Shadow::Raised</enum>
+             </property>
+             <layout class="QVBoxLayout" name="verticalLayout_17">
+              <item>
+               <widget class="QLabel" name="label_12">
+                <property name="font">
+                 <font>
+                  <family>Segoe UI</family>
+                  <pointsize>10</pointsize>
+                  <italic>false</italic>
+                  <bold>true</bold>
+                 </font>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">font: bold 10pt &quot;Segoe UI&quot;;</string>
+                </property>
+                <property name="text">
+                 <string>Auto Hide Details</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QFrame" name="frame_11">
+                <property name="frameShape">
+                 <enum>QFrame::Shape::NoFrame</enum>
+                </property>
+                <property name="frameShadow">
+                 <enum>QFrame::Shadow::Raised</enum>
+                </property>
+                <layout class="QVBoxLayout" name="verticalLayout_16">
+                 <property name="leftMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="topMargin">
+                  <number>5</number>
+                 </property>
+                 <property name="rightMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="bottomMargin">
+                  <number>5</number>
+                 </property>
+                 <item>
+                  <widget class="Line" name="line_7">
+                   <property name="styleSheet">
+                    <string notr="true">background:rgb(170, 0, 0)</string>
+                   </property>
+                   <property name="orientation">
+                    <enum>Qt::Orientation::Horizontal</enum>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item>
+               <widget class="QFrame" name="frame_12">
+                <property name="frameShape">
+                 <enum>QFrame::Shape::NoFrame</enum>
+                </property>
+                <property name="frameShadow">
+                 <enum>QFrame::Shadow::Raised</enum>
+                </property>
+                <layout class="QHBoxLayout" name="horizontalLayout_11">
+                 <item>
+                  <widget class="QLabel" name="label_13">
+                   <property name="minimumSize">
+                    <size>
+                     <width>130</width>
+                     <height>0</height>
+                    </size>
+                   </property>
+                   <property name="font">
+                    <font>
+                     <bold>true</bold>
+                    </font>
+                   </property>
+                   <property name="text">
+                    <string>Hide Time (mm:ss):</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QTimeEdit" name="autoHideDetailsTimeEdit">
+                   <property name="wrapping">
+                    <bool>false</bool>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignmentFlag::AlignCenter</set>
+                   </property>
+                   <property name="currentSection">
+                    <enum>QDateTimeEdit::Section::MinuteSection</enum>
+                   </property>
+                   <property name="displayFormat">
+                    <string>mm:ss</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <spacer name="horizontalSpacer_3">
+                   <property name="orientation">
+                    <enum>Qt::Orientation::Horizontal</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>40</width>
+                     <height>20</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                 <item>
+                  <widget class="QCheckBox" name="autoHideDetailsCheckBox">
+                   <property name="text">
+                    <string>Active</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
             <widget class="QFrame" name="backupFrame">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -264,9 +444,14 @@
                <widget class="QLabel" name="backupTitleLabel">
                 <property name="font">
                  <font>
-                  <pointsize>12</pointsize>
+                  <family>Segoe UI</family>
+                  <pointsize>10</pointsize>
+                  <italic>false</italic>
                   <bold>true</bold>
                  </font>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">font: bold 10pt &quot;Segoe UI&quot;;</string>
                 </property>
                 <property name="text">
                  <string>Backups</string>
@@ -317,13 +502,13 @@
                 </property>
                 <layout class="QHBoxLayout" name="horizontalLayout_2">
                  <property name="leftMargin">
-                  <number>4</number>
+                  <number>9</number>
                  </property>
                  <property name="topMargin">
                   <number>4</number>
                  </property>
                  <property name="rightMargin">
-                  <number>4</number>
+                  <number>9</number>
                  </property>
                  <property name="bottomMargin">
                   <number>4</number>
@@ -364,13 +549,13 @@
                 </property>
                 <layout class="QHBoxLayout" name="horizontalLayout_3">
                  <property name="leftMargin">
-                  <number>4</number>
+                  <number>9</number>
                  </property>
                  <property name="topMargin">
                   <number>4</number>
                  </property>
                  <property name="rightMargin">
-                  <number>4</number>
+                  <number>9</number>
                  </property>
                  <property name="bottomMargin">
                   <number>4</number>
@@ -418,43 +603,17 @@
                   <number>4</number>
                  </property>
                  <item>
-                  <widget class="QPushButton" name="btnCreateBackup">
-                   <property name="minimumSize">
+                  <spacer name="horizontalSpacer_4">
+                   <property name="orientation">
+                    <enum>Qt::Orientation::Horizontal</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
                     <size>
-                     <width>80</width>
-                     <height>0</height>
+                     <width>40</width>
+                     <height>20</height>
                     </size>
                    </property>
-                   <property name="text">
-                    <string>Create </string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QPushButton" name="btnRestoreBackup">
-                   <property name="minimumSize">
-                    <size>
-                     <width>80</width>
-                     <height>0</height>
-                    </size>
-                   </property>
-                   <property name="text">
-                    <string>Restore </string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QPushButton" name="btnDeleteBackup">
-                   <property name="minimumSize">
-                    <size>
-                     <width>80</width>
-                     <height>0</height>
-                    </size>
-                   </property>
-                   <property name="text">
-                    <string>Delete</string>
-                   </property>
-                  </widget>
+                  </spacer>
                  </item>
                  <item>
                   <widget class="QPushButton" name="btnClearBackup">
@@ -478,8 +637,60 @@
                    </property>
                   </widget>
                  </item>
+                 <item>
+                  <widget class="QPushButton" name="btnDeleteBackup">
+                   <property name="minimumSize">
+                    <size>
+                     <width>80</width>
+                     <height>0</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string>Delete</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QPushButton" name="btnRestoreBackup">
+                   <property name="minimumSize">
+                    <size>
+                     <width>80</width>
+                     <height>0</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string>Restore </string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QPushButton" name="btnCreateBackup">
+                   <property name="minimumSize">
+                    <size>
+                     <width>80</width>
+                     <height>0</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string>Create </string>
+                   </property>
+                  </widget>
+                 </item>
                 </layout>
                </widget>
+              </item>
+              <item>
+               <spacer name="verticalSpacer_3">
+                <property name="orientation">
+                 <enum>Qt::Orientation::Vertical</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>20</width>
+                  <height>40</height>
+                 </size>
+                </property>
+               </spacer>
               </item>
              </layout>
             </widget>
@@ -497,9 +708,14 @@
                <widget class="QLabel" name="categpryTitleLabel">
                 <property name="font">
                  <font>
-                  <pointsize>12</pointsize>
+                  <family>Segoe UI</family>
+                  <pointsize>10</pointsize>
+                  <italic>false</italic>
                   <bold>true</bold>
                  </font>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">font: bold 10pt &quot;Segoe UI&quot;;</string>
                 </property>
                 <property name="text">
                  <string>Categories</string>
@@ -541,6 +757,18 @@
                </widget>
               </item>
               <item>
+               <widget class="QLabel" name="label_5">
+                <property name="font">
+                 <font>
+                  <bold>true</bold>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>Create new category.</string>
+                </property>
+               </widget>
+              </item>
+              <item>
                <widget class="QFrame" name="createCategoryFrame">
                 <property name="frameShape">
                  <enum>QFrame::Shape::NoFrame</enum>
@@ -561,18 +789,6 @@
                  <property name="bottomMargin">
                   <number>9</number>
                  </property>
-                 <item>
-                  <widget class="QLabel" name="label_5">
-                   <property name="font">
-                    <font>
-                     <bold>true</bold>
-                    </font>
-                   </property>
-                   <property name="text">
-                    <string>Create new category.</string>
-                   </property>
-                  </widget>
-                 </item>
                  <item>
                   <widget class="QFrame" name="frame_4">
                    <property name="frameShape">
@@ -608,7 +824,30 @@
                      </widget>
                     </item>
                     <item>
+                     <spacer name="horizontalSpacer_5">
+                      <property name="orientation">
+                       <enum>Qt::Orientation::Horizontal</enum>
+                      </property>
+                      <property name="sizeHint" stdset="0">
+                       <size>
+                        <width>40</width>
+                        <height>20</height>
+                       </size>
+                      </property>
+                     </spacer>
+                    </item>
+                    <item alignment="Qt::AlignmentFlag::AlignRight">
+                     <widget class="QLabel" name="label_14">
+                      <property name="text">
+                       <string>Preview:</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
                      <widget class="QPushButton" name="btnPreviewCatColor">
+                      <property name="enabled">
+                       <bool>false</bool>
+                      </property>
                       <property name="text">
                        <string/>
                       </property>
@@ -730,16 +969,16 @@ padding:  5px 0px 5px 0px;</string>
                 </property>
                 <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="0,0,0">
                  <property name="leftMargin">
-                  <number>0</number>
+                  <number>9</number>
                  </property>
                  <property name="topMargin">
-                  <number>0</number>
+                  <number>9</number>
                  </property>
                  <property name="rightMargin">
-                  <number>0</number>
+                  <number>9</number>
                  </property>
                  <property name="bottomMargin">
-                  <number>0</number>
+                  <number>9</number>
                  </property>
                  <item>
                   <widget class="QComboBox" name="editCategoryBox">
@@ -812,13 +1051,30 @@ padding:  5px 0px 5px 0px;</string>
      </widget>
      <widget class="QWidget" name="page_security">
       <layout class="QVBoxLayout">
+       <property name="leftMargin">
+        <number>4</number>
+       </property>
+       <property name="topMargin">
+        <number>4</number>
+       </property>
+       <property name="rightMargin">
+        <number>4</number>
+       </property>
+       <property name="bottomMargin">
+        <number>4</number>
+       </property>
        <item>
         <widget class="QLabel" name="securityTitle">
          <property name="font">
           <font>
+           <family>Segoe UI</family>
            <pointsize>14</pointsize>
+           <italic>false</italic>
            <bold>true</bold>
           </font>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">font: bold 14pt &quot;Segoe UI&quot;;</string>
          </property>
          <property name="text">
           <string>Security</string>
@@ -838,9 +1094,14 @@ padding:  5px 0px 5px 0px;</string>
            <widget class="QLabel" name="label">
             <property name="font">
              <font>
+              <family>Segoe UI</family>
               <pointsize>10</pointsize>
+              <italic>false</italic>
               <bold>true</bold>
              </font>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">font: bold 10pt &quot;Segoe UI&quot;;</string>
             </property>
             <property name="text">
              <string>Change Master Password</string>
@@ -884,7 +1145,7 @@ padding:  5px 0px 5px 0px;</string>
           <item>
            <widget class="QLabel" name="oldPwLabel">
             <property name="text">
-             <string>Old Password:</string>
+             <string>Password:</string>
             </property>
            </widget>
           </item>
@@ -921,7 +1182,7 @@ padding:  5px 0px 5px 0px;</string>
           <item>
            <widget class="QLabel" name="repeatPwLabel">
             <property name="text">
-             <string>Repeat Password:</string>
+             <string>Repeat New Password:</string>
             </property>
            </widget>
           </item>
@@ -945,7 +1206,7 @@ padding:  5px 0px 5px 0px;</string>
           <item alignment="Qt::AlignmentFlag::AlignRight">
            <widget class="QPushButton" name="btn_apply_pw">
             <property name="text">
-             <string>Apply Master Password</string>
+             <string>Change Masterkey</string>
             </property>
            </widget>
           </item>
@@ -969,13 +1230,30 @@ padding:  5px 0px 5px 0px;</string>
      </widget>
      <widget class="QWidget" name="page_import">
       <layout class="QVBoxLayout" name="verticalLayout_13">
+       <property name="leftMargin">
+        <number>4</number>
+       </property>
+       <property name="topMargin">
+        <number>4</number>
+       </property>
+       <property name="rightMargin">
+        <number>4</number>
+       </property>
+       <property name="bottomMargin">
+        <number>4</number>
+       </property>
        <item>
         <widget class="QLabel" name="importTitle">
          <property name="font">
           <font>
-           <pointsize>12</pointsize>
+           <family>Segoe UI</family>
+           <pointsize>14</pointsize>
+           <italic>false</italic>
            <bold>true</bold>
           </font>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">font: bold 14pt &quot;Segoe UI&quot;;</string>
          </property>
          <property name="text">
           <string>Import</string>
@@ -1001,8 +1279,14 @@ padding:  5px 0px 5px 0px;</string>
            <widget class="QLabel" name="label_8">
             <property name="font">
              <font>
+              <family>Segoe UI</family>
+              <pointsize>10</pointsize>
+              <italic>false</italic>
               <bold>true</bold>
              </font>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">font: bold 10pt &quot;Segoe UI&quot;;</string>
             </property>
             <property name="text">
              <string>Browser Imports</string>
@@ -1072,21 +1356,21 @@ padding:  5px 0px 5px 0px;</string>
             <item>
              <widget class="QLabel" name="label_9">
               <property name="text">
-               <string>Exportfile Path:</string>
+               <string>Importfile</string>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QLineEdit" name="exportFilePathLineEdit">
+             <widget class="QLineEdit" name="importFilePathLineEdit">
               <property name="placeholderText">
-               <string>Enter path to exportfile...</string>
+               <string>Enter path to importfile...</string>
               </property>
              </widget>
             </item>
             <item>
              <widget class="QPushButton" name="btnSelectPath">
               <property name="text">
-               <string>Select Path</string>
+               <string>Select File</string>
               </property>
              </widget>
             </item>
@@ -1172,15 +1456,195 @@ padding:  5px 0px 5px 0px;</string>
        </item>
       </layout>
      </widget>
+     <widget class="QWidget" name="page_export">
+      <layout class="QVBoxLayout" name="verticalLayout_18">
+       <property name="leftMargin">
+        <number>4</number>
+       </property>
+       <property name="topMargin">
+        <number>4</number>
+       </property>
+       <property name="rightMargin">
+        <number>4</number>
+       </property>
+       <property name="bottomMargin">
+        <number>4</number>
+       </property>
+       <item>
+        <widget class="QLabel" name="label_17">
+         <property name="styleSheet">
+          <string notr="true">font: bold 14pt &quot;Segoe UI&quot;;</string>
+         </property>
+         <property name="text">
+          <string>Export</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignmentFlag::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QFrame" name="frame_10">
+         <property name="frameShape">
+          <enum>QFrame::Shape::StyledPanel</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Shadow::Raised</enum>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_20">
+          <property name="spacing">
+           <number>12</number>
+          </property>
+          <item>
+           <widget class="QLabel" name="label_16">
+            <property name="font">
+             <font>
+              <family>Segoe UI</family>
+              <pointsize>10</pointsize>
+              <italic>false</italic>
+              <bold>true</bold>
+             </font>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">font: bold 10pt &quot;Segoe UI&quot;;</string>
+            </property>
+            <property name="text">
+             <string>Export</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QFrame" name="frame_13">
+            <property name="frameShape">
+             <enum>QFrame::Shape::NoFrame</enum>
+            </property>
+            <property name="frameShadow">
+             <enum>QFrame::Shadow::Raised</enum>
+            </property>
+            <layout class="QVBoxLayout" name="verticalLayout_19" stretch="0">
+             <property name="spacing">
+              <number>0</number>
+             </property>
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>2</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
+              <number>2</number>
+             </property>
+             <item>
+              <widget class="Line" name="line_8">
+               <property name="styleSheet">
+                <string notr="true">background:rgb(170, 0, 0)</string>
+               </property>
+               <property name="orientation">
+                <enum>Qt::Orientation::Horizontal</enum>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="exportFilenameLineEdit">
+            <property name="placeholderText">
+             <string>Enter a filename to export...</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_12">
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QLabel" name="label_15">
+              <property name="text">
+               <string>Exportfile</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="exportFileLineEdit">
+              <property name="placeholderText">
+               <string>Enter path to export directory...</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="btnExportPath">
+              <property name="text">
+               <string>Select Path</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item alignment="Qt::AlignmentFlag::AlignRight">
+           <widget class="QPushButton" name="btnStartExport">
+            <property name="text">
+             <string>Start Export</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Orientation::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
      <widget class="QWidget" name="page_about">
       <layout class="QVBoxLayout">
+       <property name="leftMargin">
+        <number>4</number>
+       </property>
+       <property name="topMargin">
+        <number>4</number>
+       </property>
+       <property name="rightMargin">
+        <number>4</number>
+       </property>
+       <property name="bottomMargin">
+        <number>4</number>
+       </property>
        <item alignment="Qt::AlignmentFlag::AlignTop">
         <widget class="QLabel" name="aboutTitle">
          <property name="font">
           <font>
+           <family>Segoe UI</family>
            <pointsize>14</pointsize>
+           <italic>false</italic>
            <bold>true</bold>
           </font>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">font: bold 14pt &quot;Segoe UI&quot;;</string>
          </property>
          <property name="text">
           <string>About</string>
@@ -1200,8 +1664,8 @@ padding:  5px 0px 5px 0px;</string>
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>481</width>
-            <height>338</height>
+            <width>497</width>
+            <height>348</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout">

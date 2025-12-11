@@ -69,6 +69,7 @@ class Ui_CategoryEditDialog(object):
 
         self.button_colorPreview = QPushButton(self.colorFrame)
         self.button_colorPreview.setObjectName(u"button_colorPreview")
+        self.button_colorPreview.setEnabled(False)
         self.button_colorPreview.setMinimumSize(QSize(60, 25))
         self.button_colorPreview.setMaximumSize(QSize(40, 24))
 
