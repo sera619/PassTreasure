@@ -144,7 +144,7 @@
           <property name="geometry">
            <rect>
             <x>0</x>
-            <y>-208</y>
+            <y>-475</y>
             <width>489</width>
             <height>830</height>
            </rect>
@@ -1731,11 +1731,34 @@ padding:  5px 0px 5px 0px;</string>
            </widget>
           </item>
           <item>
-           <widget class="QLineEdit" name="exportFilenameLineEdit">
-            <property name="placeholderText">
-             <string>Enter a filename to export...</string>
+           <layout class="QHBoxLayout" name="horizontalLayout_16" stretch="3,1">
+            <property name="spacing">
+             <number>6</number>
             </property>
-           </widget>
+            <item>
+             <widget class="QLineEdit" name="exportFilenameLineEdit">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="placeholderText">
+               <string>Enter a filename to export...</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QComboBox" name="fileEndingBox">
+              <property name="styleSheet">
+               <string notr="true">font: 10pt &quot;Segoe UI&quot;;</string>
+              </property>
+              <property name="placeholderText">
+               <string>Select filetype...</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
           </item>
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_12">
@@ -1754,7 +1777,7 @@ padding:  5px 0px 5px 0px;</string>
             <item>
              <widget class="QLabel" name="label_15">
               <property name="text">
-               <string>Exportfile</string>
+               <string>Export Path</string>
               </property>
              </widget>
             </item>
@@ -1844,8 +1867,8 @@ padding:  5px 0px 5px 0px;</string>
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>96</width>
-            <height>26</height>
+            <width>497</width>
+            <height>348</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout">

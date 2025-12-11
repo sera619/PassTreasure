@@ -9,11 +9,11 @@ from gui.password_strength_indicator import PasswordStrengthIndicator
 from backend.password_strength_logic import evaluate_password_strength
 from gui.dialog_popup import DialogPopup
 from backend.import_worker import CsvImportWorker
-from config import TextStorage, Styles, VAULT_PATH, PopupType
+from config import TextStorage, Styles, VAULT_PATH, PopupType, EXPORT_TYPES
 from backend.database import PasswordDatabase
 from utils import load_settings, save_settings, format_last_backup
 import utils
-import os, csv
+import os, csv, json
 
 
 class SettingsWindow(QDialog):
@@ -28,6 +28,7 @@ class SettingsWindow(QDialog):
         self.ui = Ui_SettingsWindow()
         self.ui.setupUi(self)
         self.db = db
+        self.default_export_name = "FileTreasure-PasswordExport"
         self.mapping = ["none", "daily", "weekly", "monthly", "yearly"]
         self.new_category_color = None
         self.setup_navigation()
@@ -61,6 +62,7 @@ class SettingsWindow(QDialog):
         self.ui.autoLogoutCheckBox.toggled.connect(self.toggle_autologout)
         self.ui.autoLogoutTimeEdit.timeChanged.connect(self.get_autologout_time)
         self.ui.autoHideDetailsTimeEdit.timeChanged.connect(self.get_auto_hide_details_time)
+        self.ui.exportFilenameLineEdit.setPlaceholderText(f"Enter a filename... (default: {self.default_export_name})")
         # self.ui.stack.setCurrentWidget(self.ui.page_security)
     
     def update_sidebar_buttons(self):
@@ -629,14 +631,22 @@ class SettingsWindow(QDialog):
         self.ui.btnExportPath.setStyleSheet(Styles.yellow_button_outlined)
         utils.colorize_icon(self.ui.btnExportPath, "open", "yellow")
         utils.colorize_icon(self.ui.btnStartExport, "export", "green")
-        self.ui.btnExportPath.clicked.connect(self._get_file_path)
+        self.ui.btnExportPath.clicked.connect(self._get_export_file_path)
         self.ui.btnStartExport.clicked.connect(self.start_export)
+        self.ui.fileEndingBox.addItems(EXPORT_TYPES)
     
     def start_export(self):
         filename = self.ui.exportFilenameLineEdit.text()
         if not filename:
-            filename = "FileTreasure-PasswordExport"
-        filename = filename + ".csv"
+            filename = self.default_export_name
+
+        file_type = self.ui.fileEndingBox.currentText()
+        if not file_type:
+            DialogPopup("Export Error", f"No filetype selected! Please select a filetype and try again!", PopupType.ERROR, self).exec()        
+            return
+        
+        filename += file_type
+                
         dir_path = self.ui.exportFileLineEdit.text()
         if not dir_path:
             DialogPopup("Export Error", f"No directory found! Please select a directory to export.", PopupType.ERROR, self).exec()        
@@ -665,17 +675,24 @@ class SettingsWindow(QDialog):
                 DialogPopup("Export Information", "No entries to export found.", PopupType.INFO, self).exec()
                 return
             
-            with open(file_path, mode="w", newline='') as file:
-                writer = csv.DictWriter(file, fieldnames=field_names)
-                writer.writeheader()
-                writer.writerows(export_entries)
+            if file_type == ".csv":
+                with open(file_path, mode="w", newline='') as file:
+                    writer = csv.DictWriter(file, fieldnames=field_names)
+                    writer.writeheader()
+                    writer.writerows(export_entries)
+            elif file_type == ".json":
+                with open(file_path, mode="w") as file:
+                    data = json.dumps(export_entries, indent=4)
+                    file.write(data)
+        
+            self.ui.fileEndingBox.setCurrentIndex(-1)
             self.ui.exportFilenameLineEdit.clear()
             self.ui.exportFileLineEdit.clear()
-            DialogPopup("Export Success", f"Exporting {filename} successfully!\nPath:{file_path}", PopupType.SUCCESS, self).exec()        
+            DialogPopup("Export Success", f"Exporting {len(export_entries)}x entries to:\n'{filename}'\nsuccessfully!", PopupType.SUCCESS, self).exec()        
         except Exception as e:
             DialogPopup("Export Error", f"Failure at export to csv:\n{e}", PopupType.ERROR, self).exec()        
     
-    def _get_file_path(self):
+    def _get_export_file_path(self):
         file_path = QFileDialog.getExistingDirectory(
             parent=self,
             caption="Select directory."

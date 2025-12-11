@@ -11,13 +11,18 @@ class PopupType(Enum):
     INFO = 2
     WARNING = 3
     ERROR = 4
+    
 
-IS_DEBUGGING = True
+IS_DEBUGGING = False
 BASE_DIR = resource_path(".")
 DATA_PATH = resource_path("data")
 VAULT_PATH = resource_path('data/vault.db')
 SETTINGS_PATH = resource_path("data/user_settings.json")
 BACKUP_PATH = resource_path('backup')
+EXPORT_TYPES = [
+    ".json",
+    ".csv"
+]
 
 DEFAULT_SETTINGS: dict = {
     "auto_backup": "daily",

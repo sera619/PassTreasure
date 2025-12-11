@@ -94,7 +94,7 @@ class Ui_SettingsWindow(object):
         self.scrollAreaGeneral.setWidgetResizable(True)
         self.scrollAreaWidgetContents_2 = QWidget()
         self.scrollAreaWidgetContents_2.setObjectName(u"scrollAreaWidgetContents_2")
-        self.scrollAreaWidgetContents_2.setGeometry(QRect(0, -208, 489, 830))
+        self.scrollAreaWidgetContents_2.setGeometry(QRect(0, -475, 489, 830))
         self.verticalLayout_3 = QVBoxLayout(self.scrollAreaWidgetContents_2)
         self.verticalLayout_3.setSpacing(14)
         self.verticalLayout_3.setObjectName(u"verticalLayout_3")
@@ -904,10 +904,26 @@ class Ui_SettingsWindow(object):
 
         self.verticalLayout_20.addWidget(self.frame_13)
 
+        self.horizontalLayout_16 = QHBoxLayout()
+        self.horizontalLayout_16.setSpacing(6)
+        self.horizontalLayout_16.setObjectName(u"horizontalLayout_16")
         self.exportFilenameLineEdit = QLineEdit(self.frame_10)
         self.exportFilenameLineEdit.setObjectName(u"exportFilenameLineEdit")
+        sizePolicy3.setHeightForWidth(self.exportFilenameLineEdit.sizePolicy().hasHeightForWidth())
+        self.exportFilenameLineEdit.setSizePolicy(sizePolicy3)
 
-        self.verticalLayout_20.addWidget(self.exportFilenameLineEdit)
+        self.horizontalLayout_16.addWidget(self.exportFilenameLineEdit)
+
+        self.fileEndingBox = QComboBox(self.frame_10)
+        self.fileEndingBox.setObjectName(u"fileEndingBox")
+        self.fileEndingBox.setStyleSheet(u"font: 10pt \"Segoe UI\";")
+
+        self.horizontalLayout_16.addWidget(self.fileEndingBox)
+
+        self.horizontalLayout_16.setStretch(0, 3)
+        self.horizontalLayout_16.setStretch(1, 1)
+
+        self.verticalLayout_20.addLayout(self.horizontalLayout_16)
 
         self.horizontalLayout_12 = QHBoxLayout()
         self.horizontalLayout_12.setObjectName(u"horizontalLayout_12")
@@ -961,7 +977,7 @@ class Ui_SettingsWindow(object):
         self.scrollArea.setWidgetResizable(True)
         self.scrollAreaWidgetContents = QWidget()
         self.scrollAreaWidgetContents.setObjectName(u"scrollAreaWidgetContents")
-        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 96, 26))
+        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 497, 348))
         self.verticalLayout = QVBoxLayout(self.scrollAreaWidgetContents)
         self.verticalLayout.setSpacing(0)
         self.verticalLayout.setObjectName(u"verticalLayout")
@@ -1059,7 +1075,8 @@ class Ui_SettingsWindow(object):
         self.label_17.setText(QCoreApplication.translate("SettingsWindow", u"Export", None))
         self.label_16.setText(QCoreApplication.translate("SettingsWindow", u"Export", None))
         self.exportFilenameLineEdit.setPlaceholderText(QCoreApplication.translate("SettingsWindow", u"Enter a filename to export...", None))
-        self.label_15.setText(QCoreApplication.translate("SettingsWindow", u"Exportfile", None))
+        self.fileEndingBox.setPlaceholderText(QCoreApplication.translate("SettingsWindow", u"Select filetype...", None))
+        self.label_15.setText(QCoreApplication.translate("SettingsWindow", u"Export Path", None))
         self.exportFileLineEdit.setPlaceholderText(QCoreApplication.translate("SettingsWindow", u"Enter path to export directory...", None))
         self.btnExportPath.setText(QCoreApplication.translate("SettingsWindow", u"Select Path", None))
         self.btnStartExport.setText(QCoreApplication.translate("SettingsWindow", u"Start Export", None))
