@@ -50,15 +50,15 @@ class PasswordDatabase:
             service = entry.get("service")
             username = entry.get("username")
             password = entry.get("password")
-            url = entry.get("url", "https://www.google.com")
+            url = entry.get("url", f"https://www.{service.lower()}.com")
             category = entry.get("category", "General")
             category = random.choice(entry_categories)
-            
+            note =  "No note set."
             if not service or not username or not password:
                 print(f"skipping invalid entry: {entry}")
                 continue
             try:
-                self.add_entry(service, username, password, category, url)
+                self.add_entry(service, username, password, category, url, note)
             except Exception as e:
                 print(f"Failed to add entry: {e}")
             
@@ -68,14 +68,6 @@ class PasswordDatabase:
         
         self.conn = sqlite3.connect(self.path)
         self.cursor = self.conn.cursor()
-        return True
-    
-    def disconnect(self) -> bool:
-        if not self.conn:
-            return False
-        self.conn.close()
-        self.conn = None
-        self.cursor = None
         return True
     
     # Backup
@@ -222,6 +214,7 @@ class PasswordDatabase:
                 url TEXT,
                 nonce BLOB NOT NULL,
                 category TEXT DEFAULT 'General',
+                note TEXT,
                 created_at TEXT,
                 updated_at TEXT
             )
@@ -329,9 +322,18 @@ class PasswordDatabase:
             return True
 
         return False
-
+    
+    def disconnect(self) -> bool:
+        if not self.conn:
+            return False
+        self.conn.close()
+        self.conn = None
+        self.cursor = None
+        self.aes_key = None
+        return True
+    
     # Password Entry Handling
-    def add_entry(self, service: str, username: str, password: str, category: str = "General", url: str = "Unknown") -> None:
+    def add_entry(self, service: str, username: str, password: str, category: str = "General", url: str = "Unknown", note: str = "Unknown") -> None:
 
         if self.aes_key is None:
             raise Exception("Vault not unlocked!")
@@ -343,9 +345,9 @@ class PasswordDatabase:
         now = datetime.now(timezone.utc).isoformat()
 
         self.cursor.execute("""
-            INSERT INTO entries (service, username, password, url, nonce, category, created_at, updated_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-        """, (service, username, encrypted_pw, url, nonce, category, now, now))
+            INSERT INTO entries (service, username, password, url, nonce, category, note, created_at, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, (service, username, encrypted_pw, url, nonce, category, note, now, now))
 
         self.conn.commit()
 
@@ -354,7 +356,7 @@ class PasswordDatabase:
         Returns full entry details including timestamps and category.
         """
         self.cursor.execute("""
-            SELECT service, username, category, url, created_at, updated_at
+            SELECT service, username, category, url, note, created_at, updated_at
             FROM entries
             WHERE id = ?
         """, (entry_id,))
@@ -363,12 +365,13 @@ class PasswordDatabase:
         if row is None:
             raise Exception("Entry not found!")
 
-        service, username, category, url, created_at, updated_at = row
+        service, username, category, url, note, created_at, updated_at = row
         return {
             "service": service,
             "username": username,
             "category": category,
             "url": url,
+            "note": note,
             "created_at": created_at,
             "updated_at": updated_at
         }
@@ -376,6 +379,11 @@ class PasswordDatabase:
     def get_all_entries(self) -> List[Tuple[int, str, str, str]]:
         """Returns id, service, username, category for listing."""
         self.cursor.execute("SELECT id, service, username, category FROM entries")
+        return self.cursor.fetchall()
+    
+    def get_export_entries(self) -> List[Tuple[int, str, str, str, str, str]]:
+        """Returns id, service, username, category, url, note"""
+        self.cursor.execute("SELECT id, service, username, category, url, note FROM entries")
         return self.cursor.fetchall()
 
     def get_password(self, entry_id: int) -> str:
@@ -445,7 +453,6 @@ class PasswordDatabase:
         self.conn.commit()
 
     def edit_password(self, entry_id: int, new_password: str) -> None:
-
         if self.aes_key is None:
             raise Exception("Vault not unlocked!")
 
@@ -468,6 +475,14 @@ class PasswordDatabase:
         self.cursor.execute(
             "UPDATE entries SET url = ?, updated_at = ? WHERE id = ?",
             (new_url, now, entry_id)
+        )
+        self.conn.commit()
+        
+    def edit_note(self, entry_id: int, new_note: str) -> None:
+        now = datetime.now(timezone.utc).isoformat()
+        self.cursor.execute(
+            "UPDATE entries SET note = ?, updated_at = ? WHERE id = ?",
+            (new_note, now, entry_id)
         )
         self.conn.commit()
 
