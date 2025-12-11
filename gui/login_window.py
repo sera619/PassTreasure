@@ -85,7 +85,7 @@ class LoginWindow(QWidget):
         level = evaluate_password_strength(pw)
         self.strength_indicator.set_strength(level)
                 
-    def configure_mode(self):
+    def configure_mode(self): 
         if self.db.get_latest_backup():
             self.ui.btn_restore_backup.show()
         else:

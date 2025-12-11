@@ -29,10 +29,12 @@ class DialogPopup(QDialog):
     def _build_ui(self):
         ok_button = self.ui.buttonBox.button(QDialogButtonBox.StandardButton.Ok)
         cancel_button = self.ui.buttonBox.button(QDialogButtonBox.StandardButton.Cancel)
-        ok_button.setStyleSheet(config.Styles.green_button_outlined)
-        utils.colorize_icon(ok_button, "check", "green")
-        cancel_button.setStyleSheet(config.Styles.red_button_outlined)
-        utils.colorize_icon(cancel_button, "close", "red")
+        if ok_button:
+            ok_button.setStyleSheet(config.Styles.green_button_outlined)
+            utils.colorize_icon(ok_button, "check", "green")
+        if cancel_button:
+            cancel_button.setStyleSheet(config.Styles.red_button_outlined)
+            utils.colorize_icon(cancel_button, "close", "red")
         self.ui.textLabel.setStyleSheet("font: 10pt Segoe UI; color: #fff;")
         
     def _fill_data(self):
@@ -59,6 +61,7 @@ class DialogPopup(QDialog):
                 icon_colored = utils.tint_pixmap(icon, QColor("#49d655"))
                 self.ui.iconLabel.setPixmap(icon_colored)
                 self.ui.titleLabel.setStyleSheet("font: bold 15pt Segoe UI; color: #49d655;")
+                self.ui.buttonBox.setStandardButtons(QDialogButtonBox.StandardButton.Ok)
                 
             case PopupType.INFO:
                 self.setWindowTitle("Information")
@@ -66,6 +69,7 @@ class DialogPopup(QDialog):
                 icon_colored = utils.tint_pixmap(icon, QColor("#6fbdf5"))
                 self.ui.iconLabel.setPixmap(icon_colored)
                 self.ui.titleLabel.setStyleSheet("font: bold 15pt Segoe UI; color: #6fbdf5;")
+                self.ui.buttonBox.setStandardButtons(QDialogButtonBox.StandardButton.Ok)
 
             case PopupType.WARNING:
                 self.setWindowTitle("Warning")
@@ -73,6 +77,7 @@ class DialogPopup(QDialog):
                 icon_colored = utils.tint_pixmap(icon, QColor("#f1bd54"))
                 self.ui.iconLabel.setPixmap(icon_colored)
                 self.ui.titleLabel.setStyleSheet("font: bold 15pt Segoe UI; color: #f1bd54;")
+                self.ui.buttonBox.setStandardButtons(QDialogButtonBox.StandardButton.Ok)
 
             case PopupType.ERROR:
                 self.setWindowTitle("Error")
@@ -80,3 +85,5 @@ class DialogPopup(QDialog):
                 icon_colored = utils.tint_pixmap(icon, QColor("#df2b2b"))
                 self.ui.iconLabel.setPixmap(icon_colored)
                 self.ui.titleLabel.setStyleSheet("font: bold 15pt Segoe UI; color: #df2b2b;")
+                self.ui.buttonBox.setStandardButtons(QDialogButtonBox.StandardButton.Ok)
+

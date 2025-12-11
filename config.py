@@ -17,11 +17,12 @@ BASE_DIR = resource_path(".")
 DATA_PATH = resource_path("data")
 VAULT_PATH = resource_path('data/vault.db')
 SETTINGS_PATH = resource_path("data/user_settings.json")
-
+BACKUP_PATH = resource_path('backup')
 
 DEFAULT_SETTINGS: dict = {
     "auto_backup": "daily",
     "last_backup": None,
+    "backup_path": f"{BACKUP_PATH}",
     "auto_logout": True,
     "auto_logouttime": 180000, # 3 min
     "auto_hide_details": False,

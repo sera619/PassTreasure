@@ -8,6 +8,7 @@ from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 from config import TEST_ENTRIES
 from utils import load_settings, save_settings, clean_url, resource_path
 import shutil
+from pathlib import Path
 from backend.kdf import (
     generate_salt,
     derive_key,
@@ -28,12 +29,14 @@ class PasswordDatabase:
         # AES key will be placed here after unlock
         self.aes_key: Optional[bytes] = None
         self._init_data()
-        self._init_backup()
-        
+        self._init_backup()        
 
     def _init_backup(self):
-        if not os.path.exists(BACKUP_PATH):
-            os.makedirs(BACKUP_PATH)
+        settings = load_settings()
+        path = settings.get("backup_path")
+        path = os.path.abspath(path)
+        if not os.path.exists(path):
+            os.makedirs(path)
             
     def _init_data(self):
         if not os.path.exists(DATA_PATH):
@@ -71,29 +74,90 @@ class PasswordDatabase:
         self.cursor = self.conn.cursor()
         return True
     
-    # Backup
+    # Backup    
     def create_backup(self):
         if not VAULT_PATH.exists():
             raise FileNotFoundError("vault.db does not exist – nothing to backup!")
+        settings = load_settings()
+        backup_dir = settings.get("backup_path")
         time_now = datetime.now().strftime("%d-%m-%Y_%H-%M-%S")
+
         backup_name = f"{time_now}_vault.db"
-        backup_file = resource_path(f'backup/{backup_name}')
+        backup_file = os.path.join(os.path.abspath(backup_dir), backup_name)
+        
         shutil.copy2(VAULT_PATH, backup_file)
         return backup_file
     
-    def get_latest_backup(self):
-        backups = list(BACKUP_PATH.glob("*_vault.db"))
+    def get_latest_backup(self) -> Optional[str]:
+        """
+        Return the filename (not path) of the most recent backup file matching
+        the pattern '*_vault.db' inside the configured backup directory.
+        Returns None if no matching file is found or path is invalid.
+        """
+        settings = load_settings()
+        backup_path_str = settings.get("backup_path")
+        if not backup_path_str:
+            return None
+
+        backup_dir = Path(os.path.abspath(backup_path_str))
+
+        if not backup_dir.exists() or not backup_dir.is_dir():
+            return None
+
+        # collect files that end with '_vault.db'
+        backups = []
+        for entry in backup_dir.iterdir():          # no glob() used
+            try:
+                if entry.is_file() and entry.name.endswith("_vault.db"):
+                    backups.append(entry)
+            except (OSError, PermissionError):
+                # ignore entries we can't stat/read
+                continue
+
         if not backups:
             return None
-        sorted_backups = sorted(backups, reverse=True)
-        return sorted_backups[0].name
+
+        # sort by modification time, newest first
+        backups.sort(key=lambda p: p.stat().st_mtime, reverse=True)
+
+        # return only the filename (not full path)
+        return backups[0].name
         
     def delete_backup(self, backup_filename: str):
-        backup_file = BACKUP_PATH / backup_filename
+        """
+        Delete the selected backup file from the backup directory.
+        Uses no glob() and falls back to manual directory scanning.
+        """
+        settings = load_settings()
+        backup_path_str = settings.get("backup_path")
+
+        if not backup_path_str:
+            raise FileNotFoundError("Backup path not configured.")
+
+        backup_dir = Path(os.path.abspath(backup_path_str))
+
+        if not backup_dir.exists() or not backup_dir.is_dir():
+            raise FileNotFoundError(f"Backup path does not exist: {backup_dir}")
+
+        # target file
+        backup_file = backup_dir / backup_filename
+
         if not backup_file.exists():
             raise FileNotFoundError(f"Backup file not found: {backup_file}")
+
+        # delete backup
         os.remove(backup_file)
-        remaining = list(BACKUP_PATH.glob("*_vault.db"))
+
+        # check if backups remain (manual scan instead of glob)
+        remaining = []
+        for entry in backup_dir.iterdir():
+            try:
+                if entry.is_file() and entry.name.endswith("_vault.db"):
+                    remaining.append(entry)
+            except (OSError, PermissionError):
+                continue
+
+        # if no backups left: clear "last_backup"
         if len(remaining) == 0:
             try:
                 settings = load_settings()
@@ -101,12 +165,21 @@ class PasswordDatabase:
                 save_settings(settings)
             except Exception as e:
                 print(f"Failed to update settings: {e}")
-    
+
     def clear_backups(self):
-        if not BACKUP_PATH.exists():
-            raise FileNotFoundError(f"Backup directory does not exists: {BACKUP_PATH}")
+        settings = load_settings()
+        backup_path_str = settings.get("backup_path")
+
+        if not backup_path_str:
+            raise FileNotFoundError("Backup path not configured.")
+
+        backup_dir = Path(os.path.abspath(backup_path_str))
+
+        if not backup_dir.exists() or not backup_dir.is_dir():
+            raise FileNotFoundError(f"Backup path does not exist: {backup_dir}")   
+        
         removed = 0
-        for file in BACKUP_PATH.iterdir():
+        for file in backup_dir.iterdir():
             if file.is_file() and file.name.endswith("_vault.db"):
                 try:
                     file.unlink()
@@ -119,7 +192,19 @@ class PasswordDatabase:
         return removed                        
     
     def apply_backup(self, backup_filename: str):
-        backup_file = BACKUP_PATH / backup_filename
+        settings = load_settings()
+        backup_path_str = settings.get("backup_path")
+
+        if not backup_path_str:
+            raise FileNotFoundError("Backup path not configured.")
+
+        backup_dir = Path(os.path.abspath(backup_path_str))
+
+        if not backup_dir.exists() or not backup_dir.is_dir():
+            raise FileNotFoundError(f"Backup path does not exist: {backup_dir}")  
+         
+        backup_file = backup_dir / backup_filename
+        
         if not backup_file.exists():
             raise FileNotFoundError(f"Backup file not found: {backup_file}")
         # 1. Close DB connection if open
@@ -183,6 +268,35 @@ class PasswordDatabase:
 
         return True
 
+    def get_all_backups(self) -> Optional[list]:
+        settings = load_settings()
+        backup_path_str = settings.get("backup_path")
+
+        if not backup_path_str:
+            raise FileNotFoundError("Backup path not configured.")
+
+        backup_dir = Path(os.path.abspath(backup_path_str))
+
+        if not backup_dir.exists() or not backup_dir.is_dir():
+            raise FileNotFoundError(f"Backup path does not exist: {backup_dir}")  
+
+        try:
+            # collect files that end with '_vault.db'
+            backups = []
+            for entry in backup_dir.iterdir():
+                    try:
+                        if entry.is_file() and entry.name.endswith("_vault.db"):
+                            backups.append(entry.name)
+                    except (OSError, PermissionError):
+                        continue
+            if not backups:
+                return None
+
+            return backups
+        except Exception as e:
+            print(f"Error get all backups:\n{e}")
+            return None
+        
     # Unlock / Verify
     def create_new_vault(self, master_password: str) -> None:
         if os.path.exists(self.path):
