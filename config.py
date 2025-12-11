@@ -4,7 +4,7 @@ import sys
 from pathlib import Path
 from datetime import datetime
 
-IS_DEBUGGING = True
+IS_DEBUGGING = False
 
 def resource_path(relative: str) -> Path:
     """
@@ -30,13 +30,15 @@ DEFAULT_SETTINGS = {
     "last_backup": None,
     "auto_logout": True,
     "auto_logouttime": 180000, # 3 min
-    "entry_categories": ["General", "Arbeit", "Privat", "Finanzen", "Sonstiges", "Social Media"],
+    "auto_hide_details": False,
+    "auto_hide_details_time": 60000, # 60 sec
+    "entry_categories": ["General", "Work", "Private", "Finance", "Others", "Social Media"],
     "category_colors": {
         "General": "rgba(211, 211, 211, 140)",    # LightGray
-        "Arbeit": "rgba(70, 130, 180, 140)",      # SteelBlue
-        "Privat": "rgba(144, 238, 144, 140)",     # LightGreen
-        "Finanzen": "rgba(255, 215, 0, 140)",     # Gold
-        "Sonstiges": "rgba(255, 165, 0, 140)",    # Orange
+        "Work": "rgba(70, 130, 180, 140)",      # SteelBlue
+        "Private": "rgba(144, 238, 144, 140)",     # LightGreen
+        "Finance": "rgba(255, 215, 0, 140)",     # Gold
+        "Others": "rgba(255, 165, 0, 140)",    # Orange
         "Social Media": "rgba(30, 195, 198, 180)" # Cyan  
     }
 }
@@ -180,6 +182,17 @@ class TextStorage:
     ]
 
 class Styles:
+    COLORS = {
+        "green": "#1b5e20",
+        "yellow": "#b8860b",
+        "blue": "#0d47a1",
+        "red": "#8b1a1a",
+        "dark": "#ffffff"        
+    }
+    
+    h_line = """  
+       background-color: rgb(97, 97, 97);
+    """
     green_button = """
         QPushButton {
             background-color: #1b5e20;
@@ -280,7 +293,7 @@ class Styles:
             color: #1b5e20;
             padding: 6px 10px;
             border-radius: 6px;
-            border: 1px solid #2e7d32;
+            border: 0.5px solid #2e7d32;
         }
         QPushButton:hover {
             background-color: rgba(46, 125, 50, 30);
@@ -295,7 +308,7 @@ class Styles:
             color: #8b1a1a;
             padding: 6px 10px;
             border-radius: 6px;
-            border: 1px solid #b71c1c;
+            border: 0.5px solid #b71c1c;
         }
         QPushButton:hover {
             background-color: rgba(183, 28, 28, 30);
@@ -310,7 +323,7 @@ class Styles:
             color: #0d47a1;
             padding: 6px 10px;
             border-radius: 6px;
-            border: 1px solid #1565c0;
+            border: 0.5px solid #1565c0;
         }
         QPushButton:hover {
             background-color: rgba(21, 101, 192, 30);
@@ -325,7 +338,7 @@ class Styles:
             color: #b8860b;
             padding: 6px 10px;
             border-radius: 6px;
-            border: 1px solid #f9a825;
+            border: 0.5px solid #f9a825;
         }
         QPushButton:hover {
             background-color: rgba(249, 168, 37, 30);
@@ -337,9 +350,9 @@ class Styles:
         QPushButton {
             background: transparent;
             color: #b8860b;
-            padding: 2px 10px;
+            padding: 2px 6px;
             border-radius: 6px;
-            border: 1px solid #f9a825;
+            border: 0.5px solid #f9a825;
         }
         QPushButton:hover {
             background-color: rgba(249, 168, 37, 30);
@@ -353,7 +366,7 @@ class Styles:
             color: #dcdcdc;
             padding: 6px 10px;
             border-radius: 6px;
-            border: 1px solid #3a3a3a;
+            border: 0.5px solid #3a3a3a;
         }
         QPushButton:hover {
             background-color: rgba(255, 255, 255, 20);
@@ -376,11 +389,12 @@ class Styles:
         """
     
     dark_style = """
+
         QWidget {
             background-color: #1e1e1e;
             color: #dcdcdc;
             font-family: Segoe UI;
-            font-size: 14px;
+            font-size: 12px;
         }
 
         QLineEdit {
@@ -397,7 +411,7 @@ class Styles:
         QPushButton {
             background-color: #2d2d30;
             border: 1px solid #3a3a3a;
-            padding: 4px;
+            padding: 3px 6px;
             border-radius: 6px;
         }
 
@@ -414,4 +428,5 @@ class Styles:
             background-color: #1e1e1e;
             color: #dcdcdc;
         }
+
         """
