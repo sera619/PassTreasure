@@ -1,6 +1,6 @@
 from PySide6.QtWidgets import (QApplication,
     QWidget, QVBoxLayout, QLabel, QLineEdit,
-    QPushButton, QMessageBox
+    QPushButton, QMessageBox, QDialog
 )
 from PySide6.QtCore import Signal
 from PySide6.QtGui import QPixmap
@@ -111,8 +111,9 @@ class LoginWindow(QWidget):
         self.error_label.setText("")
     
     def _restore_backup(self):
-        confirm = QMessageBox.question(self, "Confirm Restore Backup", "Are you sure to restore the backup?")
-        if confirm != QMessageBox.StandardButton.Yes:
+        popup = DialogPopup("Confirm Restore", "Are you sure you want to restore the backup?", PopupType.QUESTION, parent=self)
+        result = popup.exec()
+        if result != QDialog.DialogCode.Accepted:
             return
         try:
             self.db.apply_backup(self.db.get_latest_backup())
@@ -124,8 +125,9 @@ class LoginWindow(QWidget):
   
 
     def handle_delete_vault(self):
-        confirm = QMessageBox.question(self, "Confirm Delete", "Are you sure you want to delete this vault?")
-        if confirm != QMessageBox.StandardButton.Yes:
+        popup = DialogPopup("Confirm Delete", "Are you sure you want to delete this vault?", PopupType.QUESTION, parent=self)
+        result = popup.exec()
+        if result != QDialog.DialogCode.Accepted:
             return
         try:
             pw = self.input_pw.text().strip()

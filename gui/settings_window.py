@@ -226,8 +226,9 @@ class SettingsWindow(QDialog):
         if not latest_backup:
             DialogPopup("Restore Error", f"Cant find any backup!", PopupType.ERROR, self).exec()
             return
-        confirm = QMessageBox.question(self, "Confirm Restore", "Are you sure you want to restore the backup?")
-        if confirm != QMessageBox.StandardButton.Yes:
+        popup = DialogPopup("Confirm Restore", "Are you sure you want to restore the backup?", PopupType.QUESTION, parent=self)
+        result = popup.exec()
+        if result != QDialog.DialogCode.Accepted:
             return
         try:  
             self.db.apply_backup(latest_backup)
@@ -241,8 +242,9 @@ class SettingsWindow(QDialog):
         delete_backup = self.ui.backupDeleteBox.currentText()
         if not delete_backup:
             return
-        confirm = QMessageBox.question(self, "Confirm Delete", "Are you sure you want to delete this backup?")
-        if confirm != QMessageBox.StandardButton.Yes:
+        popup = DialogPopup("Confirm Delete", "Are you sure you want to delete this backup?", PopupType.QUESTION, parent=self)
+        result = popup.exec()
+        if result != QDialog.DialogCode.Accepted:
             return
         try:        
             self.db.delete_backup(delete_backup)
@@ -252,8 +254,9 @@ class SettingsWindow(QDialog):
             DialogPopup("Delete Error", f"Failed to delete backup:\n{e}", PopupType.ERROR, self).exec()    
 
     def clear_backups(self):
-        confirm = QMessageBox.question(self, "Confirm Delete", "Are you sure you want to delete this backup?")
-        if confirm != QMessageBox.StandardButton.Yes:
+        popup = DialogPopup("Confirm Delete", "Are you sure you want to delete ALL backups?", PopupType.QUESTION, parent=self)
+        result = popup.exec()
+        if result != QDialog.DialogCode.Accepted:
             return
         try:
             removed = self.db.clear_backups()

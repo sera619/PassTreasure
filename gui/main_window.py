@@ -408,8 +408,9 @@ class MainWindow(QWidget):
         if not selected:
             return
         entry_id = selected.data(Qt.ItemDataRole.UserRole)
-        confirm = QMessageBox.question(self, "Confirm Delete", "Are you sure you want to delete this entry?")
-        if confirm != QMessageBox.StandardButton.Yes:
+        popup = DialogPopup("Confirm Delete", "Are you sure you want to delete this entry?", PopupType.QUESTION, parent=self)
+        result = popup.exec()
+        if result != QDialog.DialogCode.Accepted:
             return
         try:
             self.db.delete_entry(entry_id)
@@ -420,8 +421,9 @@ class MainWindow(QWidget):
             DialogPopup("Error", f"Failed to delete entry:\n{e}", PopupType.ERROR, self).exec()    
          
     def clear_all_entries(self):
-        confirm = QMessageBox.question(self, "Confirm Clear", "Are you sure you want delete ALL entries?")
-        if confirm != QMessageBox.StandardButton.Yes:
+        popup = DialogPopup("Confirm Clear", "Are you sure you want to delete ALL entries?", PopupType.QUESTION, parent=self)
+        result = popup.exec()
+        if result != QDialog.DialogCode.Accepted:
             return
         try:
             self.db.clear_entries()
@@ -468,7 +470,7 @@ class MainWindow(QWidget):
         if dialog.exec():
             new_password = dialog.get_password()
             if not new_password:
-                QMessageBox.warning(self, "Error", "No password provided.")
+                DialogPopup("Error", f"No password provided. Please enter a password and try again!", PopupType.ERROR, self).exec()                
                 return
             
             try:
@@ -539,7 +541,7 @@ class MainWindow(QWidget):
         if dialog.exec():
             new_url = dialog.get_url()
             if not new_url:
-                QMessageBox.warning(self, "Error", "No URL provided.")
+                DialogPopup("Error", f"No url provided. Please enter a url and try again!", PopupType.ERROR, self).exec()                
                 return
             try:
                 self.db.edit_url(entry_id, new_url.strip())
@@ -548,7 +550,7 @@ class MainWindow(QWidget):
                 self.ui.listWidget.setCurrentIndex(index)
                 DialogPopup("Edit Success", f"URL successfully updated for:\n\n'{current_service}'", PopupType.SUCCESS, self).exec()        
             except Exception as e:
-                DialogPopup("Error", f"Failed to update url:\n{e}", PopupType.ERROR, self).exec()        
+                DialogPopup("Edit Error", f"Failed to update url:\n{e}", PopupType.ERROR, self).exec()        
     
     def edit_entry_note(self):
         selected = self.ui.listWidget.currentItem()
