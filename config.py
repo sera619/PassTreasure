@@ -1,4 +1,4 @@
-from utils import resource_path, get_base_dir
+from utils import get_base_dir
 from enum import Enum
 import os
 
@@ -8,7 +8,7 @@ class PopupType(Enum):
     WARNING = 3
     ERROR = 4
     
-IS_DEBUGGING = False
+IS_DEBUGGING = True
 BASE_DIR = get_base_dir()
 DATA_PATH = os.path.join(BASE_DIR, "data")
 BACKUP_PATH = os.path.join(BASE_DIR, "backup")
