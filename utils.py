@@ -135,3 +135,28 @@ def limit_text(text: str, max_len: int = 20) -> str:
     if len(text) <= max_len:
         return text
     return text[:max_len] + "..."
+
+def get_contrast_text_color(rgba_color: str) -> str:
+    """
+    Takes an rgba/hex/css color string and returns 'black' or 'white'
+    depending on the luminance of the background.
+    """
+
+    # extract the rgba(...) part → r,g,b
+    if rgba_color.startswith("rgba"):
+        rgba_color = rgba_color.replace("rgba(", "").replace(")", "")
+        r, g, b, *_ = map(int, rgba_color.split(","))
+    elif rgba_color.startswith("#"):
+        hex_color = rgba_color.lstrip("#")
+        r = int(hex_color[0:2], 16)
+        g = int(hex_color[2:4], 16)
+        b = int(hex_color[4:6], 16)
+    else:
+        # fallback: assume light gray
+        return "black"
+
+    # perceived luminance (W3C)
+    luminance = (0.299 * r + 0.587 * g + 0.114 * b)
+
+    # threshold: > 160 → too bright for white text
+    return "black" if luminance > 160 else "white"
