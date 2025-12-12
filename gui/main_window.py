@@ -114,6 +114,9 @@ class MainWindow(QWidget):
         utils.colorize_icon(self.ui.btnEditUrl, "pencil", "yellow")
         utils.colorize_icon(self.ui.btnEditNote, "pencil", "yellow")
         
+        self.ui.btnRestorePW.setStyleSheet(Styles.yellow_button_outlined_low)
+        utils.colorize_icon(self.ui.btnRestorePW, "reset", "yellow")
+        
         self.ui.btnClearEntries.setStyleSheet(Styles.red_button_outlined)
         self.ui.btnCopyPass.setStyleSheet(Styles.dark_button_outlined)
         self.ui.btnShowPass.setStyleSheet(Styles.dark_button_outlined)
@@ -123,6 +126,8 @@ class MainWindow(QWidget):
         utils.colorize_icon(self.ui.btnShowPass, "show", "dark")
         utils.colorize_icon(self.ui.btnCloseDetails, "hiden", "red")
         self.ui.listWidget.setStyleSheet(Styles.list_widget_style)
+        
+        self.ui.btnRestorePW.hide()
     
     def build_ui(self):
         pixmap = QPixmap(":/assets/icon.png")
@@ -191,9 +196,6 @@ class MainWindow(QWidget):
         if self.details_open:
             self.toggle_details()
         self.ui.btnDelete.hide()
-        selected = self.ui.listWidget.currentItem()
-        if selected:
-            self.ui.listWidget.setCurrentRow(-1)
 
     def sort_list(self, role_key):
         self.entry_cache.sort(key= lambda e: e[role_key])
@@ -332,7 +334,7 @@ class MainWindow(QWidget):
                 QTimer.singleShot(auto_hide_time, self.hide_details)
             
         except Exception as e:
-            self.ui.detailStatus.setText(f"Error loading password:\n{e}")
+            self.ui.detailStatus.setText(f"Error loading password:{e}")
 
     def toggle_password_visibility(self):
         if not hasattr(self, "_current_plain_password"):
@@ -449,7 +451,7 @@ class MainWindow(QWidget):
                 self.ui.listWidget.setCurrentIndex(index)
                 DialogPopup("Edit Success", f"Password successfully updated for:\n\n'{service_name}'", PopupType.SUCCESS, self).exec()        
             except Exception as e:
-                DialogPopup("Error", f"Failed to update oassword:\n{e}", PopupType.ERROR, self).exec()    
+                DialogPopup("Error", f"Failed to update password:\n{e}", PopupType.ERROR, self).exec()    
     
     def edit_entry_category(self):
         selected = self.ui.listWidget.currentItem()
