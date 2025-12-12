@@ -664,6 +664,7 @@ class MainWindow(QWidget):
     def hide_details_after_anim(self):
         self.ui.detailFrame.hide()
         self.ui.detailLabel.show()
+        self.anim.finished.disconnect(self.hide_details_after_anim)
         
     def toggle_details(self):
         frame = self.ui.detailFrame
@@ -679,5 +680,6 @@ class MainWindow(QWidget):
 
         if self.details_open:
             self.anim.finished.connect(self.hide_details_after_anim)
+                        
         self.anim.start()
         self.details_open = not self.details_open
