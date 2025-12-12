@@ -2,13 +2,10 @@ from utils import get_base_dir
 from enum import Enum
 import os
 
-class PopupType(Enum):
-    SUCCESS = 1
-    INFO = 2
-    WARNING = 3
-    ERROR = 4
-    
 IS_DEBUGGING = True
+VERSION_NUM = "2.2.1"
+GITHUB_API = "https://api.github.com/repos/sera619/PassTreasure/releases/latest"
+    
 BASE_DIR = get_base_dir()
 DATA_PATH = os.path.join(BASE_DIR, "data")
 BACKUP_PATH = os.path.join(BASE_DIR, "backup")
@@ -24,6 +21,7 @@ DEFAULT_SETTINGS: dict = {
     "auto_backup": "daily",
     "last_backup": None,
     "backup_path": f"{BACKUP_PATH}",
+    "check_update": False,
     "auto_logout": True,
     "auto_logouttime": 180000, # 3 min
     "auto_hide_details": False,
@@ -39,7 +37,11 @@ DEFAULT_SETTINGS: dict = {
     }
 }
 
-VERSION_NUM = "2.1.7"
+class PopupType(Enum):
+    SUCCESS = 1
+    INFO = 2
+    WARNING = 3
+    ERROR = 4
 
 class TextStorage:
     PW_INDICATOR_STRENGTH_TEXTS = [

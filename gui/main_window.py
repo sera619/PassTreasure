@@ -44,6 +44,7 @@ class MainWindow(QWidget):
         self.strength_indicator = PasswordStrengthIndicator(self)
         self.ui.indicatorHolder.addWidget(self.strength_indicator)  
 
+        self.db.migrate_database()
         if IS_DEBUGGING:
             loaded_entries = self.db.get_all_entries()
             if len(loaded_entries) == 0:
@@ -60,7 +61,30 @@ class MainWindow(QWidget):
         self.check_auto_backup()
         self.check_autologout()
         QTimer.singleShot(0, self.clear_initial_selection)
-            
+        self._check_for_updates()
+
+                
+    # update
+    def _check_for_updates(self):
+        settings = load_settings()
+        check_update = settings.get("check_update")
+        if not check_update:
+            return
+        try:
+            update_result = utils.check_for_update()
+            if not update_result.get("update_available"):
+                return
+            popup = DialogPopup(
+                f"Update {update_result['version']} verfügbar",
+                f"Neues Update gefunden:\n\n{update_result['changelog']}\n\nJetzt herunterladen?",
+                parent=self
+            )
+            if popup.exec():
+                utils.open_url(update_result["download_url"])
+        except Exception as e:
+            DialogPopup("Restore Error", f"Failed checking for updates:\n{e}", PopupType.ERROR, self).exec()    
+
+    
     # autologout
     def start_autologout(self):
         settings = load_settings()

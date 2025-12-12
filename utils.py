@@ -1,13 +1,59 @@
 from PySide6.QtGui import QPixmap, QPainter, QColor, QIcon
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QPushButton
-import config
+import config 
 import json
 import resources_rc
 import sys
 import os
+import requests
 from pathlib import Path
 from datetime import datetime
+
+
+def has_internet(timeout: float = 2.0) -> bool:
+    """check if system has active internet conntection"""
+    try:
+        requests.get("https://1.1.1.1", timeout=timeout)
+        return True 
+    except requests.RequestException:
+        return False
+
+def open_url(url: str):
+    import webbrowser
+    webbrowser.open(url)
+
+def parse_version(version: str) -> tuple:
+    """Convert version string like '2.2.7' to tuple (2, 2, 7)"""
+    return tuple(map(int, version.split(".")))
+
+def check_for_update():
+    """Check GitHub for latest release and compare with local version"""
+    if not has_internet():
+        return
+    try:
+        response = requests.get(config.GITHUB_API, timeout=5)
+        response.raise_for_status()
+        
+        data = response.json()
+        latest_version = data["tag_name"].lstrip("v")
+        download_url = data["assets"][0]["browser_download_url"]
+        
+        
+        local_v = parse_version(config.VERSION_NUM)
+        remote_v = parse_version(latest_version)
+        
+        if remote_v > local_v:
+            return {
+                "update_available": True,
+                "version": latest_version,
+                "download_url": download_url,
+                "changelog": data.get("body", "")
+                }
+        else:
+            return {"update_available": False}
+    except Exception as e:
+        return {"error": str(e)}
 
 def get_base_dir():
     if getattr(sys, "frozen", False):
@@ -15,17 +61,10 @@ def get_base_dir():
     else:
         return os.path.dirname(__file__)
     
-BASE_DIR = get_base_dir()
-DATA_PATH = os.path.join(BASE_DIR, "data")
-BACKUP_PATH = os.path.join(BASE_DIR, "backup")
-SETTINGS_PATH = os.path.join(DATA_PATH, "settings.json")
-VAULT_PATH = os.path.join(DATA_PATH, "vault.db")
-
 def tint_pixmap(pix: QPixmap, color: QColor) -> QPixmap:
     """Recolors a pixmap fully with a given color."""
     tinted = QPixmap(pix.size())
     tinted.fill(Qt.GlobalColor.transparent)
-
     painter = QPainter(tinted)
     painter.drawPixmap(0, 0, pix)
     painter.setCompositionMode(QPainter.CompositionMode.CompositionMode_SourceIn)
@@ -57,18 +96,18 @@ def resource_path(relative: str) -> Path:
     return base_path / relative
 
 def load_settings():
-    if not os.path.exists(SETTINGS_PATH):
+    if not os.path.exists(config.SETTINGS_PATH):
         save_settings(config.DEFAULT_SETTINGS)
         return config.DEFAULT_SETTINGS
     try:
-        with open(SETTINGS_PATH, "r", encoding="utf-8") as f:
+        with open(config.SETTINGS_PATH, "r", encoding="utf-8") as f:
             data = json.loads(f.read())
             return data
     except:
         return config.DEFAULT_SETTINGS
     
 def save_settings(data):
-    with open(SETTINGS_PATH, "w", encoding="utf-8") as f:
+    with open(config.SETTINGS_PATH, "w", encoding="utf-8") as f:
         f.write(json.dumps(data, indent=4))
 
 def format_last_backup(iso_str: str) -> str:
