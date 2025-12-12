@@ -30,14 +30,15 @@ No cloud. No telemetry. No tracking. Everything stays on your device — and bel
 - Modern and clean **PySide6** UI  
 - Auto-logout with adjustable timer  
 - Custom categories for password organization  
-- Fast search and filtering  
+- Fast search and filtering
+- Custom notice for each password  
 
 ### 🔧 Additional Tools
 - Password generator with real-time strength analysis  
 - Manual and automatic vault backups  
 - Import passwords from Firefox and Chrome  
 - Robust error handling and logging  
-
+- Export passwords as .json or .csv
 ---
 
 ## 📦 Installation
