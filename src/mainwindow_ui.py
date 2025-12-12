@@ -271,7 +271,7 @@ class Ui_MainWindow(object):
         self.serviceHBox.setContentsMargins(2, 2, 2, 2)
         self.label = QLabel(self.serviceFrame)
         self.label.setObjectName(u"label")
-        self.label.setMinimumSize(QSize(80, 0))
+        self.label.setMinimumSize(QSize(70, 0))
         font3 = QFont()
         font3.setBold(True)
         font3.setItalic(True)
@@ -306,7 +306,7 @@ class Ui_MainWindow(object):
         self.usernameEditLayout.setContentsMargins(2, 2, 2, 2)
         self.label_4 = QLabel(self.usernameFrame)
         self.label_4.setObjectName(u"label_4")
-        self.label_4.setMinimumSize(QSize(80, 0))
+        self.label_4.setMinimumSize(QSize(70, 0))
         self.label_4.setFont(font3)
         self.label_4.setStyleSheet(u"QLabel {\n"
 "	color:rgb(118, 0, 0);\n"
@@ -338,7 +338,7 @@ class Ui_MainWindow(object):
         self.passEditLayout.setContentsMargins(2, 2, 2, 2)
         self.label_3 = QLabel(self.passFrame)
         self.label_3.setObjectName(u"label_3")
-        self.label_3.setMinimumSize(QSize(80, 0))
+        self.label_3.setMinimumSize(QSize(70, 0))
         self.label_3.setFont(font3)
         self.label_3.setStyleSheet(u"QLabel {\n"
 "	color:rgb(118, 0, 0);\n"
@@ -370,7 +370,7 @@ class Ui_MainWindow(object):
         self.passEditLayout_2.setContentsMargins(2, 2, 2, 2)
         self.label_9 = QLabel(self.passSecurityFrame)
         self.label_9.setObjectName(u"label_9")
-        self.label_9.setMinimumSize(QSize(80, 0))
+        self.label_9.setMinimumSize(QSize(70, 0))
         self.label_9.setFont(font3)
         self.label_9.setStyleSheet(u"QLabel {\n"
 "	color:rgb(118, 0, 0);\n"
@@ -381,10 +381,16 @@ class Ui_MainWindow(object):
         self.indicatorHolder = QVBoxLayout()
         self.indicatorHolder.setSpacing(0)
         self.indicatorHolder.setObjectName(u"indicatorHolder")
+        self.indicatorHolder.setContentsMargins(0, -1, -1, -1)
 
         self.passEditLayout_2.addLayout(self.indicatorHolder)
 
-        self.passEditLayout_2.setStretch(1, 2)
+        self.btnRestorePW = QPushButton(self.passSecurityFrame)
+        self.btnRestorePW.setObjectName(u"btnRestorePW")
+
+        self.passEditLayout_2.addWidget(self.btnRestorePW)
+
+        self.passEditLayout_2.setStretch(1, 1)
 
         self.verticalLayout.addWidget(self.passSecurityFrame)
 
@@ -399,7 +405,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout_12.setContentsMargins(2, 2, 2, 2)
         self.label_7 = QLabel(self.urlFrame)
         self.label_7.setObjectName(u"label_7")
-        self.label_7.setMinimumSize(QSize(80, 0))
+        self.label_7.setMinimumSize(QSize(70, 0))
         self.label_7.setSizeIncrement(QSize(0, 0))
         self.label_7.setFont(font3)
         self.label_7.setStyleSheet(u"QLabel {\n"
@@ -434,7 +440,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout_7.setContentsMargins(2, 2, 2, 2)
         self.label_5 = QLabel(self.categoryFrame)
         self.label_5.setObjectName(u"label_5")
-        self.label_5.setMinimumSize(QSize(80, 0))
+        self.label_5.setMinimumSize(QSize(70, 0))
         self.label_5.setFont(font3)
         self.label_5.setStyleSheet(u"QLabel {\n"
 "	color:rgb(118, 0, 0);\n"
@@ -475,7 +481,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout_5.setContentsMargins(2, 2, 2, 2)
         self.label_2 = QLabel(self.createdFrame)
         self.label_2.setObjectName(u"label_2")
-        self.label_2.setMinimumSize(QSize(80, 0))
+        self.label_2.setMinimumSize(QSize(70, 0))
         self.label_2.setFont(font3)
         self.label_2.setStyleSheet(u"QLabel {\n"
 "	color:rgb(118, 0, 0);\n"
@@ -505,7 +511,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout_6.setContentsMargins(2, 2, 2, 2)
         self.label_6 = QLabel(self.updatedFrame)
         self.label_6.setObjectName(u"label_6")
-        self.label_6.setMinimumSize(QSize(80, 0))
+        self.label_6.setMinimumSize(QSize(70, 0))
         self.label_6.setFont(font3)
         self.label_6.setStyleSheet(u"QLabel {\n"
 "	color:rgb(118, 0, 0);\n"
@@ -535,7 +541,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout_13.setContentsMargins(2, 2, 2, 2)
         self.label_8 = QLabel(self.noteFrame)
         self.label_8.setObjectName(u"label_8")
-        self.label_8.setMinimumSize(QSize(80, 0))
+        self.label_8.setMinimumSize(QSize(70, 0))
         self.label_8.setFont(font3)
         self.label_8.setStyleSheet(u"QLabel {\n"
 "	color:rgb(118, 0, 0);\n"
@@ -546,8 +552,11 @@ class Ui_MainWindow(object):
         self.noteLabel = QTextEdit(self.noteFrame)
         self.noteLabel.setObjectName(u"noteLabel")
         self.noteLabel.setEnabled(True)
-        sizePolicy.setHeightForWidth(self.noteLabel.sizePolicy().hasHeightForWidth())
-        self.noteLabel.setSizePolicy(sizePolicy)
+        sizePolicy2 = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Maximum)
+        sizePolicy2.setHorizontalStretch(0)
+        sizePolicy2.setVerticalStretch(0)
+        sizePolicy2.setHeightForWidth(self.noteLabel.sizePolicy().hasHeightForWidth())
+        self.noteLabel.setSizePolicy(sizePolicy2)
         self.noteLabel.setStyleSheet(u"QTextEdit {\n"
 "    border: 1px solid rgb(60, 60, 60);      /* Subtle border */\n"
 "    border-radius: 6px;\n"
@@ -598,11 +607,12 @@ class Ui_MainWindow(object):
         self.verticalLayout_4.setContentsMargins(2, 2, 2, 2)
         self.detailStatus = QLabel(self.staatusFrame)
         self.detailStatus.setObjectName(u"detailStatus")
+        self.detailStatus.setWordWrap(False)
 
         self.verticalLayout_4.addWidget(self.detailStatus)
 
 
-        self.verticalLayout_5.addWidget(self.staatusFrame)
+        self.verticalLayout_5.addWidget(self.staatusFrame, 0, Qt.AlignmentFlag.AlignTop)
 
         self.btnFrame = QFrame(self.detailBtnFrame)
         self.btnFrame.setObjectName(u"btnFrame")
@@ -708,13 +718,14 @@ class Ui_MainWindow(object):
         self.passLabel.setText(QCoreApplication.translate("MainWindow", u"TextLabel", None))
         self.btnEditPass.setText("")
         self.label_9.setText(QCoreApplication.translate("MainWindow", u"Security:", None))
+        self.btnRestorePW.setText("")
         self.label_7.setText(QCoreApplication.translate("MainWindow", u"Url:", None))
         self.urlLabel.setText(QCoreApplication.translate("MainWindow", u"TextLabel", None))
         self.btnEditUrl.setText("")
         self.label_5.setText(QCoreApplication.translate("MainWindow", u"Category:", None))
         self.categoryLabel.setText(QCoreApplication.translate("MainWindow", u"TextLabel", None))
         self.btnEditCategory.setText("")
-        self.label_2.setText(QCoreApplication.translate("MainWindow", u"Created At", None))
+        self.label_2.setText(QCoreApplication.translate("MainWindow", u"Created At:", None))
         self.createdLabel.setText(QCoreApplication.translate("MainWindow", u"TextLabel", None))
         self.label_6.setText(QCoreApplication.translate("MainWindow", u"Updated At:", None))
         self.updatedLabel.setText(QCoreApplication.translate("MainWindow", u"TextLabel", None))

@@ -540,7 +540,7 @@ font: bold 12pt &quot;Segoe UI&quot;;</string>
                   <widget class="QLabel" name="label">
                    <property name="minimumSize">
                     <size>
-                     <width>80</width>
+                     <width>70</width>
                      <height>0</height>
                     </size>
                    </property>
@@ -602,7 +602,7 @@ font: bold 12pt &quot;Segoe UI&quot;;</string>
                   <widget class="QLabel" name="label_4">
                    <property name="minimumSize">
                     <size>
-                     <width>80</width>
+                     <width>70</width>
                      <height>0</height>
                     </size>
                    </property>
@@ -664,7 +664,7 @@ font: bold 12pt &quot;Segoe UI&quot;;</string>
                   <widget class="QLabel" name="label_3">
                    <property name="minimumSize">
                     <size>
-                     <width>80</width>
+                     <width>70</width>
                      <height>0</height>
                     </size>
                    </property>
@@ -709,7 +709,7 @@ font: bold 12pt &quot;Segoe UI&quot;;</string>
               </item>
               <item>
                <widget class="QFrame" name="passSecurityFrame">
-                <layout class="QHBoxLayout" name="passEditLayout_2" stretch="0,2">
+                <layout class="QHBoxLayout" name="passEditLayout_2" stretch="0,1,0">
                  <property name="leftMargin">
                   <number>2</number>
                  </property>
@@ -726,7 +726,7 @@ font: bold 12pt &quot;Segoe UI&quot;;</string>
                   <widget class="QLabel" name="label_9">
                    <property name="minimumSize">
                     <size>
-                     <width>80</width>
+                     <width>70</width>
                      <height>0</height>
                     </size>
                    </property>
@@ -751,7 +751,17 @@ font: bold 12pt &quot;Segoe UI&quot;;</string>
                    <property name="spacing">
                     <number>0</number>
                    </property>
+                   <property name="leftMargin">
+                    <number>0</number>
+                   </property>
                   </layout>
+                 </item>
+                 <item>
+                  <widget class="QPushButton" name="btnRestorePW">
+                   <property name="text">
+                    <string/>
+                   </property>
+                  </widget>
                  </item>
                 </layout>
                </widget>
@@ -781,7 +791,7 @@ font: bold 12pt &quot;Segoe UI&quot;;</string>
                   <widget class="QLabel" name="label_7">
                    <property name="minimumSize">
                     <size>
-                     <width>80</width>
+                     <width>70</width>
                      <height>0</height>
                     </size>
                    </property>
@@ -855,7 +865,7 @@ font: bold 12pt &quot;Segoe UI&quot;;</string>
                   <widget class="QLabel" name="label_5">
                    <property name="minimumSize">
                     <size>
-                     <width>80</width>
+                     <width>70</width>
                      <height>0</height>
                     </size>
                    </property>
@@ -948,7 +958,7 @@ font: bold 12pt &quot;Segoe UI&quot;;</string>
                   <widget class="QLabel" name="label_2">
                    <property name="minimumSize">
                     <size>
-                     <width>80</width>
+                     <width>70</width>
                      <height>0</height>
                     </size>
                    </property>
@@ -964,7 +974,7 @@ font: bold 12pt &quot;Segoe UI&quot;;</string>
 }</string>
                    </property>
                    <property name="text">
-                    <string>Created At</string>
+                    <string>Created At:</string>
                    </property>
                   </widget>
                  </item>
@@ -1012,7 +1022,7 @@ font: bold 12pt &quot;Segoe UI&quot;;</string>
                   <widget class="QLabel" name="label_6">
                    <property name="minimumSize">
                     <size>
-                     <width>80</width>
+                     <width>70</width>
                      <height>0</height>
                     </size>
                    </property>
@@ -1076,7 +1086,7 @@ font: bold 12pt &quot;Segoe UI&quot;;</string>
                   <widget class="QLabel" name="label_8">
                    <property name="minimumSize">
                     <size>
-                     <width>80</width>
+                     <width>70</width>
                      <height>0</height>
                     </size>
                    </property>
@@ -1102,7 +1112,7 @@ font: bold 12pt &quot;Segoe UI&quot;;</string>
                     <bool>true</bool>
                    </property>
                    <property name="sizePolicy">
-                    <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                    <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
                      <horstretch>0</horstretch>
                      <verstretch>0</verstretch>
                     </sizepolicy>
@@ -1177,7 +1187,7 @@ QTextEdit:focus {
                  <property name="bottomMargin">
                   <number>2</number>
                  </property>
-                 <item>
+                 <item alignment="Qt::AlignmentFlag::AlignTop">
                   <widget class="QFrame" name="staatusFrame">
                    <property name="frameShape">
                     <enum>QFrame::Shape::NoFrame</enum>
@@ -1202,6 +1212,9 @@ QTextEdit:focus {
                      <widget class="QLabel" name="detailStatus">
                       <property name="text">
                        <string>TextLabel</string>
+                      </property>
+                      <property name="wordWrap">
+                       <bool>false</bool>
                       </property>
                      </widget>
                     </item>

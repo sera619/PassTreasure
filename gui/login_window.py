@@ -10,7 +10,7 @@ from src.loginwindow_ui import Ui_LoginWindowUI
 from gui.password_strength_indicator import PasswordStrengthIndicator
 from gui.dialog_popup import DialogPopup
 from backend.password_strength_logic import evaluate_password_strength
-from config import Styles, resource_path, VERSION_NUM, IS_DEBUGGING, PopupType
+from config import Styles, VERSION_NUM, IS_DEBUGGING, PopupType
 import utils
 
 class LoginWindow(QWidget):
@@ -49,11 +49,6 @@ class LoginWindow(QWidget):
         self._pw2_visible = False
         
         self.configure_mode()
-        self.ui.btn_toggle_pw.font().setPointSize(18)
-        self.ui.btn_toggle_pw.setText("👁️")
-        self.ui.btn_toggle_pw2.font().setPointSize(18)
-        self.ui.btn_toggle_pw2.setText("👁️")
-        self.ui.input_password2.setEchoMode(QLineEdit.EchoMode.Password)
 
         self.ui.btn_toggle_pw.clicked.connect(lambda checked, b=self.ui.btn_toggle_pw: self.toggle_password_visibility(b))
         self.ui.btn_toggle_pw2.clicked.connect(lambda checked, b=self.ui.btn_toggle_pw2: self.toggle_password_visibility(b))
@@ -69,6 +64,12 @@ class LoginWindow(QWidget):
             self.ui.input_password2.setText("kekskeks")
 
     def apply_styles(self):
+        self.ui.btn_toggle_pw.font().setPointSize(18)
+        self.ui.btn_toggle_pw.setText("👁️")
+        self.ui.btn_toggle_pw2.font().setPointSize(18)
+        self.ui.btn_toggle_pw2.setText("👁️")
+        self.ui.input_password2.setEchoMode(QLineEdit.EchoMode.Password)
+
         self.ui.btn_login.setStyleSheet(Styles.green_button)
         self.ui.btn_delete_vault.setStyleSheet(Styles.red_button_outlined)
         self.ui.btn_create.setStyleSheet(Styles.green_button)
@@ -117,7 +118,6 @@ class LoginWindow(QWidget):
             self.db.apply_backup(self.db.get_latest_backup())
             self.is_first_run = not os.path.exists(self.VAULT_PATH)
             self.configure_mode()
-
             DialogPopup("Backup Success", f"Backup restored successfully!", PopupType.SUCCESS, self).exec()        
         except Exception as e:
             DialogPopup("Backup Error", f"Failure restoring backup:\n{e}", PopupType.ERROR, self).exec()        
@@ -127,7 +127,16 @@ class LoginWindow(QWidget):
         confirm = QMessageBox.question(self, "Confirm Delete", "Are you sure you want to delete this vault?")
         if confirm != QMessageBox.StandardButton.Yes:
             return
-        try:        
+        try:
+            pw = self.input_pw.text().strip()
+            if not pw:
+                DialogPopup("Vault Error", f"No master password found! Please enter the master password and try again!", PopupType.ERROR, self).exec()        
+                return
+            
+            if not self.db.unlock_vault(pw):
+                DialogPopup("Vault Error", f"Master password is wrong! Please enter the correct master password and try again!", PopupType.ERROR, self).exec()        
+                return
+
             self.db.delete_vault()
             self.is_first_run = not os.path.exists(self.VAULT_PATH)
             self.configure_mode()
