@@ -31,7 +31,8 @@ No cloud. No telemetry. No tracking. Everything stays on your device — and bel
 - Auto-logout with adjustable timer  
 - Custom categories for password organization  
 - Fast search and filtering
-- Custom notice for each password  
+- Custom notice for each password
+- Time-based Secure Clipboard
 
 ### 🔧 Additional Tools
 - Password generator with real-time strength analysis  
@@ -44,7 +45,7 @@ No cloud. No telemetry. No tracking. Everything stays on your device — and bel
 ## 📦 Installation
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/PassTreasure.git
+git clone https://github.com/sera619/PassTreasure.git
 cd PassTreasure
 pip install -r requirements.txt
 python main.py
