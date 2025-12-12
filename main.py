@@ -10,7 +10,7 @@ from config import Styles, PopupType
 import sys
 import resources_rc
 
-app = QApplication([])
+app = QApplication(sys.argv)
 main_window = None
 splash = None
 login = None
@@ -55,6 +55,7 @@ def start_login(splash):
     login.show()
 
 def main():
+    global app
     app.setStyleSheet(Styles.dark_style)
     app.setApplicationVersion(f"v{config.VERSION_NUM}")
     global splash
@@ -66,9 +67,8 @@ def main():
     splash.show()
     splash.start()
     splash.intro_finished.connect(lambda: start_login(splash))
-
+    
     sys.exit(app.exec())
 
 if __name__ == "__main__":
     main()
-    

@@ -1,5 +1,6 @@
-from utils import resource_path
+from utils import resource_path, get_base_dir
 from enum import Enum
+import os
 
 class PopupType(Enum):
     SUCCESS = 1
@@ -7,13 +8,13 @@ class PopupType(Enum):
     WARNING = 3
     ERROR = 4
     
+IS_DEBUGGING = True
+BASE_DIR = get_base_dir()
+DATA_PATH = os.path.join(BASE_DIR, "data")
+BACKUP_PATH = os.path.join(BASE_DIR, "backup")
+SETTINGS_PATH = os.path.join(DATA_PATH, "settings.json")
+VAULT_PATH = os.path.join(DATA_PATH, "vault.db")
 
-IS_DEBUGGING = False
-BASE_DIR = resource_path(".")
-DATA_PATH = resource_path("data")
-VAULT_PATH = resource_path('data/vault.db')
-SETTINGS_PATH = resource_path("data/user_settings.json")
-BACKUP_PATH = resource_path('backup')
 EXPORT_TYPES = [
     ".json",
     ".csv"

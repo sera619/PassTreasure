@@ -6,7 +6,7 @@ from datetime import datetime, timezone
 from typing import Optional, List, Tuple
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 from config import TEST_ENTRIES
-from utils import load_settings, save_settings, clean_url, resource_path
+from utils import load_settings, save_settings, clean_url, resource_path, get_base_dir
 import shutil
 from pathlib import Path
 from backend.kdf import (
@@ -15,10 +15,11 @@ from backend.kdf import (
     verify_master_password
 )
 
-
-DATA_PATH = resource_path('data')
-BACKUP_PATH = resource_path('backup')
-VAULT_PATH = resource_path('data/vault.db')
+BASE_DIR = get_base_dir()
+DATA_PATH = os.path.join(BASE_DIR, "data")
+BACKUP_PATH = os.path.join(BASE_DIR, "backup")
+SETTINGS_PATH = os.path.join(DATA_PATH, "settings.json")
+VAULT_PATH = os.path.join(DATA_PATH, "vault.db")
 
 class PasswordDatabase:
     def __init__(self, path: str = VAULT_PATH):
@@ -37,12 +38,13 @@ class PasswordDatabase:
         path = os.path.abspath(path)
         if not os.path.exists(path):
             os.makedirs(path)
-            
+            # os.makedirs(BACKUP_PATH, exist_ok=True)
+                  
     def _init_data(self):
         if not os.path.exists(DATA_PATH):
-            os.makedirs(DATA_PATH)
-        load_settings()
-
+            os.makedirs(DATA_PATH, exist_ok=True)
+        load_settings()        
+        
     def add_test_entries(self) -> None:
         if self.aes_key is None:
             raise Exception("Vault not unlocked!")
@@ -76,7 +78,7 @@ class PasswordDatabase:
     
     # Backup    
     def create_backup(self):
-        if not VAULT_PATH.exists():
+        if not os.path.exists(VAULT_PATH):
             raise FileNotFoundError("vault.db does not exist – nothing to backup!")
         settings = load_settings()
         backup_dir = settings.get("backup_path")

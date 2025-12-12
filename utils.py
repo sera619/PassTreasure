@@ -5,9 +5,21 @@ import config
 import json
 import resources_rc
 import sys
+import os
 from pathlib import Path
 from datetime import datetime
 
+def get_base_dir():
+    if getattr(sys, "frozen", False):
+        return os.path.dirname(sys.executable)
+    else:
+        return os.path.dirname(__file__)
+    
+BASE_DIR = get_base_dir()
+DATA_PATH = os.path.join(BASE_DIR, "data")
+BACKUP_PATH = os.path.join(BASE_DIR, "backup")
+SETTINGS_PATH = os.path.join(DATA_PATH, "settings.json")
+VAULT_PATH = os.path.join(DATA_PATH, "vault.db")
 
 def tint_pixmap(pix: QPixmap, color: QColor) -> QPixmap:
     """Recolors a pixmap fully with a given color."""
@@ -29,7 +41,6 @@ def colorize_icon(btn: QPushButton, icon: str, color: str) -> QPushButton:
     btn.setIcon(icon);
     return btn;
 
-
 def resource_path(relative: str) -> Path:
     """
     Get absolute path to resource, works in dev and PyInstaller exe.
@@ -46,16 +57,19 @@ def resource_path(relative: str) -> Path:
     return base_path / relative
 
 def load_settings():
-    if not config.SETTINGS_PATH.exists():
+    if not os.path.exists(SETTINGS_PATH):
         save_settings(config.DEFAULT_SETTINGS)
         return config.DEFAULT_SETTINGS
     try:
-        return json.loads(config.SETTINGS_PATH.read_text())
+        with open(SETTINGS_PATH, "r", encoding="utf-8") as f:
+            data = json.loads(f.read())
+            return data
     except:
         return config.DEFAULT_SETTINGS
     
 def save_settings(data):
-    config.SETTINGS_PATH.write_text(json.dumps(data, indent=4))
+    with open(SETTINGS_PATH, "w", encoding="utf-8") as f:
+        f.write(json.dumps(data, indent=4))
 
 def format_last_backup(iso_str: str) -> str:
     if not iso_str:

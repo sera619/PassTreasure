@@ -148,7 +148,7 @@ class NewEntryDialog(QDialog):
         if not category:
             category = "General"
             
-        note = self.ui.noteTextEdit.text()
+        note = self.ui.noteTextEdit.toPlainText()
         if not note:
             note = "No Note set."
         

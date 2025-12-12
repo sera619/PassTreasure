@@ -19,8 +19,8 @@ class LoginWindow(QWidget):
     def __init__(self):
         super().__init__()
         self.db = PasswordDatabase()
-        self.BASE_DIR = resource_path("data")
-        self.VAULT_PATH = resource_path('data/vault.db')
+        self.BASE_DIR = utils.DATA_PATH
+        self.VAULT_PATH = utils.VAULT_PATH
         self.is_first_run = not os.path.exists(self.VAULT_PATH)
         
         # Load UI
