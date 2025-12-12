@@ -128,7 +128,8 @@ class MainWindow(QWidget):
         pixmap = QPixmap(":/assets/icon.png")
         pixmap = pixmap.scaled(35, 35)
         self.ui.mainTitleIcon.setPixmap(pixmap)
-        
+
+        self.ui.listWidget.itemClicked.connect(self.handle_item_click)
         self.ui.listWidget.currentItemChanged.connect(self.update_details)
         self.ui.btnAdd.clicked.connect(self.add_entry)
         self.ui.btnDelete.clicked.connect(self.delete_entry)
@@ -164,6 +165,14 @@ class MainWindow(QWidget):
         self.ui.listWidget.clearSelection()
         self.hide_details()
         self.ui.listWidget.blockSignals(False)
+
+    def handle_item_click(self, item):
+        if self.listWidget.currentItem() == item:
+            self.listWidget.clearSelection() # Deselects the item
+        # Or: self.list_widget.setCurrentItem(None) if using setItemSelected(item, False)
+    # Else, it's a new selection, let the default handling work.
+
+
     
     def show_details(self):
         self.ui.detailFrame.show()
