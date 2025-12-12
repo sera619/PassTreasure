@@ -3,6 +3,9 @@ env-pt
 build
 data
 backup
+dist
+package
+
 CodelineCounter.py
 passtreasure-addon
 ImageConverter.py
