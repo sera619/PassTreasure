@@ -54,7 +54,7 @@ class MainWindow(QWidget):
         self.ui.detailFrame.setMaximumWidth(0)
         self.ui.detailFrame.hide()
         self.ui.btnDelete.hide()
-        
+        self.last_clicked_item = None
         self._block_click = False
         self.load_entries()
         self.check_auto_backup()
@@ -130,7 +130,6 @@ class MainWindow(QWidget):
         self.ui.mainTitleIcon.setPixmap(pixmap)
 
         self.ui.listWidget.itemClicked.connect(self.handle_item_click)
-        self.ui.listWidget.currentItemChanged.connect(self.update_details)
         self.ui.btnAdd.clicked.connect(self.add_entry)
         self.ui.btnDelete.clicked.connect(self.delete_entry)
         
@@ -166,13 +165,20 @@ class MainWindow(QWidget):
         self.hide_details()
         self.ui.listWidget.blockSignals(False)
 
-    def handle_item_click(self, item):
-        if self.listWidget.currentItem() == item:
-            self.listWidget.clearSelection() # Deselects the item
-        # Or: self.list_widget.setCurrentItem(None) if using setItemSelected(item, False)
-    # Else, it's a new selection, let the default handling work.
-
-
+    def handle_item_click(self, item: QListWidgetItem):
+        if self.last_clicked_item == item and item.isSelected():
+            # Deselects the item
+            self.ui.listWidget.blockSignals(True)
+            self.ui.listWidget.clearSelection()
+            self.ui.listWidget.setCurrentRow(-1)
+            self.ui.listWidget.blockSignals(False)
+            self.hide_details()
+            self.last_clicked_item = None
+            return
+        self.last_clicked_item = item
+        self.update_details(item)
+            # Or: self.list_widget.setCurrentItem(None) if using setItemSelected(item, False)
+        # Else, it's a new selection, let the default handling work.
     
     def show_details(self):
         self.ui.detailFrame.show()
