@@ -24,7 +24,6 @@ clean:
 fullclean:
 	cls
 	@echo Cleaning full...
-	@if exist "./package/$(ZIP_NAME)" del /s /q .\package\$(ZIP_NAME)
 	@if exist "./build" rd /s /q build
 	@if exist "./dist" rd /s /q dist
 	@if exist "./backup" rd /s /q backup
@@ -40,6 +39,7 @@ build:
 package:
 	cls
 	@echo "📦 Creating ZIP package..."
+	@if exist "./package/$(ZIP_NAME)" del /s /q .\package\$(ZIP_NAME)
 	@copy .\LICENCE .\dist\PassTreasure
 	@cd .\dist\PassTreasure && tar.exe -a -c -f .\$(ZIP_NAME) $(APP_NAME).exe _internal LICENCE
 	@move .\dist\PassTreasure\$(ZIP_NAME) .\package
@@ -48,4 +48,4 @@ package:
 release:
 	cls
 	@echo Start release...
-	@gh release create $(VERSION_NUM) .\package\$(ZIP_NAME) --title "$(APP_NAME) v$(VERSION_NUM)" --notes "Fix release"
+	@gh release create $(VERSION_NUM) .\package\$(ZIP_NAME) --title "$(APP_NAME) v$(VERSION_NUM)" --notes "Automatic release"
