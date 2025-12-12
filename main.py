@@ -17,8 +17,6 @@ login = None
 
 def autologout_restart():
     global login
-    login.show()
-    login.close()
     login = None
     login = LoginWindow()
     login.setWindowIcon(QIcon(":/assets/icon.png"))

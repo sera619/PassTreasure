@@ -69,15 +69,15 @@ class LoginWindow(QWidget):
             self.ui.input_password2.setText("kekskeks")
 
     def apply_styles(self):
-        self.ui.btn_login.setStyleSheet(Styles.green_button_outlined)
+        self.ui.btn_login.setStyleSheet(Styles.green_button)
         self.ui.btn_delete_vault.setStyleSheet(Styles.red_button_outlined)
-        self.ui.btn_create.setStyleSheet(Styles.green_button_outlined)
+        self.ui.btn_create.setStyleSheet(Styles.green_button)
         self.ui.btn_toggle_pw.setStyleSheet(Styles.dark_button)
         self.ui.btn_restore_backup.setStyleSheet(Styles.yellow_button_outlined)            
         self.ui.btn_toggle_pw2.setStyleSheet(Styles.dark_button)
-        utils.colorize_icon(self.ui.btn_login, "login", "green")
+        utils.colorize_icon(self.ui.btn_login, "login", "dark")
         utils.colorize_icon(self.ui.btn_delete_vault, "trash", "red")   
-        utils.colorize_icon(self.ui.btn_create, "magic", "green")
+        utils.colorize_icon(self.ui.btn_create, "magic", "dark")
         utils.colorize_icon(self.ui.btn_restore_backup, "reset", "yellow");                      
     
     def _update_strength(self):

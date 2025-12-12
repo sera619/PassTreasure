@@ -8,7 +8,7 @@ class PopupType(Enum):
     WARNING = 3
     ERROR = 4
     
-IS_DEBUGGING = True
+IS_DEBUGGING = False
 BASE_DIR = get_base_dir()
 DATA_PATH = os.path.join(BASE_DIR, "data")
 BACKUP_PATH = os.path.join(BASE_DIR, "backup")
