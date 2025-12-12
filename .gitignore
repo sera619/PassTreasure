@@ -6,6 +6,7 @@ backup
 dist
 package
 .env
+config
 CodelineCounter.py
 passtreasure-addon
 ImageConverter.py

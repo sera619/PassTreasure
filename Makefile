@@ -34,6 +34,7 @@ build:
 	cls 
 	@echo Building with PyInstaller...
 	@pyinstaller .\app.spec --noconfirm
+	@C:\1Coding\solicus\InstallForge\bin\ifbuilderenvx86.exe
 	@echo "Build finished."
 
 package:
