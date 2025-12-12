@@ -16,14 +16,15 @@ all: clean build package
 
 clean:
 	cls
-	@echo "🧹 Cleaning dist..."
+	@echo Cleaning dist...
 	@if exist "./build" rd /s /q build
 	@if exist "./dist" rd /s /q dist
 	@echo "Done."
 
 fullclean:
 	cls
-	@echo "🧹 Cleaning full..."
+	@echo Cleaning full...
+	@if exist "./package/$(ZIP_NAME)" del /s /q .\package\$(ZIP_NAME)
 	@if exist "./build" rd /s /q build
 	@if exist "./dist" rd /s /q dist
 	@if exist "./backup" rd /s /q backup
@@ -32,16 +33,19 @@ fullclean:
 
 build:
 	cls 
-	@echo "🔨 Building with PyInstaller..."
+	@echo Building with PyInstaller...
 	@pyinstaller .\app.spec --noconfirm
 	@echo "Build finished."
 
 package:
 	cls
 	@echo "📦 Creating ZIP package..."
-#	@move .\dist\PassTreasure\PassTreasure.exe .
-	@cd .\dist\PassTreasure && tar.exe -a -c -f .\$(ZIP_NAME) $(APP_NAME).exe ".\_internal"
-	@move .\dist\PassTreasure\$(ZIP_NAME) .\package 
-#	@move .\PassTreasure.exe .\dist\PassTreasure
-#	@move .\$(ZIP_NAME) .\dist\PassTreasure
+	@copy .\LICENCE .\dist\PassTreasure
+	@cd .\dist\PassTreasure && tar.exe -a -c -f .\$(ZIP_NAME) $(APP_NAME).exe _internal LICENCE
+	@move .\dist\PassTreasure\$(ZIP_NAME) .\package
 	@echo Package created: $(ZIP_NAME)
+
+release:
+	cls
+	@echo Start release...
+	@gh release create $(VERSION_NUM) .\package\$(ZIP_NAME) --title "$(APP_NAME) v$(VERSION_NUM)" --notes "Fix release"
