@@ -412,7 +412,7 @@ class PasswordDatabase:
         self.cursor = None
         self.aes_key = None
         
-        if not VAULT_PATH.exists():
+        if not os.path.exists(VAULT_PATH):
             raise FileNotFoundError("vault.db does not exists - nothing to delete!")
         try:
             os.remove(VAULT_PATH)
