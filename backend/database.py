@@ -317,7 +317,8 @@ class PasswordDatabase:
             CREATE TABLE meta (
                 id INTEGER PRIMARY KEY,
                 salt BLOB NOT NULL,
-                master_hash BLOB NOT NULL
+                master_hash BLOB NOT NULL,
+                db_version INTEGER DEFAULT 1
             )
         """)
 
@@ -436,8 +437,8 @@ class PasswordDatabase:
 
         if verify_master_password(master_password, salt, expected_key):
             self.aes_key = derive_key(master_password, salt)
+            self.migrate_database()
             return True
-
         return False
     
     def disconnect(self) -> bool:
@@ -622,4 +623,27 @@ class PasswordDatabase:
 
         self.conn.commit()
 
+    # Update and migration
+    def migrate_database(self):
+        """Runs incremental DB migrations safely."""
+        # 1) Check if db_version exists
+        self.cursor.execute("""
+            PRAGMA table_info(meta)
+        """)
+        cols = [row[1] for row in self.cursor.fetchall()]
 
+        # -------------------------
+        # MIGRATION: Add db_version
+        # -------------------------
+        if "db_version" not in cols:
+            print("Migrating DB → Adding db_version column...")
+            self.cursor.execute("""
+                ALTER TABLE meta ADD COLUMN db_version INTEGER DEFAULT 1
+            """)
+            self.conn.commit()
+
+        # Now read current version
+        self.cursor.execute("SELECT db_version FROM meta WHERE id=1")
+        version = self.cursor.fetchone()[0]
+        if version < 2:
+            pass
