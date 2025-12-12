@@ -5,7 +5,7 @@ data
 backup
 dist
 package
-
+.env
 CodelineCounter.py
 passtreasure-addon
 ImageConverter.py
