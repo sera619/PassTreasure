@@ -28,11 +28,11 @@ DEFAULT_SETTINGS: dict = {
     "auto_hide_details_time": 60000, # 60 sec
     "entry_categories": ["General", "Work", "Private", "Finance", "Others", "Social Media"],
     "category_colors": {
-        "General": "rgba(211, 211, 211, 140)",    # LightGray
-        "Work": "rgba(70, 130, 180, 140)",      # SteelBlue
-        "Private": "rgba(144, 238, 144, 140)",     # LightGreen
-        "Finance": "rgba(255, 215, 0, 140)",     # Gold
-        "Others": "rgba(255, 165, 0, 140)",    # Orange
+        "General": "rgba(211, 211, 211, 180)",    # LightGray
+        "Work": "rgba(70, 130, 180, 180)",      # SteelBlue
+        "Private": "rgba(144, 238, 144, 180)",     # LightGreen
+        "Finance": "rgba(255, 215, 0, 180)",     # Gold
+        "Others": "rgba(255, 165, 0, 180)",    # Orange
         "Social Media": "rgba(30, 195, 198, 180)" # Cyan  
     }
 }
@@ -42,6 +42,7 @@ class PopupType(Enum):
     INFO = 2
     WARNING = 3
     ERROR = 4
+    QUESTION = 5
 
 class TextStorage:
     PW_INDICATOR_STRENGTH_TEXTS = [

@@ -24,7 +24,7 @@ class Ui_DialogPopup(object):
     def setupUi(self, DialogPopup):
         if not DialogPopup.objectName():
             DialogPopup.setObjectName(u"DialogPopup")
-        DialogPopup.resize(310, 180)
+        DialogPopup.resize(340, 180)
         self.verticalLayout_3 = QVBoxLayout(DialogPopup)
         self.verticalLayout_3.setObjectName(u"verticalLayout_3")
         self.verticalLayout_3.setContentsMargins(4, 4, 4, 4)

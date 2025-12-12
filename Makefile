@@ -5,7 +5,7 @@
 APP_NAME = PassTreasure
 VERSION_NUM = $(shell python -c "import config; print(config.VERSION_NUM)")
 DIST_DIR = dist/$(APP_NAME)
-ZIP_NAME = $(APP_NAME)-$(VERSION_NUM).zip
+ZIP_NAME = $(APP_NAME)-$(VERSION_NUM)-WinExe.zip
 
 # ---------------------------------------------
 # Targets
@@ -49,4 +49,4 @@ package:
 release:
 	cls
 	@echo Start release...
-	@gh release create $(VERSION_NUM) .\package\$(ZIP_NAME) --title "$(APP_NAME) v$(VERSION_NUM)" --notes "Automatic release"
+	@gh release create $(VERSION_NUM) .\package\$(ZIP_NAME) .\package\Install-PassTreasure.exe --title "$(APP_NAME) v$(VERSION_NUM)" --notes "Automatic release"

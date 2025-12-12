@@ -1,6 +1,6 @@
 from PySide6.QtWidgets import (
     QApplication,QWidget, QVBoxLayout, QHBoxLayout, QLabel, QListWidget,
-    QPushButton, QLineEdit, QInputDialog, QMessageBox, QTextEdit,QListWidgetItem, QToolTip, QFrame
+    QPushButton, QLineEdit, QInputDialog, QMessageBox, QTextEdit,QListWidgetItem, QToolTip, QFrame, QDialog
 )
 from PySide6.QtGui import QPixmap
 from PySide6.QtCore import Qt, QTimer, Signal, QPropertyAnimation, QEasingCurve
@@ -75,14 +75,15 @@ class MainWindow(QWidget):
             if not update_result.get("update_available"):
                 return
             popup = DialogPopup(
-                f"Update {update_result['version']} verfügbar",
-                f"Neues Update gefunden:\n\n{update_result['changelog']}\n\nJetzt herunterladen?",
+                f"Update {update_result['version']} available",
+                f"Found new Update:\n\n{update_result['changelog']}\n\nDownload now?", PopupType.QUESTION,
                 parent=self
             )
-            if popup.exec():
+            result = popup.exec()
+            if result == QDialog.DialogCode.Accepted:
                 utils.open_url(update_result["download_url"])
         except Exception as e:
-            DialogPopup("Restore Error", f"Failed checking for updates:\n{e}", PopupType.ERROR, self).exec()    
+            DialogPopup("Update Error", f"Failed checking for updates:\n{e}", PopupType.ERROR, self).exec()    
 
     
     # autologout
@@ -329,9 +330,10 @@ class MainWindow(QWidget):
             settings = load_settings()
             colors = settings.get("category_colors")            
             self.ui.categoryLabel.setStyleSheet(f"""
-                                           font: 700 8pt "Segoe UI"; 
-                                           border-radius: 5px; 
-                                           background: {colors[category]};
+                                        color: {utils.get_contrast_text_color(colors[category])};
+                                        font: 700 8pt "Segoe UI"; 
+                                        border-radius: 5px; 
+                                        background: {colors[category]};
                                            """)
             self.ui.categoryLabel.setText(category)
             self.ui.urlLabel.setText(details.get("url"))

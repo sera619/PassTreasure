@@ -137,6 +137,11 @@ class SettingsWindow(QDialog):
         utils.colorize_icon(self.ui.btnSelectPath, "open", "yellow")        
         self.ui.btnStartImport.setStyleSheet(Styles.green_button_outlined)
         utils.colorize_icon(self.ui.btnStartImport, "import", "green")
+        self.ui.btnCheckUpdate.setStyleSheet(Styles.green_button_outlined)
+        utils.colorize_icon(self.ui.btnCheckUpdate, "check_update", "green")
+        self.ui.btnStartUpdate.setStyleSheet(Styles.green_button)
+        utils.colorize_icon(self.ui.btnStartUpdate, "check", "dark")
+
         
     def _update_pw_strength(self):
         pw = self.ui.new_pw1.text()
@@ -157,11 +162,14 @@ class SettingsWindow(QDialog):
         }.get(mode, 0)
         self.ui.backupModeBox.setCurrentIndex(idx)
         self.ui.backupPathLineEdit.setText(settings.get("backup_path"))
+        self.ui.autoUpdatesSelect.setChecked(settings.get("check_update"))
+        self.ui.autoUpdatesSelect.toggled.connect(self._toggle_auto_check_update)
         self.ui.backupModeBox.currentIndexChanged.connect(self.update_backup_mode)
         self.ui.btnGetBackupPath.clicked.connect(self._get_backup_dir_path)
         self.ui.btnSetBackupPath.clicked.connect(self.set_backup_path)
         self.ui.btnClearBackupPathLineEdit.clicked.connect(self.ui.backupPathLineEdit.clear)
-        
+        self.ui.btnCheckUpdate.clicked.connect(self._check_updates)
+        self.ui.btnStartUpdate.hide()
         self.update_general_page()
     
     def _load_all_backups(self):
@@ -709,3 +717,33 @@ class SettingsWindow(QDialog):
         if not file_path:
             return
         self.ui.backupPathLineEdit.setText(file_path)        
+
+    def _reset_update_status(self):
+        self.ui.updateStatusLabel.setText("Check not started.")
+        self.ui.updateStatusLabel.setStyleSheet("color: #fff;")
+
+    def _on_btnStartUpdate_click(self, url: str):
+        self._reset_update_status()
+        self.ui.btnStartUpdate.hide()
+
+        utils.open_url(url)
+    
+    
+    def _toggle_auto_check_update(self, checked: bool):
+        settings = load_settings()
+        settings["check_update"] = checked
+        save_settings(settings)
+    
+    def _check_updates(self):
+        try:
+            update_result = utils.check_for_update()
+            if not update_result.get("update_available"):
+                self.ui.updateStatusLabel.setText("Currently no updates available.")
+                self.ui.updateStatusLabel.setStyleSheet(f"color: {Styles.COLORS['red']};")
+                return QTimer.singleShot(5000, self._reset_update_status)
+            self.ui.updateStatusLabel.setText(f"Update {update_result['version']} available.")
+            self.ui.updateStatusLabel.setStyleSheet(f"color: {Styles.COLORS['green']};")
+            self.ui.btnStartUpdate.show()
+            self.ui.btnStartUpdate.clicked.connect(lambda: self._on_btnStartUpdate_click(update_result["download_url"]))
+        except Exception as e:
+            DialogPopup("Update Error", f"Failed checking for updates:\n{e}", PopupType.ERROR, self).exec()  

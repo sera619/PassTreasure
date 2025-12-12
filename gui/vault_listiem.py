@@ -1,7 +1,7 @@
 from PySide6.QtWidgets import QWidget, QLabel, QSizePolicy
 from PySide6.QtCore import Qt
 from src.vaultlistitemwidget_ui import Ui_VaultListItemWidget  # Pfad zu deiner generierten UI
-from utils import load_settings, limit_text
+from utils import load_settings, limit_text, get_contrast_text_color
 
 class VaultListItemWidget(QWidget):
     def __init__(self, entry_id: int, service: str, username: str, category: str, parent=None):
@@ -17,6 +17,6 @@ class VaultListItemWidget(QWidget):
         
         color = self.category_colors.get(category, "rgba(211, 211, 211, 140)")
         self.ui.badgeLabel.setStyleSheet(
-            f'font: 700 8pt "Segoe UI"; border-radius: 5px; background: {color};'
+            f'color: {get_contrast_text_color(color)}; font: 700 8pt "Segoe UI"; border-radius: 5px; background: {color};'
         )
         self.ui.badgeLabel.setAlignment(Qt.AlignmentFlag.AlignHCenter)
