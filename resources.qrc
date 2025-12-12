@@ -25,5 +25,6 @@
     <file>assets/check_circle.png</file>
     <file>assets/hiden.png</file>
     <file>assets/question.png</file>
+    <file>assets/check_update.png</file>
   </qresource>
 </RCC>
