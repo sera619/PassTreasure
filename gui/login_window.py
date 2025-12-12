@@ -10,7 +10,7 @@ from src.loginwindow_ui import Ui_LoginWindowUI
 from gui.password_strength_indicator import PasswordStrengthIndicator
 from gui.dialog_popup import DialogPopup
 from backend.password_strength_logic import evaluate_password_strength
-from config import Styles, VERSION_NUM, IS_DEBUGGING, PopupType
+from config import Styles, VERSION_NUM, IS_DEBUGGING, PopupType, DATA_PATH, VAULT_PATH
 import utils
 
 class LoginWindow(QWidget):
@@ -19,8 +19,8 @@ class LoginWindow(QWidget):
     def __init__(self):
         super().__init__()
         self.db = PasswordDatabase()
-        self.BASE_DIR = utils.DATA_PATH
-        self.VAULT_PATH = utils.VAULT_PATH
+        self.BASE_DIR = DATA_PATH
+        self.VAULT_PATH = VAULT_PATH
         self.is_first_run = not os.path.exists(self.VAULT_PATH)
         
         # Load UI
