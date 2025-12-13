@@ -1,5 +1,6 @@
 <center>
 
+
 ![Python Version](https://img.shields.io/badge/Python-3.10%2B-blue)
 ![PySide6](https://img.shields.io/badge/GUI-PySide6-6f42c1)
 ![Encryption](https://img.shields.io/badge/Encryption-AES--256--GCM-red)
@@ -8,6 +9,7 @@
 ![Platform](https://img.shields.io/badge/Platform-Local%20Only-orange)
 ![Database](https://img.shields.io/badge/Database-Encrypted%20SQLite-lightgrey)
 ![License](https://img.shields.io/badge/License-MIT-green)
+
 
 </center>
 
@@ -58,6 +60,7 @@ Perfect if you just want to run the app without installing anything.
 ## 🛠️ Under the Hood
 - Packaging via PyInstaller & cx_Freeze
 - Cross-platform compatibility (Windows / Linux, macOS coming later)
+
 ---
 
 ## 📦 Installation
