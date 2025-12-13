@@ -144,9 +144,9 @@
           <property name="geometry">
            <rect>
             <x>0</x>
-            <y>0</y>
+            <y>-624</y>
             <width>489</width>
-            <height>973</height>
+            <height>976</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -1266,8 +1266,8 @@
                      <widget class="QPushButton" name="btnCreateCategory">
                       <property name="minimumSize">
                        <size>
-                        <width>80</width>
-                        <height>20</height>
+                        <width>100</width>
+                        <height>0</height>
                        </size>
                       </property>
                       <property name="text">
@@ -1381,8 +1381,8 @@ padding:  5px 0px 5px 0px;</string>
                    </property>
                    <property name="minimumSize">
                     <size>
-                     <width>80</width>
-                     <height>15</height>
+                     <width>100</width>
+                     <height>0</height>
                     </size>
                    </property>
                    <property name="text">
@@ -1400,8 +1400,8 @@ padding:  5px 0px 5px 0px;</string>
                    </property>
                    <property name="minimumSize">
                     <size>
-                     <width>80</width>
-                     <height>15</height>
+                     <width>100</width>
+                     <height>0</height>
                     </size>
                    </property>
                    <property name="styleSheet">

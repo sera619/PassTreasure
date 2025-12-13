@@ -15,10 +15,11 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QApplication, QComboBox, QFrame, QHBoxLayout,
-    QLabel, QLineEdit, QListWidget, QListWidgetItem,
-    QPushButton, QScrollArea, QSizePolicy, QSpacerItem,
-    QTextEdit, QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (QAbstractItemView, QAbstractScrollArea, QApplication, QComboBox,
+    QFrame, QHBoxLayout, QLabel, QLineEdit,
+    QListView, QListWidget, QListWidgetItem, QPushButton,
+    QScrollArea, QSizePolicy, QSpacerItem, QTextEdit,
+    QVBoxLayout, QWidget)
 import resources_rc
 
 class Ui_MainWindow(object):
@@ -26,6 +27,7 @@ class Ui_MainWindow(object):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
         MainWindow.resize(900, 570)
+        MainWindow.setAutoFillBackground(False)
         self.verticalLayout_2 = QVBoxLayout(MainWindow)
         self.verticalLayout_2.setSpacing(6)
         self.verticalLayout_2.setContentsMargins(11, 11, 11, 11)
@@ -56,6 +58,7 @@ class Ui_MainWindow(object):
         font = QFont()
         font.setPointSize(9)
         self.btnSettings.setFont(font)
+        self.btnSettings.setFlat(True)
 
         self.horizontalLayout_4.addWidget(self.btnSettings)
 
@@ -101,6 +104,7 @@ class Ui_MainWindow(object):
         self.btnLogout = QPushButton(self.titleFrame)
         self.btnLogout.setObjectName(u"btnLogout")
         self.btnLogout.setMinimumSize(QSize(60, 15))
+        self.btnLogout.setFlat(True)
 
         self.horizontalLayout_10.addWidget(self.btnLogout)
 
@@ -166,9 +170,58 @@ class Ui_MainWindow(object):
 
         self.listWidget = QListWidget(MainWindow)
         self.listWidget.setObjectName(u"listWidget")
+        palette = QPalette()
+        brush = QBrush(QColor(36, 36, 36, 255))
+        brush.setStyle(Qt.BrushStyle.SolidPattern)
+        palette.setBrush(QPalette.ColorGroup.Active, QPalette.ColorRole.Base, brush)
+        brush1 = QBrush(QColor(25, 25, 25, 255))
+        brush1.setStyle(Qt.BrushStyle.SolidPattern)
+        palette.setBrush(QPalette.ColorGroup.Active, QPalette.ColorRole.Window, brush1)
+        brush2 = QBrush(QColor(152, 0, 0, 60))
+        brush2.setStyle(Qt.BrushStyle.SolidPattern)
+        palette.setBrush(QPalette.ColorGroup.Active, QPalette.ColorRole.Highlight, brush2)
+        brush3 = QBrush(QColor(80, 80, 80, 40))
+        brush3.setStyle(Qt.BrushStyle.SolidPattern)
+        palette.setBrush(QPalette.ColorGroup.Active, QPalette.ColorRole.AlternateBase, brush3)
+        brush4 = QBrush(QColor(220, 0, 0, 255))
+        brush4.setStyle(Qt.BrushStyle.SolidPattern)
+#if QT_VERSION >= QT_VERSION_CHECK(6, 6, 0)
+        palette.setBrush(QPalette.ColorGroup.Active, QPalette.ColorRole.Accent, brush4)
+#endif
+        palette.setBrush(QPalette.ColorGroup.Inactive, QPalette.ColorRole.Window, brush1)
+        brush5 = QBrush(QColor(127, 0, 0, 90))
+        brush5.setStyle(Qt.BrushStyle.SolidPattern)
+        palette.setBrush(QPalette.ColorGroup.Inactive, QPalette.ColorRole.Highlight, brush5)
+        palette.setBrush(QPalette.ColorGroup.Inactive, QPalette.ColorRole.AlternateBase, brush3)
+#if QT_VERSION >= QT_VERSION_CHECK(6, 6, 0)
+        palette.setBrush(QPalette.ColorGroup.Inactive, QPalette.ColorRole.Accent, brush4)
+#endif
+        palette.setBrush(QPalette.ColorGroup.Disabled, QPalette.ColorRole.Base, brush1)
+        palette.setBrush(QPalette.ColorGroup.Disabled, QPalette.ColorRole.Window, brush1)
+        palette.setBrush(QPalette.ColorGroup.Disabled, QPalette.ColorRole.AlternateBase, brush3)
+#if QT_VERSION >= QT_VERSION_CHECK(6, 6, 0)
+        palette.setBrush(QPalette.ColorGroup.Disabled, QPalette.ColorRole.Accent, brush4)
+#endif
+        self.listWidget.setPalette(palette)
         self.listWidget.setMouseTracking(True)
+        self.listWidget.setStyleSheet(u"")
+        self.listWidget.setFrameShape(QFrame.Shape.StyledPanel)
+        self.listWidget.setFrameShadow(QFrame.Shadow.Sunken)
+        self.listWidget.setSizeAdjustPolicy(QAbstractScrollArea.SizeAdjustPolicy.AdjustIgnored)
+        self.listWidget.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.listWidget.setProperty(u"showDropIndicator", False)
         self.listWidget.setAlternatingRowColors(True)
-        self.listWidget.setSpacing(2)
+        self.listWidget.setTextElideMode(Qt.TextElideMode.ElideLeft)
+        self.listWidget.setMovement(QListView.Movement.Snap)
+        self.listWidget.setFlow(QListView.Flow.TopToBottom)
+        self.listWidget.setProperty(u"isWrapping", False)
+        self.listWidget.setResizeMode(QListView.ResizeMode.Fixed)
+        self.listWidget.setSpacing(1)
+        self.listWidget.setViewMode(QListView.ViewMode.ListMode)
+        self.listWidget.setModelColumn(0)
+        self.listWidget.setUniformItemSizes(False)
+        self.listWidget.setWordWrap(False)
+        self.listWidget.setSelectionRectVisible(True)
 
         self.leftLayout.addWidget(self.listWidget)
 

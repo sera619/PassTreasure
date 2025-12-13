@@ -94,7 +94,7 @@ class Ui_SettingsWindow(object):
         self.scrollAreaGeneral.setWidgetResizable(True)
         self.scrollAreaWidgetContents_2 = QWidget()
         self.scrollAreaWidgetContents_2.setObjectName(u"scrollAreaWidgetContents_2")
-        self.scrollAreaWidgetContents_2.setGeometry(QRect(0, 0, 489, 973))
+        self.scrollAreaWidgetContents_2.setGeometry(QRect(0, -624, 489, 976))
         self.verticalLayout_3 = QVBoxLayout(self.scrollAreaWidgetContents_2)
         self.verticalLayout_3.setSpacing(14)
         self.verticalLayout_3.setObjectName(u"verticalLayout_3")
@@ -655,7 +655,7 @@ class Ui_SettingsWindow(object):
 
         self.btnCreateCategory = QPushButton(self.frame_5)
         self.btnCreateCategory.setObjectName(u"btnCreateCategory")
-        self.btnCreateCategory.setMinimumSize(QSize(80, 20))
+        self.btnCreateCategory.setMinimumSize(QSize(100, 0))
 
         self.horizontalLayout_6.addWidget(self.btnCreateCategory)
 
@@ -713,7 +713,7 @@ class Ui_SettingsWindow(object):
         sizePolicy4.setVerticalStretch(0)
         sizePolicy4.setHeightForWidth(self.btnEditCategory.sizePolicy().hasHeightForWidth())
         self.btnEditCategory.setSizePolicy(sizePolicy4)
-        self.btnEditCategory.setMinimumSize(QSize(80, 15))
+        self.btnEditCategory.setMinimumSize(QSize(100, 0))
 
         self.horizontalLayout_5.addWidget(self.btnEditCategory, 0, Qt.AlignmentFlag.AlignVCenter)
 
@@ -721,7 +721,7 @@ class Ui_SettingsWindow(object):
         self.btnDeleteCategory.setObjectName(u"btnDeleteCategory")
         sizePolicy4.setHeightForWidth(self.btnDeleteCategory.sizePolicy().hasHeightForWidth())
         self.btnDeleteCategory.setSizePolicy(sizePolicy4)
-        self.btnDeleteCategory.setMinimumSize(QSize(80, 15))
+        self.btnDeleteCategory.setMinimumSize(QSize(100, 0))
         self.btnDeleteCategory.setStyleSheet(u"background: rgb(170, 0, 0);")
 
         self.horizontalLayout_5.addWidget(self.btnDeleteCategory, 0, Qt.AlignmentFlag.AlignVCenter)

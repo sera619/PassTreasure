@@ -121,7 +121,7 @@ class MainWindow(QWidget):
         self.ui.btnLogout.setStyleSheet(Styles.red_button_outlined)
         self.ui.btnAdd.setStyleSheet(Styles.green_button)
         self.ui.btnDelete.setStyleSheet(Styles.red_button_outlined)
-        utils.colorize_icon(self.ui.btnSettings, "settings", "yellow")
+        utils.colorize_icon(self.ui.btnSettings, "setting", "yellow")
         utils.colorize_icon(self.ui.btnLogout, "exit", "red")
         utils.colorize_icon(self.ui.btnAdd, "add", "dark")
         utils.colorize_icon(self.ui.btnDelete, "trash", "red")
@@ -150,8 +150,7 @@ class MainWindow(QWidget):
         utils.colorize_icon(self.ui.btnCopyPass, "copy", "dark")
         utils.colorize_icon(self.ui.btnShowPass, "show", "dark")
         utils.colorize_icon(self.ui.btnCloseDetails, "hiden", "red")
-        self.ui.listWidget.setStyleSheet(Styles.list_widget_style)
-        
+        #self.ui.listWidget.setStyleSheet(Styles.list_widget_style)        
         self.ui.btnRestorePW.hide()
     
     def build_ui(self):

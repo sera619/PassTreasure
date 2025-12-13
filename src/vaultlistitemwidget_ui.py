@@ -23,6 +23,7 @@ class Ui_VaultListItemWidget(object):
         if not VaultListItemWidget.objectName():
             VaultListItemWidget.setObjectName(u"VaultListItemWidget")
         VaultListItemWidget.resize(300, 40)
+        VaultListItemWidget.setStyleSheet(u"")
         self.horizontalLayout = QHBoxLayout(VaultListItemWidget)
         self.horizontalLayout.setSpacing(4)
         self.horizontalLayout.setObjectName(u"horizontalLayout")
@@ -42,7 +43,7 @@ class Ui_VaultListItemWidget(object):
         font.setBold(False)
         font.setItalic(False)
         self.labelText.setFont(font)
-        self.labelText.setStyleSheet(u" background: None;\n"
+        self.labelText.setStyleSheet(u"background: None;\n"
 "font: 8pt \"Segoe UI\";")
         self.labelText.setAlignment(Qt.AlignmentFlag.AlignLeading|Qt.AlignmentFlag.AlignLeft|Qt.AlignmentFlag.AlignVCenter)
 

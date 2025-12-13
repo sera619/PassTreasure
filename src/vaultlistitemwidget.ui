@@ -10,6 +10,9 @@
     <height>40</height>
    </rect>
   </property>
+  <property name="styleSheet">
+   <string notr="true"/>
+  </property>
   <layout class="QHBoxLayout" name="horizontalLayout">
    <property name="spacing">
     <number>4</number>
@@ -45,7 +48,7 @@
         </font>
        </property>
        <property name="styleSheet">
-        <string notr="true"> background: None;
+        <string notr="true">background: None;
 font: 8pt &quot;Segoe UI&quot;;</string>
        </property>
        <property name="text">
