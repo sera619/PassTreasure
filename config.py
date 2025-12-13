@@ -3,7 +3,7 @@ from enum import Enum
 import os
 
 IS_DEBUGGING = False
-VERSION_NUM = "2.2.1"
+VERSION_NUM = "2.2.5"
 GITHUB_API = "https://api.github.com/repos/sera619/PassTreasure/releases/latest"
     
 BASE_DIR = get_base_dir()
