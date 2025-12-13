@@ -2,7 +2,7 @@ from utils import get_base_dir
 from enum import Enum
 import os
 
-IS_DEBUGGING = True
+IS_DEBUGGING = False
 VERSION_NUM = "2.2.1"
 GITHUB_API = "https://api.github.com/repos/sera619/PassTreasure/releases/latest"
     
@@ -112,7 +112,7 @@ class Styles:
             color: white;
             padding: 6px 10px;
             border-radius: 6px;
-            border: 1px solid #2e7d32;
+            border: 0.5px solid #2e7d32;
         }
         QPushButton:hover {
             background-color: #2e7d32;
@@ -127,7 +127,7 @@ class Styles:
             color: white;
             padding: 6px 10px;
             border-radius: 6px;
-            border: 1px solid #b71c1c;
+            border: 0.5px solid #b71c1c;
         }
         QPushButton:hover {
             background-color: #b71c1c;
@@ -140,9 +140,9 @@ class Styles:
         QPushButton {
             background-color: #0d47a1;
             color: white;
-            padding: 6px 10px;
+            padding: 3px 6px;
             border-radius: 6px;
-            border: 1px solid #0d47a1;
+            border: 0.5px solid #0d47a1;
         }
         QPushButton:hover {
            	background-color: #1565c0;
@@ -157,7 +157,7 @@ class Styles:
             color: #333;
             padding: 6px 10px;
             border-radius: 6px;
-            border: 1px solid #f9a825;
+            border: 0.5px solid #f9a825;
         }
         QPushButton:hover {
             background-color: #f9a825;
@@ -172,7 +172,7 @@ class Styles:
             color: #333;
             padding: 2px 4px;
             border-radius: 4px;
-            border: 1px solid #f9a825;
+            border: 0.5px solid #f9a825;
         }
         QPushButton:hover {
             background-color: #f9a825;
@@ -187,7 +187,7 @@ class Styles:
             color: white;
             padding: 6px 10px;
             border-radius: 6px;
-            border: 1px solid #1f1f1f;
+            border: 0.5px solid #1f1f1f;
         }
         QPushButton:hover {
             background-color: #3a3a3a;
@@ -234,7 +234,7 @@ class Styles:
         QPushButton {
             background: transparent;
             color: #0d47a1;
-            padding: 6px 10px;
+            padding: 3px 6px;
             border-radius: 6px;
             border: 0.5px solid #1565c0;
         }
@@ -282,25 +282,13 @@ class Styles:
             border: 0.5px solid #3a3a3a;
         }
         QPushButton:hover {
-            background-color: rgba(255, 255, 255, 20);
+            background-color: rgba(0, 255, 255, 20);
         }
         QPushButton:pressed {
-            background-color: rgba(255, 255, 255, 40);
+            background-color: rgba(0, 255, 255, 40);
         }"""
 
-    list_widget_style = """
-        QListWidget::item:hover {
-                background-color: rgba(255, 255, 255, 20);
-                border-radius: 4px;
-            }
 
-            QListWidget::item:selected {
-                background-color: rgba(255, 255, 255, 40);
-                border-radius: 4px;
-            }
-
-        """
-    
     dark_style = """
 
         QWidget {
