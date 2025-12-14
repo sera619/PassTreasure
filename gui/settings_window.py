@@ -8,10 +8,10 @@ from gui.category_edit_dialog import CategoryEditDialog
 from gui.password_strength_indicator import PasswordStrengthIndicator
 from backend.password_strength_logic import evaluate_password_strength
 from gui.dialog_popup import DialogPopup
-from backend.import_worker import CsvImportWorker
 from config import TextStorage, Styles, VAULT_PATH, PopupType, EXPORT_TYPES
 from backend.database import PasswordDatabase
 from backend.backup_manager import BackupManager
+from backend.import_manager import ImportManager
 from utils import load_settings, save_settings, reformat_timestamp
 import utils
 import os, csv, json
@@ -30,6 +30,7 @@ class SettingsWindow(QDialog):
         self.ui.setupUi(self)
         self.db = db
         self.backups = BackupManager(VAULT_PATH)
+        self.import_manager = ImportManager(self)
         self.default_export_name = "FileTreasure-PasswordExport"
         self.new_category_color = None
         self.setup_navigation()
@@ -40,8 +41,9 @@ class SettingsWindow(QDialog):
         self.setWindowTitle("PassTreasure - Settings")
         self.setWindowIcon(QIcon(":/assets/icon.png"))
         self.apply_styles()
+        self._build_UI()
         
-        # Master password change
+    def _build_UI(self):
         self.strength_indicator = PasswordStrengthIndicator(self)
         self.ui.indicatorHolder.addWidget(self.strength_indicator)        
         
@@ -57,15 +59,20 @@ class SettingsWindow(QDialog):
         self.ui.btnClearBackup.clicked.connect(self.clear_backups)
         self.ui.showPwCheckbox.toggled.connect(self.toggle_masterpw_visibility)
         self.ui.btnStartImport.clicked.connect(self.start_import)
-        self.ui.btnSelectPath.clicked.connect(self.get_import_path)
+        self.ui.btnSelectPath.clicked.connect(self.get_import_file_path)
         self.ui.stack.currentChanged.connect(self.update_sidebar_buttons)
         
         self.ui.autoLogoutCheckBox.toggled.connect(self.toggle_autologout)
         self.ui.autoLogoutTimeEdit.timeChanged.connect(self.get_autologout_time)
         self.ui.autoHideDetailsTimeEdit.timeChanged.connect(self.get_auto_hide_details_time)
+    
+        self.import_manager.progress.connect(self.on_import_progress)
+        self.import_manager.finished.connect(self.on_import_finished)
+        self.import_manager.error.connect(self.on_import_error)
+    
         self.ui.exportFilenameLineEdit.setPlaceholderText(f"Enter a filename... (default: {self.default_export_name})")
         # self.ui.stack.setCurrentWidget(self.ui.page_security)
-    
+        
     def update_sidebar_buttons(self):
         current = self.ui.stack.currentWidget()
         if current == self.ui.page_about:
@@ -197,7 +204,7 @@ class SettingsWindow(QDialog):
         self.ui.backupDeleteBox.addItems(backups)        
     
     def update_backup_mode(self, index):
-        mode = self.backup_intervall_mapping[index]
+        mode = self.backups.BACKUP_INTERVAL_TYPES[index]
         settings = load_settings()
         settings["auto_backup"] = mode
         save_settings(settings)
@@ -494,7 +501,14 @@ class SettingsWindow(QDialog):
         self.ui.importModeBox.addItems(import_modes)
         self.ui.progressFrame.hide()
     
-    def get_import_path(self):
+    def reset_import_ui(self):
+        self.ui.importFilePathLineEdit.clear()
+        self.ui.importModeBox.setCurrentIndex(-1)
+        self.ui.progressBar.setValue(0)
+        self.ui.progressLabel.clear()
+        self.ui.progressFrame.hide()
+    
+    def get_import_file_path(self):
         file_path, _ = QFileDialog.getOpenFileName(self, "Import CSV", filter="*.csv")
         if not file_path:
             return
@@ -502,33 +516,18 @@ class SettingsWindow(QDialog):
     
     def start_import(self):
         mode = self.ui.importModeBox.currentText().lower()
-        if not mode:
-            DialogPopup("Import Warning", f"Missing importmode. No importmode selected!\nPlease select a importmode!.", PopupType.WARNING, self).exec()        
-            return
         file_path = self.ui.importFilePathLineEdit.text().strip()
-        if not file_path:
-            DialogPopup("Import Warning", "Missing import filepath. No filepath set!\nPlease enter a filepath to import from.", PopupType.WARNING, self).exec()        
+        if not mode or not file_path:
+            DialogPopup("Import Warning", f"Please select import mode and file.", PopupType.WARNING, self).exec()        
             return
         pw = self.ask_master_password()
         if not pw:
             return
-        
-        from PySide6.QtCore import QThread
-        
-        self.qthread = QThread()
-        self.worker = CsvImportWorker(VAULT_PATH, file_path, pw, mode)
-        self.worker.moveToThread(self.qthread)
-        
-        self.worker.progress.connect(self.on_import_progress)
-        self.worker.finished.connect(self.on_import_finished)
-        self.worker.error.connect(self.on_import_error)
-        
-        self.qthread.started.connect(self.worker.run)
-        self.qthread.start() 
-        
         self.ui.progressBar.setValue(0)
         self.ui.progressLabel.clear()
         self.ui.progressFrame.show()
+        self.import_manager.start_import(VAULT_PATH, file_path, pw, mode)
+
         
     def on_import_progress(self, count, total):
         percentage = int(count / total * 100)
@@ -538,23 +537,13 @@ class SettingsWindow(QDialog):
     def on_import_finished(self):
         self.ui.progressBar.setValue(100)
         self.ui.progressLabel.setText("Import finished!")
-        self.qthread.quit()
-        self.qthread.wait()
         DialogPopup("Import Success", f"Import finished!", PopupType.SUCCESS, self).exec()        
         self.import_successfully.emit()
         QTimer.singleShot(1000, self.reset_import_ui)
 
     def on_import_error(self, err):
         DialogPopup("Import Error", f"Error at import:\n{err}", PopupType.ERROR, self).exec()
-        self.qthread.quit()
-        self.qthread.wait()
 
-    def reset_import_ui(self):
-        self.ui.importFilePathLineEdit.clear()
-        self.ui.importModeBox.setCurrentIndex(-1)
-        self.ui.progressBar.setValue(0)
-        self.ui.progressLabel.clear()
-        self.ui.progressFrame.hide()
         
     # autologout
     def toggle_autologout(self, checked: bool):
@@ -645,42 +634,25 @@ class SettingsWindow(QDialog):
         file_path = os.path.join(os.path.abspath(dir_path), filename)
         try:
             entries = self.db.get_export_entries()
-            export_entries = []
-            field_names = ["id", "service", "username", "password", "category", "url", "note"]
-            for entry in entries:
-                export_entry = {}
-                entry_id, service, username, category, url, note = entry
-                export_entry["id"] = entry_id            
-                export_entry["service"] = service
-                export_entry["username"] = username
-                export_entry["category"] = category
-                export_entry["url"] = url
-                export_entry["note"] = note            
-                
-                password = self.db.get_password(entry_id)
-                if password:
-                    export_entry["password"] = password
-                else:
-                    continue
-                export_entries.append(export_entry)
-            if len(export_entries) == 0:
+            if len(entries) == 0:
                 DialogPopup("Export Information", "No entries to export found.", PopupType.INFO, self).exec()
                 return
+            field_names = entries[0].keys()
             
             if file_type == ".csv":
                 with open(file_path, mode="w", newline='') as file:
                     writer = csv.DictWriter(file, fieldnames=field_names)
                     writer.writeheader()
-                    writer.writerows(export_entries)
+                    writer.writerows(entries)
             elif file_type == ".json":
                 with open(file_path, mode="w") as file:
-                    data = json.dumps(export_entries, indent=4)
+                    data = json.dumps(entries, indent=4)
                     file.write(data)
         
             self.ui.fileEndingBox.setCurrentIndex(-1)
             self.ui.exportFilenameLineEdit.clear()
             self.ui.exportFileLineEdit.clear()
-            DialogPopup("Export Success", f"Exporting {len(export_entries)}x entries to:\n'{filename}'\nsuccessfully!", PopupType.SUCCESS, self).exec()        
+            DialogPopup("Export Success", f"Exporting {len(entries)}x entries to:\n'{filename}'\nsuccessfully!", PopupType.SUCCESS, self).exec()        
         except Exception as e:
             DialogPopup("Export Error", f"Failure at export to csv:\n{e}", PopupType.ERROR, self).exec()        
     
@@ -709,7 +681,6 @@ class SettingsWindow(QDialog):
     def _on_btnStartUpdate_click(self, url: str):
         self._reset_update_status()
         self.ui.btnStartUpdate.hide()
-
         utils.open_url(url)
      
     def _toggle_auto_check_update(self, checked: bool):

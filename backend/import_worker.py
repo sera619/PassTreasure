@@ -18,9 +18,10 @@ class CsvImportWorker(QObject):
         import csv
         from backend.database import PasswordDatabase
         try:
-            db = PasswordDatabase(self.db_path)
+            db: PasswordDatabase = PasswordDatabase(self.db_path)
             db.connect()
-            db.unlock_vault(self.master_pw)
+            if not db.unlock_vault(self.master_pw):
+                raise PermissionError("Invalid master password")
             
             with open(self.csv_path, "r", encoding="utf-8") as f:
                 reader = list(csv.DictReader(f))
@@ -53,7 +54,7 @@ class CsvImportWorker(QObject):
                     note = row.get("note") or ""                     
 
                 if password:
-                    db.add_entry(service, username, password, category, url, note)
+                    db.create_entry(service, username, password, category, url, note)
 
                 count += 1
                 self.progress.emit(count, total)
