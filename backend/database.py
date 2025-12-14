@@ -1,198 +1,224 @@
-import sqlite3
+# database.py – refactored (phase 1)
 import os
+import sqlite3
 import random
-import csv
-from datetime import datetime, timezone 
-from typing import Optional, List, Tuple
-from cryptography.hazmat.primitives.ciphers.aead import AESGCM
-from config import TEST_ENTRIES
-from utils import load_settings, save_settings, clean_url, resource_path, get_base_dir
 import shutil
 from pathlib import Path
-from backend.kdf import (
-    generate_salt,
-    derive_key,
-    verify_master_password
-)
+from datetime import datetime, timezone
+from typing import Optional, List, Tuple, Dict
+
+from cryptography.hazmat.primitives.ciphers.aead import AESGCM
+
+from config import TEST_ENTRIES
+from utils import load_settings, save_settings, get_base_dir
+from backend.crypto_manager import CryptoManager
+from backend.backup_manager import BackupManager
+# -----------------------------------------------------------------------------
+# Paths
+# -----------------------------------------------------------------------------
 
 BASE_DIR = get_base_dir()
 DATA_PATH = os.path.join(BASE_DIR, "data")
 BACKUP_PATH = os.path.join(BASE_DIR, "backup")
-SETTINGS_PATH = os.path.join(DATA_PATH, "settings.json")
 VAULT_PATH = os.path.join(DATA_PATH, "vault.db")
 
+
 class PasswordDatabase:
-    def __init__(self, path: str = VAULT_PATH):
-        self.path = path
-        self.conn = None
-        self.cursor = None
+    """
+    Main database access layer for PassTreasure.
 
-        # AES key will be placed here after unlock
+    Responsibilities (phase 1):
+    - SQLite connection handling
+    - Vault unlock / crypto usage
+    - Entry CRUD
+    - Backup handling
+    - DB migrations
+
+    NOTE: Further refactors may split this into smaller services.
+    """
+
+    # ------------------------------------------------------------------
+    # INIT / STATE
+    # ------------------------------------------------------------------
+
+    def __init__(self, db_path: str = VAULT_PATH):
+        self.db_path = db_path
+        self.conn: Optional[sqlite3.Connection] = None
+        self.cursor: Optional[sqlite3.Cursor] = None
         self.aes_key: Optional[bytes] = None
-        self._init_data()
-        self._init_backup()        
+        self.backup_manager: BackupManager = BackupManager(self.db_path)
+        
+        self._init_data_dirs()
+        self._init_backup_dir()
 
-    def _init_backup(self):
-        settings = load_settings()
-        path = settings.get("backup_path")
-        path = os.path.abspath(path)
-        if not os.path.exists(path):
-            os.makedirs(path)
-            # os.makedirs(BACKUP_PATH, exist_ok=True)
-                  
-    def _init_data(self):
-        if not os.path.exists(DATA_PATH):
-            os.makedirs(DATA_PATH, exist_ok=True)
-        load_settings()        
-        
-    def add_test_entries(self) -> None:
+    # ------------------------------------------------------------------
+    # INTERNAL HELPERS
+    # ------------------------------------------------------------------
+
+    def _utc_now(self) -> str:
+        return datetime.now(timezone.utc).isoformat()
+
+    def _require_connected(self):
+        if not self.conn or not self.cursor:
+            raise RuntimeError("Database not connected")
+
+    def _require_unlocked(self):
+        """Check if aes_key exists"""
         if self.aes_key is None:
-            raise Exception("Vault not unlocked!")
-        entries = TEST_ENTRIES
-        
-        for entry in entries:
-            settings = load_settings()
-            entry_categories = settings["entry_categories"]
-            service = entry.get("service")
-            username = entry.get("username")
-            password = entry.get("password")
-            url = entry.get("url", f"https://www.{service.lower()}.com")
-            category = entry.get("category", "General")
-            category = random.choice(entry_categories)
-            note =  "No note set."
-            if not service or not username or not password:
-                print(f"skipping invalid entry: {entry}")
-                continue
-            try:
-                self.add_entry(service, username, password, category, url, note)
-            except Exception as e:
-                print(f"Failed to add entry: {e}")
-            
+            raise RuntimeError("Vault not unlocked")
+
+    def _execute(
+        self,
+        query: str,
+        params: tuple = (),
+        *,
+        commit: bool = False,
+        fetchone: bool = False,
+        fetchall: bool = False,
+    ):
+        self._require_connected()
+        self.cursor.execute(query, params)
+
+        if commit:
+            self.conn.commit()
+        if fetchone:
+            return self.cursor.fetchone()
+        if fetchall:
+            return self.cursor.fetchall()
+
+    # ------------------------------------------------------------------
+    # INIT DIRECTORIES
+    # ------------------------------------------------------------------
+
+    def _init_data_dirs(self):
+        os.makedirs(DATA_PATH, exist_ok=True)
+        load_settings()
+
+    def _init_backup_dir(self):
+        settings = load_settings()
+        path = os.path.abspath(settings.get("backup_path"))
+        os.makedirs(path, exist_ok=True)
+
+    # ------------------------------------------------------------------
+    # CONNECTION HANDLING
+    # ------------------------------------------------------------------
+
     def connect(self) -> bool:
-        if not os.path.exists(self.path):
+        if not os.path.exists(self.db_path):
             return False
-        
-        self.conn = sqlite3.connect(self.path)
+        self.conn = sqlite3.connect(self.db_path)
         self.cursor = self.conn.cursor()
         return True
-    
-    # Backup    
-    def create_backup(self):
-        if not os.path.exists(VAULT_PATH):
-            raise FileNotFoundError("vault.db does not exist – nothing to backup!")
-        settings = load_settings()
-        backup_dir = settings.get("backup_path")
-        time_now = datetime.now().strftime("%d-%m-%Y_%H-%M-%S")
 
-        backup_name = f"{time_now}_vault.db"
-        backup_file = os.path.join(os.path.abspath(backup_dir), backup_name)
-        
-        shutil.copy2(VAULT_PATH, backup_file)
-        return backup_file
-    
-    def get_latest_backup(self) -> Optional[str]:
-        """
-        Return the filename (not path) of the most recent backup file matching
-        the pattern '*_vault.db' inside the configured backup directory.
-        Returns None if no matching file is found or path is invalid.
-        """
-        settings = load_settings()
-        backup_path_str = settings.get("backup_path")
-        if not backup_path_str:
-            return None
+    def disconnect(self) -> bool:
+        if not self.conn:
+            return False
+        self.conn.close()
+        self.conn = None
+        self.cursor = None
+        self.aes_key = None
+        return True
 
-        backup_dir = Path(os.path.abspath(backup_path_str))
+    # ------------------------------------------------------------------
+    # VAULT CREATION / AUTH
+    # ------------------------------------------------------------------
 
-        if not backup_dir.exists() or not backup_dir.is_dir():
-            return None
+    def create_new_vault(self, master_password: str) -> None:
+        if os.path.exists(self.db_path):
+            raise RuntimeError("Vault already exists")
 
-        # collect files that end with '_vault.db'
-        backups = []
-        for entry in backup_dir.iterdir():          # no glob() used
-            try:
-                if entry.is_file() and entry.name.endswith("_vault.db"):
-                    backups.append(entry)
-            except (OSError, PermissionError):
-                # ignore entries we can't stat/read
-                continue
+        salt = CryptoManager.generate_salt()
+        verifier_key = CryptoManager.derive_key(master_password, salt)
+        self.aes_key = verifier_key
 
-        if not backups:
-            return None
+        self.connect()
 
-        # sort by modification time, newest first
-        backups.sort(key=lambda p: p.stat().st_mtime, reverse=True)
+        self.cursor.execute("""
+            CREATE TABLE meta (
+                id INTEGER PRIMARY KEY,
+                salt BLOB NOT NULL,
+                master_hash BLOB NOT NULL,
+                db_version INTEGER DEFAULT 1
+            )
+        """)
 
-        # return only the filename (not full path)
-        return backups[0].name
-        
-    def delete_backup(self, backup_filename: str):
-        """
-        Delete the selected backup file from the backup directory.
-        Uses no glob() and falls back to manual directory scanning.
-        """
-        settings = load_settings()
-        backup_path_str = settings.get("backup_path")
+        self.cursor.execute("""
+            CREATE TABLE entries (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                service TEXT NOT NULL,
+                username TEXT NOT NULL,
+                password BLOB NOT NULL,
+                nonce BLOB NOT NULL,
+                url TEXT,
+                category TEXT DEFAULT 'General',
+                note TEXT,
+                created_at TEXT,
+                updated_at TEXT
+            )
+        """)
 
-        if not backup_path_str:
-            raise FileNotFoundError("Backup path not configured.")
+        self.cursor.execute(
+            "INSERT INTO meta (id, salt, master_hash) VALUES (1, ?, ?)",
+            (salt, verifier_key)
+        )
+        self.conn.commit()
 
-        backup_dir = Path(os.path.abspath(backup_path_str))
+    def unlock_vault(self, master_password: str) -> bool:
+        if not self.connect():
+            return False
 
-        if not backup_dir.exists() or not backup_dir.is_dir():
-            raise FileNotFoundError(f"Backup path does not exist: {backup_dir}")
+        row = self._execute(
+            "SELECT salt, master_hash FROM meta WHERE id = 1",
+            fetchone=True
+        )
+        if row is None:
+            return False
 
-        # target file
-        backup_file = backup_dir / backup_filename
+        salt, expected_key = row
+        if not CryptoManager.verify_master_password(master_password, salt, expected_key):
+            return False
 
-        if not backup_file.exists():
-            raise FileNotFoundError(f"Backup file not found: {backup_file}")
+        self.aes_key = CryptoManager.derive_key(master_password, salt)
+        self.migrate_database()
+        return True
 
-        # delete backup
-        os.remove(backup_file)
+    def change_master_password(self, old_password: str, new_password: str) -> bool:
+        if not self.unlock_vault(old_password):
+            return False
 
-        # check if backups remain (manual scan instead of glob)
-        remaining = []
-        for entry in backup_dir.iterdir():
-            try:
-                if entry.is_file() and entry.name.endswith("_vault.db"):
-                    remaining.append(entry)
-            except (OSError, PermissionError):
-                continue
+        rows = self._execute(
+            "SELECT id, password, nonce FROM entries",
+            fetchall=True
+        )
 
-        # if no backups left: clear "last_backup"
-        if len(remaining) == 0:
-            try:
-                settings = load_settings()
-                settings["last_backup"] = None
-                save_settings(settings)
-            except Exception as e:
-                print(f"Failed to update settings: {e}")
+        aes_old = AESGCM(self.aes_key)
+        decrypted = [
+            (eid, aes_old.decrypt(n, pw, None).decode("utf-8"))
+            for eid, pw, n in rows
+        ]
 
-    def clear_backups(self):
-        settings = load_settings()
-        backup_path_str = settings.get("backup_path")
+        new_salt = CryptoManager.generate_salt()
+        new_key = CryptoManager.derive_key(new_password, new_salt)
+        aes_new = AESGCM(new_key)
 
-        if not backup_path_str:
-            raise FileNotFoundError("Backup path not configured.")
+        for entry_id, pw in decrypted:
+            nonce, enc = CryptoManager.encrypt(aes_new, pw.encode())
+            # nonce = os.urandom(12)
+            # enc = aes_new.encrypt(nonce, pw.encode(), None)
+            self._execute(
+                "UPDATE entries SET password=?, nonce=? WHERE id=?",
+                (enc, nonce, entry_id)
+            )
 
-        backup_dir = Path(os.path.abspath(backup_path_str))
+        self._execute(
+            "UPDATE meta SET salt=?, master_hash=? WHERE id=1",
+            (new_salt, new_key),
+            commit=True
+        )
 
-        if not backup_dir.exists() or not backup_dir.is_dir():
-            raise FileNotFoundError(f"Backup path does not exist: {backup_dir}")   
-        
-        removed = 0
-        for file in backup_dir.iterdir():
-            if file.is_file() and file.name.endswith("_vault.db"):
-                try:
-                    file.unlink()
-                    removed += 1
-                except Exception as e:
-                    print(f"Failed to delete backup {file}: {e}")
-        settings = load_settings()
-        settings["last_backup"] = None
-        save_settings(settings)
-        return removed                        
-    
+        self.aes_key = new_key
+        return True
+ 
     def apply_backup(self, backup_filename: str):
         settings = load_settings()
         backup_path_str = settings.get("backup_path")
@@ -220,7 +246,7 @@ class PasswordDatabase:
         self.cursor = None
         self.aes_key = None
 
-        if VAULT_PATH.exists():
+        if os.path.exists(VAULT_PATH):
             try:
                 os.remove(VAULT_PATH)
             except PermissionError:
@@ -251,7 +277,7 @@ class PasswordDatabase:
         self.aes_key = None
 
         # Vault wieder verbinden
-        if not VAULT_PATH.exists():
+        if not os.path.exists(VAULT_PATH):
             raise FileNotFoundError("Restored vault.db not found after backup!")
 
         if not self.connect():
@@ -269,220 +295,46 @@ class PasswordDatabase:
             raise PermissionError("Wrong master password for restored vault!")
 
         return True
+ 
+    # ------------------------------------------------------------------
+    # ENTRY CRUD
+    # ------------------------------------------------------------------
 
-    def get_all_backups(self) -> Optional[list]:
-        settings = load_settings()
-        backup_path_str = settings.get("backup_path")
+    def create_entry(self, service: str, username: str, password: str,
+                  category: str = "General", url: str = "", note: str = ""):
+        self._require_unlocked()
 
-        if not backup_path_str:
-            raise FileNotFoundError("Backup path not configured.")
-
-        backup_dir = Path(os.path.abspath(backup_path_str))
-
-        if not backup_dir.exists() or not backup_dir.is_dir():
-            raise FileNotFoundError(f"Backup path does not exist: {backup_dir}")  
-
-        try:
-            # collect files that end with '_vault.db'
-            backups = []
-            for entry in backup_dir.iterdir():
-                    try:
-                        if entry.is_file() and entry.name.endswith("_vault.db"):
-                            backups.append(entry.name)
-                    except (OSError, PermissionError):
-                        continue
-            if not backups:
-                return None
-
-            return backups
-        except Exception as e:
-            print(f"Error get all backups:\n{e}")
-            return None
+        # aes = AESGCM(self.aes_key)
+        # nonce = os.urandom(12)
+        # enc = aes.encrypt(nonce, password.encode(), None)
         
-    # Unlock / Verify
-    def create_new_vault(self, master_password: str) -> None:
-        if os.path.exists(self.path):
-            raise Exception("Vault already exists!")
+        nonce, enc = CryptoManager.encrypt(self.aes_key, password)       
+        now = self._utc_now()
 
-        salt = generate_salt()
-        verifier_key = derive_key(master_password, salt)
-
-        self.aes_key = verifier_key
-
-        self.conn = sqlite3.connect(self.path)
-        self.cursor = self.conn.cursor()
-
-        # META
-        self.cursor.execute("""
-            CREATE TABLE meta (
-                id INTEGER PRIMARY KEY,
-                salt BLOB NOT NULL,
-                master_hash BLOB NOT NULL,
-                db_version INTEGER DEFAULT 1
-            )
-        """)
-
-        # ENTRIES (jetzt mit category + timestamps!)
-        self.cursor.execute("""
-            CREATE TABLE entries (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                service TEXT NOT NULL,
-                username TEXT NOT NULL,
-                password BLOB NOT NULL,
-                url TEXT,
-                nonce BLOB NOT NULL,
-                category TEXT DEFAULT 'General',
-                note TEXT,
-                created_at TEXT,
-                updated_at TEXT
-            )
-        """)
-
-        self.cursor.execute(
-            "INSERT INTO meta (id, salt, master_hash) VALUES (1, ?, ?)",
-            (salt, verifier_key)
+        self._execute(
+            """
+            INSERT INTO entries
+            (service, username, password, nonce, url, category, note, created_at, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (service, username, enc, nonce, url, category, note, now, now),
+            commit=True
         )
 
-        self.conn.commit()
-
-    def change_master_password(self, old_password: str, new_password: str) -> bool:
+    def get_entry_details(self, entry_id: int) -> Optional[Dict]:
         """
-        Changes the master password securely.
-        Steps:
-        1. Verify old password
-        2. Generate new salt + new hash
-        3. Decrypt ALL entries using old aes_key
-        4. Re-encrypt them using the new aes_key
-        5. Write updated meta + entries back
+        Returns full entry details:
+        service, username, category, url, note, created_at, updated_at
         """
-        # 1: Check old password
-        if not self.unlock_vault(old_password):
-            return False
-
-        # Load existing encrypted entries
-        self.cursor.execute("SELECT id, password, nonce FROM entries")
-        rows = self.cursor.fetchall()
-
-        # Decrypt all entries with old key
-        aes_old = AESGCM(self.aes_key)
-        decrypted_entries = []
-
-        for entry_id, encrypted_pw, nonce in rows:
-            pw = aes_old.decrypt(nonce, encrypted_pw, None).decode("utf-8")
-            decrypted_entries.append((entry_id, pw))
-
-        # 2: Generate new salt + derive new key
-        new_salt = generate_salt()
-        new_hash = derive_key(new_password, new_salt)
-        new_aes_key = new_hash
-
-        aes_new = AESGCM(new_aes_key)
-
-        # 3: Re-encrypt all entries
-        for entry_id, pw in decrypted_entries:
-            new_nonce = os.urandom(12)
-            new_enc = aes_new.encrypt(new_nonce, pw.encode("utf-8"), None)
-
-            self.cursor.execute("""
-                UPDATE entries
-                SET password = ?, nonce = ?
-                WHERE id = ?
-            """, (new_enc, new_nonce, entry_id))
-
-        # 4: Update meta table
-        self.cursor.execute("""
-            UPDATE meta
-            SET salt = ?, master_hash = ?
-            WHERE id = 1
-        """, (new_salt, new_hash))
-    
-        self.conn.commit()
-
-        # 5: Update runtime aes_key
-        self.aes_key = new_aes_key
-        return True
-
-    def delete_vault(self) -> None:
-        try:
-            if self.conn:
-                self.conn.close()
-        except Exception:
-            pass
-        
-        self.conn = None
-        self.cursor = None
-        self.aes_key = None
-        
-        if not os.path.exists(VAULT_PATH):
-            raise FileNotFoundError("vault.db does not exists - nothing to delete!")
-        try:
-            os.remove(VAULT_PATH)
-        except PermissionError:
-            raise PermissionError(
-                "vault.db konnte nicht gelöscht werden — die Datei ist gesperrt!\n"
-                "Schließe andere Programme oder Fenster, die darauf zugreifen."
-            )
-
-    def unlock_vault(self, master_password: str) -> bool:
-
-        if not self.connect():
-            return False
-
-        self.cursor.execute("SELECT salt, master_hash FROM meta WHERE id = 1")
-        row = self.cursor.fetchone()
-        if row is None:
-            return False
-
-        salt, expected_key = row
-
-        if verify_master_password(master_password, salt, expected_key):
-            self.aes_key = derive_key(master_password, salt)
-            self.migrate_database()
-            return True
-        return False
-    
-    def disconnect(self) -> bool:
-        if not self.conn:
-            return False
-        self.conn.close()
-        self.conn = None
-        self.cursor = None
-        self.aes_key = None
-        return True
-    
-    # Password Entry Handling
-    def add_entry(self, service: str, username: str, password: str, category: str = "General", url: str = "Unknown", note: str = "Unknown") -> None:
-
-        if self.aes_key is None:
-            raise Exception("Vault not unlocked!")
-
-        aes = AESGCM(self.aes_key)
-        nonce = os.urandom(12)
-        encrypted_pw = aes.encrypt(nonce, password.encode("utf-8"), None)
-
-        now = datetime.now(timezone.utc).isoformat()
-
-        self.cursor.execute("""
-            INSERT INTO entries (service, username, password, url, nonce, category, note, created_at, updated_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """, (service, username, encrypted_pw, url, nonce, category, note, now, now))
-
-        self.conn.commit()
-
-    def get_entry_details(self, entry_id: int):
-        """
-        Returns full entry details including timestamps and category.
-        """
-        self.cursor.execute("""
+        row = self._execute("""
             SELECT service, username, category, url, note, created_at, updated_at
             FROM entries
             WHERE id = ?
-        """, (entry_id,))
-        
-        row = self.cursor.fetchone()
+            """, (entry_id,),
+            fetchone=True
+        )
         if row is None:
             raise Exception("Entry not found!")
-
         service, username, category, url, note, created_at, updated_at = row
         return {
             "service": service,
@@ -495,155 +347,175 @@ class PasswordDatabase:
         }
 
     def get_all_entries(self) -> List[Tuple[int, str, str, str]]:
-        """Returns id, service, username, category for listing."""
-        self.cursor.execute("SELECT id, service, username, category FROM entries")
-        return self.cursor.fetchall()
-    
-    def get_export_entries(self) -> List[Tuple[int, str, str, str, str, str]]:
-        """Returns id, service, username, category, url, note"""
-        self.cursor.execute("SELECT id, service, username, category, url, note FROM entries")
-        return self.cursor.fetchall()
-
-    def get_password(self, entry_id: int) -> str:
-
-        if self.aes_key is None:
-            raise Exception("Vault not unlocked!")
-
-        self.cursor.execute(
-            "SELECT password, nonce FROM entries WHERE id = ?",
-            (entry_id,)
+        self._require_unlocked()
+        return self._execute(
+            "SELECT id, service, username, category FROM entries",
+            fetchall=True
         )
-        row = self.cursor.fetchone()
-        if row is None:
-            raise Exception("Password entry not found!")
-
-        encrypted_pw, nonce = row
-
-        aes = AESGCM(self.aes_key)
-        decrypted = aes.decrypt(nonce, encrypted_pw, None)
-
-        return decrypted.decode("utf-8")
-
-    def delete_entry(self, entry_id: int) -> None:
-
-        self.cursor.execute("DELETE FROM entries WHERE id = ?", (entry_id,))
-        self.conn.commit()
-    
-    def get_entries_by_category(self, category: str) -> List[tuple]:
-        """
-        Returns all entries assigned to a specific category.
-        """
-        self.cursor.execute("""
+        
+    def get_entries_by_category(self, category: str) -> List[Tuple[int, str, str, str]]:
+        """Returns all entries assigned to a specific category."""
+        self._require_unlocked()
+        return self._execute("""
             SELECT id, service, username, category
             FROM entries
-            WHERE category = ?
-        """, (category,))
-        return self.cursor.fetchall()
+            WHERE category = ?""",
+            (category,),
+            fetchall=True
+        )
+        
+    def get_export_entries(self) -> list[dict]:
+        """Returns id, service, username, password, url, category, note, created_at, updated_at
+        """
+        self._require_unlocked()
+        rows = self._execute("""
+            SELECT id, service, username, password, nonce, url, category, note, created_at, updated_at
+            FROM entries""",
+            fetchall=True
+        )
+        export = []
+        for row in rows:
+            (entry_id, service, username, 
+                enc_pw, nonce, category, url,
+                note, created_at, updated_at
+            ) = row
+            password = CryptoManager.decrypt(self.aes_key, nonce, enc_pw)
+            export.append({
+                "id": entry_id,
+                "service": service,
+                "username": username,
+                "password": password,
+                "category": category,
+                "url": url,
+                "note": note,
+                "created_at": created_at,
+                "updated_at": updated_at
+            })
+        return export        
+    
+    def get_password(self, entry_id: int) -> str:
+        self._require_unlocked()
+        row = self._execute(
+            "SELECT password, nonce FROM entries WHERE id=?",
+            (entry_id,),
+            fetchone=True
+        )
+        if not row:
+            raise KeyError("Entry not found")
+        pw, nonce = row
+        dec_pw = CryptoManager.decrypt(self.aes_key, nonce, pw)
+        # AESGCM(self.aes_key).decrypt(nonce, pw, None).decode()
+        return dec_pw
+
+    def delete_entry(self, entry_id: int):
+        self._require_unlocked()
+        self._execute(
+            "DELETE FROM entries WHERE id=?",
+            (entry_id,),
+            commit=True
+        )
+        remaining =  self.get_all_entries() 
+        if len(remaining) == 0:
+            self._execute(
+                "DELETE FROM sqlite_sequence WHERE name='entries'", 
+                commit=True
+            )
 
     def clear_entries(self):
-        self.cursor.execute("DELETE FROM entries")
-        self.cursor.execute("DELETE FROM sqlite_sequence WHERE name='entries'")
-        self.conn.commit()
-        
-    # UPDATE: Edit fields
-    def edit_category(self,  entry_id: int, new_category: str) -> None:
-        now = datetime.now(timezone.utc).isoformat()
-        self.cursor.execute(
+        self._require_unlocked()
+        self._execute(
+            "DELETE FROM entries"
+        )
+        self._execute(
+            "DELETE FROM sqlite_sequence WHERE name='entries'",
+            commit=True
+        )
+
+    def edit_category(self, entry_id: int, new_category: str) -> None:
+        now = self._utc_now()
+        self._execute(
             "UPDATE entries SET category = ?, updated_at = ? WHERE id = ?",
-            (new_category, now, entry_id)
+            (new_category, now, entry_id),
+            commit=True
         )
-        self.conn.commit()
-    
+        
     def edit_service(self, entry_id: int, new_service: str) -> None:
-        now = datetime.now(timezone.utc).isoformat()
-        self.cursor.execute(
+        now = self._utc_now()
+        self._execute(
             "UPDATE entries SET service = ?, updated_at = ? WHERE id = ?",
-            (new_service, now, entry_id)
+            (new_service, now, entry_id),
+            commit=True
         )
-        self.conn.commit()
 
     def edit_username(self, entry_id: int, new_username: str) -> None:
-        now = datetime.now(timezone.utc).isoformat()
-        self.cursor.execute(
+        now = self._utc_now()        
+        self._execute(
             "UPDATE entries SET username = ?, updated_at = ? WHERE id = ?",
-            (new_username, now, entry_id)
+            (new_username, now, entry_id),
+            commit=True
         )
-        self.conn.commit()
 
     def edit_password(self, entry_id: int, new_password: str) -> None:
-        if self.aes_key is None:
-            raise Exception("Vault not unlocked!")
-
-        aes = AESGCM(self.aes_key)
-        nonce = os.urandom(12)
-        encrypted_pw = aes.encrypt(nonce, new_password.encode("utf-8"), None)
-
-        now = datetime.now(timezone.utc).isoformat()
-
-        self.cursor.execute("""
+        now = self._utc_now()        
+        nonce, encrypted_pw = CryptoManager.encrypt(self.aes_key, new_password)
+        self._execute("""
             UPDATE entries 
             SET password = ?, nonce = ?, updated_at = ?
             WHERE id = ?
-        """, (encrypted_pw, nonce, now, entry_id))
-
-        self.conn.commit()
+            """, 
+            (encrypted_pw, nonce, now, entry_id),
+            commit=True
+        )
 
     def edit_url(self, entry_id: int, new_url: str) -> None:
-        now = datetime.now(timezone.utc).isoformat()
-        self.cursor.execute(
+        now = self._utc_now()
+        self._execute(
             "UPDATE entries SET url = ?, updated_at = ? WHERE id = ?",
-            (new_url, now, entry_id)
+            (new_url, now, entry_id),
+            commit=True
         )
-        self.conn.commit()
         
     def edit_note(self, entry_id: int, new_note: str) -> None:
-        now = datetime.now(timezone.utc).isoformat()
-        self.cursor.execute(
+        now = self._utc_now()
+        self._execute(
             "UPDATE entries SET note = ?, updated_at = ? WHERE id = ?",
-            (new_note, now, entry_id)
+            (new_note, now, entry_id),
+            commit=True
         )
-        self.conn.commit()
 
-    def update_entry(self, entry_id: int, service: str, username: str, password: str, category: str) -> None:
+    # ------------------------------------------------------------------
+    # MIGRATION
+    # ------------------------------------------------------------------
 
-        if self.aes_key is None:
-            raise Exception("Vault not unlocked!")
-
-        aes = AESGCM(self.aes_key)
-        nonce = os.urandom(12)
-        encrypted_pw = aes.encrypt(nonce, password.encode("utf-8"), None)
-
-        now = datetime.now(timezone.utc).isoformat()
-
-        self.cursor.execute("""
-            UPDATE entries
-            SET service = ?, username = ?, password = ?, nonce = ?, category = ?, updated_at = ?
-            WHERE id = ?
-        """, (service, username, encrypted_pw, nonce, category, now, entry_id))
-
-        self.conn.commit()
-
-    # Update and migration
     def migrate_database(self):
-        """Runs incremental DB migrations safely."""
-        # 1) Check if db_version exists
-        self.cursor.execute("""
-            PRAGMA table_info(meta)
-        """)
-        cols = [row[1] for row in self.cursor.fetchall()]
-
-        # -------------------------
-        # MIGRATION: Add db_version
-        # -------------------------
+        cols = [
+            row[1]
+            for row in self._execute("PRAGMA table_info(meta)", fetchall=True)
+        ]
         if "db_version" not in cols:
-            print("Migrating DB → Adding db_version column...")
-            self.cursor.execute("""
-                ALTER TABLE meta ADD COLUMN db_version INTEGER DEFAULT 1
-            """)
-            self.conn.commit()
+            self._execute(
+                "ALTER TABLE meta ADD COLUMN db_version INTEGER DEFAULT 1",
+                commit=True
+            )
 
-        # Now read current version
-        self.cursor.execute("SELECT db_version FROM meta WHERE id=1")
-        version = self.cursor.fetchone()[0]
-        if version < 2:
-            pass
+    # ------------------------------------------------------------------
+    # TEST DATA
+    # ------------------------------------------------------------------
+
+    def add_test_entries(self):
+        self._require_unlocked()
+        settings = load_settings()
+        categories = settings.get("entry_categories", ["General"])
+
+        for entry in TEST_ENTRIES:
+            try:
+                self.create_entry(
+                    service=entry["service"],
+                    username=entry["username"],
+                    password=entry["password"],
+                    category=random.choice(categories),
+                    url=entry.get("url", ""),
+                    note="No note"
+                )
+            except Exception as e:
+                print(f"Test entry failed: {e}")
