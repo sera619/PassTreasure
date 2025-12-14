@@ -6,6 +6,7 @@ from PySide6.QtCore import Signal
 from PySide6.QtGui import QPixmap
 import os
 from backend.database import PasswordDatabase
+from backend.backup_manager import BackupManager
 from src.loginwindow_ui import Ui_LoginWindowUI
 from gui.password_strength_indicator import PasswordStrengthIndicator
 from gui.dialog_popup import DialogPopup
@@ -21,6 +22,9 @@ class LoginWindow(QWidget):
         self.db = PasswordDatabase()
         self.BASE_DIR = DATA_PATH
         self.VAULT_PATH = VAULT_PATH
+        
+        self.backups = BackupManager(self.VAULT_PATH)
+
         self.is_first_run = not os.path.exists(self.VAULT_PATH)
         
         # Load UI
@@ -87,7 +91,7 @@ class LoginWindow(QWidget):
         self.strength_indicator.set_strength(level)
                 
     def configure_mode(self): 
-        if self.db.get_latest_backup():
+        if self.backups.get_newest_backup():
             self.ui.btn_restore_backup.show()
         else:
             self.ui.btn_restore_backup.hide()
@@ -111,12 +115,12 @@ class LoginWindow(QWidget):
         self.error_label.setText("")
     
     def _restore_backup(self):
-        popup = DialogPopup("Confirm Restore", "Are you sure you want to restore the backup?", PopupType.QUESTION, parent=self)
+        popup = DialogPopup("Confirm Restore", "Your password vault will be deleted and cant be restored!\n\nAre you sure you want to restore the backup?", PopupType.QUESTION, parent=self)
         result = popup.exec()
         if result != QDialog.DialogCode.Accepted:
             return
         try:
-            self.db.apply_backup(self.db.get_latest_backup())
+            self.backups.restore_backup(self.backups.get_newest_backup())
             self.is_first_run = not os.path.exists(self.VAULT_PATH)
             self.configure_mode()
             DialogPopup("Backup Success", f"Backup restored successfully!", PopupType.SUCCESS, self).exec()        
