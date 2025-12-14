@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>900</width>
+    <width>921</width>
     <height>570</height>
    </rect>
   </property>
@@ -587,22 +587,25 @@ color: #fff;
           <enum>QFrame::Shape::NoFrame</enum>
          </property>
          <property name="widgetResizable">
-          <bool>true</bool>
+          <bool>false</bool>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignmentFlag::AlignCenter</set>
          </property>
          <widget class="QWidget" name="scrollAreaWidgetContents">
           <property name="geometry">
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>377</width>
+            <width>386</width>
             <height>483</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_3">
-           <property name="leftMargin">
-            <number>0</number>
+           <property name="spacing">
+            <number>2</number>
            </property>
-           <property name="topMargin">
+           <property name="leftMargin">
             <number>0</number>
            </property>
            <property name="rightMargin">
@@ -638,12 +641,6 @@ font: bold 12pt &quot;Segoe UI&quot;;</string>
              <property name="enabled">
               <bool>true</bool>
              </property>
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
              <property name="minimumSize">
               <size>
                <width>0</width>
@@ -667,7 +664,7 @@ font: bold 12pt &quot;Segoe UI&quot;;</string>
              </property>
              <layout class="QVBoxLayout" name="verticalLayout">
               <property name="spacing">
-               <number>6</number>
+               <number>4</number>
               </property>
               <property name="leftMargin">
                <number>5</number>
@@ -704,9 +701,9 @@ font: bold 12pt &quot;Segoe UI&quot;;</string>
               </item>
               <item alignment="Qt::AlignmentFlag::AlignVCenter">
                <widget class="QFrame" name="serviceFrame">
-                <layout class="QHBoxLayout" name="serviceHBox">
+                <layout class="QHBoxLayout" name="serviceHBox" stretch="0,1,0">
                  <property name="spacing">
-                  <number>6</number>
+                  <number>2</number>
                  </property>
                  <property name="leftMargin">
                   <number>2</number>
@@ -747,7 +744,7 @@ font: bold 12pt &quot;Segoe UI&quot;;</string>
                  <item alignment="Qt::AlignmentFlag::AlignVCenter">
                   <widget class="QLabel" name="serviceLabel">
                    <property name="sizePolicy">
-                    <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                      <horstretch>0</horstretch>
                      <verstretch>0</verstretch>
                     </sizepolicy>
@@ -769,7 +766,10 @@ font: bold 12pt &quot;Segoe UI&quot;;</string>
               </item>
               <item alignment="Qt::AlignmentFlag::AlignVCenter">
                <widget class="QFrame" name="usernameFrame">
-                <layout class="QHBoxLayout" name="usernameEditLayout">
+                <layout class="QHBoxLayout" name="usernameEditLayout" stretch="0,1,0">
+                 <property name="spacing">
+                  <number>2</number>
+                 </property>
                  <property name="leftMargin">
                   <number>2</number>
                  </property>
@@ -809,7 +809,7 @@ font: bold 12pt &quot;Segoe UI&quot;;</string>
                  <item alignment="Qt::AlignmentFlag::AlignVCenter">
                   <widget class="QLabel" name="usernameLabel">
                    <property name="sizePolicy">
-                    <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                      <horstretch>0</horstretch>
                      <verstretch>0</verstretch>
                     </sizepolicy>
@@ -831,7 +831,10 @@ font: bold 12pt &quot;Segoe UI&quot;;</string>
               </item>
               <item alignment="Qt::AlignmentFlag::AlignVCenter">
                <widget class="QFrame" name="passFrame">
-                <layout class="QHBoxLayout" name="passEditLayout">
+                <layout class="QHBoxLayout" name="passEditLayout" stretch="0,1,0">
+                 <property name="spacing">
+                  <number>2</number>
+                 </property>
                  <property name="leftMargin">
                   <number>2</number>
                  </property>
@@ -871,7 +874,7 @@ font: bold 12pt &quot;Segoe UI&quot;;</string>
                  <item alignment="Qt::AlignmentFlag::AlignVCenter">
                   <widget class="QLabel" name="passLabel">
                    <property name="sizePolicy">
-                    <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                      <horstretch>0</horstretch>
                      <verstretch>0</verstretch>
                     </sizepolicy>
@@ -891,9 +894,12 @@ font: bold 12pt &quot;Segoe UI&quot;;</string>
                 </layout>
                </widget>
               </item>
-              <item>
+              <item alignment="Qt::AlignmentFlag::AlignVCenter">
                <widget class="QFrame" name="passSecurityFrame">
                 <layout class="QHBoxLayout" name="passEditLayout_2" stretch="0,1,0">
+                 <property name="spacing">
+                  <number>2</number>
+                 </property>
                  <property name="leftMargin">
                   <number>2</number>
                  </property>
@@ -935,6 +941,9 @@ font: bold 12pt &quot;Segoe UI&quot;;</string>
                    <property name="spacing">
                     <number>0</number>
                    </property>
+                   <property name="sizeConstraint">
+                    <enum>QLayout::SizeConstraint::SetDefaultConstraint</enum>
+                   </property>
                    <property name="leftMargin">
                     <number>0</number>
                    </property>
@@ -958,7 +967,10 @@ font: bold 12pt &quot;Segoe UI&quot;;</string>
                 <property name="frameShadow">
                  <enum>QFrame::Shadow::Raised</enum>
                 </property>
-                <layout class="QHBoxLayout" name="horizontalLayout_12">
+                <layout class="QHBoxLayout" name="horizontalLayout_12" stretch="0,1,0">
+                 <property name="spacing">
+                  <number>2</number>
+                 </property>
                  <property name="leftMargin">
                   <number>2</number>
                  </property>
@@ -1004,10 +1016,16 @@ font: bold 12pt &quot;Segoe UI&quot;;</string>
                  <item alignment="Qt::AlignmentFlag::AlignVCenter">
                   <widget class="QLabel" name="urlLabel">
                    <property name="sizePolicy">
-                    <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                      <horstretch>0</horstretch>
                      <verstretch>0</verstretch>
                     </sizepolicy>
+                   </property>
+                   <property name="minimumSize">
+                    <size>
+                     <width>0</width>
+                     <height>0</height>
+                    </size>
                    </property>
                    <property name="text">
                     <string>TextLabel</string>
@@ -1024,7 +1042,7 @@ font: bold 12pt &quot;Segoe UI&quot;;</string>
                 </layout>
                </widget>
               </item>
-              <item>
+              <item alignment="Qt::AlignmentFlag::AlignVCenter">
                <widget class="QFrame" name="categoryFrame">
                 <property name="frameShape">
                  <enum>QFrame::Shape::NoFrame</enum>
@@ -1032,7 +1050,10 @@ font: bold 12pt &quot;Segoe UI&quot;;</string>
                 <property name="frameShadow">
                  <enum>QFrame::Shadow::Plain</enum>
                 </property>
-                <layout class="QHBoxLayout" name="horizontalLayout_7">
+                <layout class="QHBoxLayout" name="horizontalLayout_7" stretch="0,1,1,0">
+                 <property name="spacing">
+                  <number>2</number>
+                 </property>
                  <property name="leftMargin">
                   <number>2</number>
                  </property>
@@ -1072,7 +1093,7 @@ font: bold 12pt &quot;Segoe UI&quot;;</string>
                  <item>
                   <widget class="QLabel" name="categoryLabel">
                    <property name="sizePolicy">
-                    <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                      <horstretch>0</horstretch>
                      <verstretch>0</verstretch>
                     </sizepolicy>
@@ -1125,7 +1146,10 @@ font: bold 12pt &quot;Segoe UI&quot;;</string>
                 <property name="frameShadow">
                  <enum>QFrame::Shadow::Plain</enum>
                 </property>
-                <layout class="QHBoxLayout" name="horizontalLayout_5">
+                <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="0,1">
+                 <property name="spacing">
+                  <number>2</number>
+                 </property>
                  <property name="leftMargin">
                   <number>2</number>
                  </property>
@@ -1165,7 +1189,7 @@ font: bold 12pt &quot;Segoe UI&quot;;</string>
                  <item>
                   <widget class="QLabel" name="createdLabel">
                    <property name="sizePolicy">
-                    <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                      <horstretch>0</horstretch>
                      <verstretch>0</verstretch>
                     </sizepolicy>
@@ -1189,7 +1213,10 @@ font: bold 12pt &quot;Segoe UI&quot;;</string>
                 <property name="frameShadow">
                  <enum>QFrame::Shadow::Plain</enum>
                 </property>
-                <layout class="QHBoxLayout" name="horizontalLayout_6">
+                <layout class="QHBoxLayout" name="horizontalLayout_6" stretch="0,1">
+                 <property name="spacing">
+                  <number>2</number>
+                 </property>
                  <property name="leftMargin">
                   <number>2</number>
                  </property>
@@ -1229,7 +1256,7 @@ font: bold 12pt &quot;Segoe UI&quot;;</string>
                  <item>
                   <widget class="QLabel" name="updatedLabel">
                    <property name="sizePolicy">
-                    <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                      <horstretch>0</horstretch>
                      <verstretch>0</verstretch>
                     </sizepolicy>
@@ -1245,7 +1272,7 @@ font: bold 12pt &quot;Segoe UI&quot;;</string>
                 </layout>
                </widget>
               </item>
-              <item>
+              <item alignment="Qt::AlignmentFlag::AlignTop">
                <widget class="QFrame" name="noteFrame">
                 <property name="frameShape">
                  <enum>QFrame::Shape::NoFrame</enum>
@@ -1253,7 +1280,10 @@ font: bold 12pt &quot;Segoe UI&quot;;</string>
                 <property name="frameShadow">
                  <enum>QFrame::Shadow::Raised</enum>
                 </property>
-                <layout class="QHBoxLayout" name="horizontalLayout_13">
+                <layout class="QHBoxLayout" name="horizontalLayout_13" stretch="0,1,0">
+                 <property name="spacing">
+                  <number>2</number>
+                 </property>
                  <property name="leftMargin">
                   <number>2</number>
                  </property>
@@ -1270,7 +1300,7 @@ font: bold 12pt &quot;Segoe UI&quot;;</string>
                   <widget class="QLabel" name="label_8">
                    <property name="minimumSize">
                     <size>
-                     <width>70</width>
+                     <width>66</width>
                      <height>0</height>
                     </size>
                    </property>
@@ -1303,22 +1333,15 @@ font: bold 12pt &quot;Segoe UI&quot;;</string>
                    </property>
                    <property name="styleSheet">
                     <string notr="true">QTextEdit {
-    border: 1px solid rgb(60, 60, 60);      /* Subtle border */
-    border-radius: 6px;
     selection-background-color: rgb(38, 79, 120);  /* VSCode-like selection */
     selection-color: #ffffff;
 	font: 9pt &quot;Segoe UI&quot;;
-    padding: 0px;
-	margin: 0px;
 }
 
-QTextEdit:focus {
-    border: 1px solid rgb(0, 222, 222);      /* Blue accent on focus */
-}
 </string>
                    </property>
                    <property name="frameShape">
-                    <enum>QFrame::Shape::StyledPanel</enum>
+                    <enum>QFrame::Shape::NoFrame</enum>
                    </property>
                    <property name="frameShadow">
                     <enum>QFrame::Shadow::Sunken</enum>
@@ -1336,6 +1359,12 @@ QTextEdit:focus {
                  </item>
                  <item alignment="Qt::AlignmentFlag::AlignTop">
                   <widget class="QPushButton" name="btnEditNote">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
                    <property name="text">
                     <string/>
                    </property>
@@ -1343,6 +1372,19 @@ QTextEdit:focus {
                  </item>
                 </layout>
                </widget>
+              </item>
+              <item>
+               <spacer name="verticalSpacer">
+                <property name="orientation">
+                 <enum>Qt::Orientation::Vertical</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>20</width>
+                  <height>40</height>
+                 </size>
+                </property>
+               </spacer>
               </item>
               <item>
                <widget class="QFrame" name="detailBtnFrame">

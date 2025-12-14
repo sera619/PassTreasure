@@ -16,17 +16,17 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QAbstractItemView, QAbstractScrollArea, QApplication, QComboBox,
-    QFrame, QHBoxLayout, QLabel, QLineEdit,
-    QListView, QListWidget, QListWidgetItem, QPushButton,
-    QScrollArea, QSizePolicy, QSpacerItem, QTextEdit,
-    QVBoxLayout, QWidget)
+    QFrame, QHBoxLayout, QLabel, QLayout,
+    QLineEdit, QListView, QListWidget, QListWidgetItem,
+    QPushButton, QScrollArea, QSizePolicy, QSpacerItem,
+    QTextEdit, QVBoxLayout, QWidget)
 import resources_rc
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(900, 570)
+        MainWindow.resize(921, 570)
         MainWindow.setAutoFillBackground(False)
         self.verticalLayout_2 = QVBoxLayout(MainWindow)
         self.verticalLayout_2.setSpacing(6)
@@ -266,15 +266,16 @@ class Ui_MainWindow(object):
         self.scrollArea = QScrollArea(MainWindow)
         self.scrollArea.setObjectName(u"scrollArea")
         self.scrollArea.setFrameShape(QFrame.Shape.NoFrame)
-        self.scrollArea.setWidgetResizable(True)
+        self.scrollArea.setWidgetResizable(False)
+        self.scrollArea.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.scrollAreaWidgetContents = QWidget()
         self.scrollAreaWidgetContents.setObjectName(u"scrollAreaWidgetContents")
-        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 377, 483))
+        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 386, 483))
         self.verticalLayout_3 = QVBoxLayout(self.scrollAreaWidgetContents)
-        self.verticalLayout_3.setSpacing(6)
+        self.verticalLayout_3.setSpacing(2)
         self.verticalLayout_3.setContentsMargins(11, 11, 11, 11)
         self.verticalLayout_3.setObjectName(u"verticalLayout_3")
-        self.verticalLayout_3.setContentsMargins(0, 0, 0, 0)
+        self.verticalLayout_3.setContentsMargins(0, -1, 0, 0)
         self.detailLabel = QLabel(self.scrollAreaWidgetContents)
         self.detailLabel.setObjectName(u"detailLabel")
         font2 = QFont()
@@ -292,18 +293,13 @@ class Ui_MainWindow(object):
         self.detailFrame = QFrame(self.scrollAreaWidgetContents)
         self.detailFrame.setObjectName(u"detailFrame")
         self.detailFrame.setEnabled(True)
-        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
-        sizePolicy1.setHorizontalStretch(0)
-        sizePolicy1.setVerticalStretch(0)
-        sizePolicy1.setHeightForWidth(self.detailFrame.sizePolicy().hasHeightForWidth())
-        self.detailFrame.setSizePolicy(sizePolicy1)
         self.detailFrame.setMinimumSize(QSize(0, 0))
         self.detailFrame.setMaximumSize(QSize(16777215, 16777215))
         self.detailFrame.setFrameShape(QFrame.Shape.StyledPanel)
         self.detailFrame.setFrameShadow(QFrame.Shadow.Raised)
         self.detailFrame.setLineWidth(0)
         self.verticalLayout = QVBoxLayout(self.detailFrame)
-        self.verticalLayout.setSpacing(6)
+        self.verticalLayout.setSpacing(4)
         self.verticalLayout.setContentsMargins(11, 11, 11, 11)
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.verticalLayout.setContentsMargins(5, 5, 5, 5)
@@ -318,7 +314,7 @@ class Ui_MainWindow(object):
         self.serviceFrame = QFrame(self.detailFrame)
         self.serviceFrame.setObjectName(u"serviceFrame")
         self.serviceHBox = QHBoxLayout(self.serviceFrame)
-        self.serviceHBox.setSpacing(6)
+        self.serviceHBox.setSpacing(2)
         self.serviceHBox.setContentsMargins(11, 11, 11, 11)
         self.serviceHBox.setObjectName(u"serviceHBox")
         self.serviceHBox.setContentsMargins(2, 2, 2, 2)
@@ -337,8 +333,11 @@ class Ui_MainWindow(object):
 
         self.serviceLabel = QLabel(self.serviceFrame)
         self.serviceLabel.setObjectName(u"serviceLabel")
-        sizePolicy.setHeightForWidth(self.serviceLabel.sizePolicy().hasHeightForWidth())
-        self.serviceLabel.setSizePolicy(sizePolicy)
+        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
+        sizePolicy1.setHorizontalStretch(0)
+        sizePolicy1.setVerticalStretch(0)
+        sizePolicy1.setHeightForWidth(self.serviceLabel.sizePolicy().hasHeightForWidth())
+        self.serviceLabel.setSizePolicy(sizePolicy1)
 
         self.serviceHBox.addWidget(self.serviceLabel, 0, Qt.AlignmentFlag.AlignVCenter)
 
@@ -347,13 +346,14 @@ class Ui_MainWindow(object):
 
         self.serviceHBox.addWidget(self.btnEditService)
 
+        self.serviceHBox.setStretch(1, 1)
 
         self.verticalLayout.addWidget(self.serviceFrame, 0, Qt.AlignmentFlag.AlignVCenter)
 
         self.usernameFrame = QFrame(self.detailFrame)
         self.usernameFrame.setObjectName(u"usernameFrame")
         self.usernameEditLayout = QHBoxLayout(self.usernameFrame)
-        self.usernameEditLayout.setSpacing(6)
+        self.usernameEditLayout.setSpacing(2)
         self.usernameEditLayout.setContentsMargins(11, 11, 11, 11)
         self.usernameEditLayout.setObjectName(u"usernameEditLayout")
         self.usernameEditLayout.setContentsMargins(2, 2, 2, 2)
@@ -369,8 +369,8 @@ class Ui_MainWindow(object):
 
         self.usernameLabel = QLabel(self.usernameFrame)
         self.usernameLabel.setObjectName(u"usernameLabel")
-        sizePolicy.setHeightForWidth(self.usernameLabel.sizePolicy().hasHeightForWidth())
-        self.usernameLabel.setSizePolicy(sizePolicy)
+        sizePolicy1.setHeightForWidth(self.usernameLabel.sizePolicy().hasHeightForWidth())
+        self.usernameLabel.setSizePolicy(sizePolicy1)
 
         self.usernameEditLayout.addWidget(self.usernameLabel, 0, Qt.AlignmentFlag.AlignVCenter)
 
@@ -379,13 +379,14 @@ class Ui_MainWindow(object):
 
         self.usernameEditLayout.addWidget(self.btnEditUsername)
 
+        self.usernameEditLayout.setStretch(1, 1)
 
         self.verticalLayout.addWidget(self.usernameFrame, 0, Qt.AlignmentFlag.AlignVCenter)
 
         self.passFrame = QFrame(self.detailFrame)
         self.passFrame.setObjectName(u"passFrame")
         self.passEditLayout = QHBoxLayout(self.passFrame)
-        self.passEditLayout.setSpacing(6)
+        self.passEditLayout.setSpacing(2)
         self.passEditLayout.setContentsMargins(11, 11, 11, 11)
         self.passEditLayout.setObjectName(u"passEditLayout")
         self.passEditLayout.setContentsMargins(2, 2, 2, 2)
@@ -401,8 +402,8 @@ class Ui_MainWindow(object):
 
         self.passLabel = QLabel(self.passFrame)
         self.passLabel.setObjectName(u"passLabel")
-        sizePolicy.setHeightForWidth(self.passLabel.sizePolicy().hasHeightForWidth())
-        self.passLabel.setSizePolicy(sizePolicy)
+        sizePolicy1.setHeightForWidth(self.passLabel.sizePolicy().hasHeightForWidth())
+        self.passLabel.setSizePolicy(sizePolicy1)
 
         self.passEditLayout.addWidget(self.passLabel, 0, Qt.AlignmentFlag.AlignVCenter)
 
@@ -411,13 +412,14 @@ class Ui_MainWindow(object):
 
         self.passEditLayout.addWidget(self.btnEditPass)
 
+        self.passEditLayout.setStretch(1, 1)
 
         self.verticalLayout.addWidget(self.passFrame, 0, Qt.AlignmentFlag.AlignVCenter)
 
         self.passSecurityFrame = QFrame(self.detailFrame)
         self.passSecurityFrame.setObjectName(u"passSecurityFrame")
         self.passEditLayout_2 = QHBoxLayout(self.passSecurityFrame)
-        self.passEditLayout_2.setSpacing(6)
+        self.passEditLayout_2.setSpacing(2)
         self.passEditLayout_2.setContentsMargins(11, 11, 11, 11)
         self.passEditLayout_2.setObjectName(u"passEditLayout_2")
         self.passEditLayout_2.setContentsMargins(2, 2, 2, 2)
@@ -434,6 +436,7 @@ class Ui_MainWindow(object):
         self.indicatorHolder = QVBoxLayout()
         self.indicatorHolder.setSpacing(0)
         self.indicatorHolder.setObjectName(u"indicatorHolder")
+        self.indicatorHolder.setSizeConstraint(QLayout.SizeConstraint.SetDefaultConstraint)
         self.indicatorHolder.setContentsMargins(0, -1, -1, -1)
 
         self.passEditLayout_2.addLayout(self.indicatorHolder)
@@ -445,14 +448,14 @@ class Ui_MainWindow(object):
 
         self.passEditLayout_2.setStretch(1, 1)
 
-        self.verticalLayout.addWidget(self.passSecurityFrame)
+        self.verticalLayout.addWidget(self.passSecurityFrame, 0, Qt.AlignmentFlag.AlignVCenter)
 
         self.urlFrame = QFrame(self.detailFrame)
         self.urlFrame.setObjectName(u"urlFrame")
         self.urlFrame.setFrameShape(QFrame.Shape.NoFrame)
         self.urlFrame.setFrameShadow(QFrame.Shadow.Raised)
         self.horizontalLayout_12 = QHBoxLayout(self.urlFrame)
-        self.horizontalLayout_12.setSpacing(6)
+        self.horizontalLayout_12.setSpacing(2)
         self.horizontalLayout_12.setContentsMargins(11, 11, 11, 11)
         self.horizontalLayout_12.setObjectName(u"horizontalLayout_12")
         self.horizontalLayout_12.setContentsMargins(2, 2, 2, 2)
@@ -469,8 +472,9 @@ class Ui_MainWindow(object):
 
         self.urlLabel = QLabel(self.urlFrame)
         self.urlLabel.setObjectName(u"urlLabel")
-        sizePolicy.setHeightForWidth(self.urlLabel.sizePolicy().hasHeightForWidth())
-        self.urlLabel.setSizePolicy(sizePolicy)
+        sizePolicy1.setHeightForWidth(self.urlLabel.sizePolicy().hasHeightForWidth())
+        self.urlLabel.setSizePolicy(sizePolicy1)
+        self.urlLabel.setMinimumSize(QSize(0, 0))
 
         self.horizontalLayout_12.addWidget(self.urlLabel, 0, Qt.AlignmentFlag.AlignVCenter)
 
@@ -479,6 +483,7 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_12.addWidget(self.btnEditUrl)
 
+        self.horizontalLayout_12.setStretch(1, 1)
 
         self.verticalLayout.addWidget(self.urlFrame)
 
@@ -487,7 +492,7 @@ class Ui_MainWindow(object):
         self.categoryFrame.setFrameShape(QFrame.Shape.NoFrame)
         self.categoryFrame.setFrameShadow(QFrame.Shadow.Plain)
         self.horizontalLayout_7 = QHBoxLayout(self.categoryFrame)
-        self.horizontalLayout_7.setSpacing(6)
+        self.horizontalLayout_7.setSpacing(2)
         self.horizontalLayout_7.setContentsMargins(11, 11, 11, 11)
         self.horizontalLayout_7.setObjectName(u"horizontalLayout_7")
         self.horizontalLayout_7.setContentsMargins(2, 2, 2, 2)
@@ -503,8 +508,8 @@ class Ui_MainWindow(object):
 
         self.categoryLabel = QLabel(self.categoryFrame)
         self.categoryLabel.setObjectName(u"categoryLabel")
-        sizePolicy.setHeightForWidth(self.categoryLabel.sizePolicy().hasHeightForWidth())
-        self.categoryLabel.setSizePolicy(sizePolicy)
+        sizePolicy1.setHeightForWidth(self.categoryLabel.sizePolicy().hasHeightForWidth())
+        self.categoryLabel.setSizePolicy(sizePolicy1)
         self.categoryLabel.setMinimumSize(QSize(110, 0))
         self.categoryLabel.setStyleSheet(u"font: 700 8pt \"Segoe UI\"; border-radius: 5px; background: rgba(211, 211, 211, 140);")
         self.categoryLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -520,15 +525,17 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_7.addWidget(self.btnEditCategory)
 
+        self.horizontalLayout_7.setStretch(1, 1)
+        self.horizontalLayout_7.setStretch(2, 1)
 
-        self.verticalLayout.addWidget(self.categoryFrame)
+        self.verticalLayout.addWidget(self.categoryFrame, 0, Qt.AlignmentFlag.AlignVCenter)
 
         self.createdFrame = QFrame(self.detailFrame)
         self.createdFrame.setObjectName(u"createdFrame")
         self.createdFrame.setFrameShape(QFrame.Shape.NoFrame)
         self.createdFrame.setFrameShadow(QFrame.Shadow.Plain)
         self.horizontalLayout_5 = QHBoxLayout(self.createdFrame)
-        self.horizontalLayout_5.setSpacing(6)
+        self.horizontalLayout_5.setSpacing(2)
         self.horizontalLayout_5.setContentsMargins(11, 11, 11, 11)
         self.horizontalLayout_5.setObjectName(u"horizontalLayout_5")
         self.horizontalLayout_5.setContentsMargins(2, 2, 2, 2)
@@ -544,12 +551,13 @@ class Ui_MainWindow(object):
 
         self.createdLabel = QLabel(self.createdFrame)
         self.createdLabel.setObjectName(u"createdLabel")
-        sizePolicy.setHeightForWidth(self.createdLabel.sizePolicy().hasHeightForWidth())
-        self.createdLabel.setSizePolicy(sizePolicy)
+        sizePolicy1.setHeightForWidth(self.createdLabel.sizePolicy().hasHeightForWidth())
+        self.createdLabel.setSizePolicy(sizePolicy1)
         self.createdLabel.setAlignment(Qt.AlignmentFlag.AlignLeading|Qt.AlignmentFlag.AlignLeft|Qt.AlignmentFlag.AlignVCenter)
 
         self.horizontalLayout_5.addWidget(self.createdLabel)
 
+        self.horizontalLayout_5.setStretch(1, 1)
 
         self.verticalLayout.addWidget(self.createdFrame)
 
@@ -558,7 +566,7 @@ class Ui_MainWindow(object):
         self.updatedFrame.setFrameShape(QFrame.Shape.NoFrame)
         self.updatedFrame.setFrameShadow(QFrame.Shadow.Plain)
         self.horizontalLayout_6 = QHBoxLayout(self.updatedFrame)
-        self.horizontalLayout_6.setSpacing(6)
+        self.horizontalLayout_6.setSpacing(2)
         self.horizontalLayout_6.setContentsMargins(11, 11, 11, 11)
         self.horizontalLayout_6.setObjectName(u"horizontalLayout_6")
         self.horizontalLayout_6.setContentsMargins(2, 2, 2, 2)
@@ -574,12 +582,13 @@ class Ui_MainWindow(object):
 
         self.updatedLabel = QLabel(self.updatedFrame)
         self.updatedLabel.setObjectName(u"updatedLabel")
-        sizePolicy.setHeightForWidth(self.updatedLabel.sizePolicy().hasHeightForWidth())
-        self.updatedLabel.setSizePolicy(sizePolicy)
+        sizePolicy1.setHeightForWidth(self.updatedLabel.sizePolicy().hasHeightForWidth())
+        self.updatedLabel.setSizePolicy(sizePolicy1)
         self.updatedLabel.setAlignment(Qt.AlignmentFlag.AlignLeading|Qt.AlignmentFlag.AlignLeft|Qt.AlignmentFlag.AlignVCenter)
 
         self.horizontalLayout_6.addWidget(self.updatedLabel)
 
+        self.horizontalLayout_6.setStretch(1, 1)
 
         self.verticalLayout.addWidget(self.updatedFrame)
 
@@ -588,13 +597,13 @@ class Ui_MainWindow(object):
         self.noteFrame.setFrameShape(QFrame.Shape.NoFrame)
         self.noteFrame.setFrameShadow(QFrame.Shadow.Raised)
         self.horizontalLayout_13 = QHBoxLayout(self.noteFrame)
-        self.horizontalLayout_13.setSpacing(6)
+        self.horizontalLayout_13.setSpacing(2)
         self.horizontalLayout_13.setContentsMargins(11, 11, 11, 11)
         self.horizontalLayout_13.setObjectName(u"horizontalLayout_13")
         self.horizontalLayout_13.setContentsMargins(2, 2, 2, 2)
         self.label_8 = QLabel(self.noteFrame)
         self.label_8.setObjectName(u"label_8")
-        self.label_8.setMinimumSize(QSize(70, 0))
+        self.label_8.setMinimumSize(QSize(66, 0))
         self.label_8.setFont(font3)
         self.label_8.setStyleSheet(u"QLabel {\n"
 "	color:rgb(118, 0, 0);\n"
@@ -611,20 +620,13 @@ class Ui_MainWindow(object):
         sizePolicy2.setHeightForWidth(self.noteLabel.sizePolicy().hasHeightForWidth())
         self.noteLabel.setSizePolicy(sizePolicy2)
         self.noteLabel.setStyleSheet(u"QTextEdit {\n"
-"    border: 1px solid rgb(60, 60, 60);      /* Subtle border */\n"
-"    border-radius: 6px;\n"
 "    selection-background-color: rgb(38, 79, 120);  /* VSCode-like selection */\n"
 "    selection-color: #ffffff;\n"
 "	font: 9pt \"Segoe UI\";\n"
-"    padding: 0px;\n"
-"	margin: 0px;\n"
 "}\n"
 "\n"
-"QTextEdit:focus {\n"
-"    border: 1px solid rgb(0, 222, 222);      /* Blue accent on focus */\n"
-"}\n"
 "")
-        self.noteLabel.setFrameShape(QFrame.Shape.StyledPanel)
+        self.noteLabel.setFrameShape(QFrame.Shape.NoFrame)
         self.noteLabel.setFrameShadow(QFrame.Shadow.Sunken)
         self.noteLabel.setReadOnly(True)
         self.noteLabel.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
@@ -633,11 +635,21 @@ class Ui_MainWindow(object):
 
         self.btnEditNote = QPushButton(self.noteFrame)
         self.btnEditNote.setObjectName(u"btnEditNote")
+        sizePolicy3 = QSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Preferred)
+        sizePolicy3.setHorizontalStretch(0)
+        sizePolicy3.setVerticalStretch(0)
+        sizePolicy3.setHeightForWidth(self.btnEditNote.sizePolicy().hasHeightForWidth())
+        self.btnEditNote.setSizePolicy(sizePolicy3)
 
         self.horizontalLayout_13.addWidget(self.btnEditNote, 0, Qt.AlignmentFlag.AlignTop)
 
+        self.horizontalLayout_13.setStretch(1, 1)
 
-        self.verticalLayout.addWidget(self.noteFrame)
+        self.verticalLayout.addWidget(self.noteFrame, 0, Qt.AlignmentFlag.AlignTop)
+
+        self.verticalSpacer = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+
+        self.verticalLayout.addItem(self.verticalSpacer)
 
         self.detailBtnFrame = QFrame(self.detailFrame)
         self.detailBtnFrame.setObjectName(u"detailBtnFrame")
