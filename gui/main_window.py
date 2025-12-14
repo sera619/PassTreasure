@@ -3,7 +3,7 @@ from PySide6.QtWidgets import (
     QPushButton, QLineEdit, QInputDialog, QMessageBox, QTextEdit,QListWidgetItem, QToolTip, QFrame, QDialog
 )
 from PySide6.QtGui import QPixmap
-from PySide6.QtCore import Qt, QTimer, Signal, QPropertyAnimation, QEasingCurve
+from PySide6.QtCore import Qt, QTimer, Signal, QPropertyAnimation, QEasingCurve, QEvent
 from src.mainwindow_ui import Ui_MainWindow
 from gui.change_password_popup import ChangePasswordPopup
 from gui.settings_window import SettingsWindow
@@ -18,9 +18,10 @@ from gui.password_strength_indicator import PasswordStrengthIndicator
 
 from backend.password_strength_logic import evaluate_password_strength
 from backend.database import PasswordDatabase
+from backend.backup_manager import BackupManager
 from backend.inactivity_watcher import AutoLocker, InactivityWatcher
 
-from config import VERSION_NUM, Styles, IS_DEBUGGING, PopupType
+from config import VERSION_NUM, Styles, IS_DEBUGGING, PopupType, VAULT_PATH, WIN_HEIGHT, WIN_WIDTH
 from datetime import datetime
 from utils import load_settings, save_settings
 import utils
@@ -31,39 +32,54 @@ class MainWindow(QWidget):
     def __init__(self, db: PasswordDatabase):
         super().__init__()
         self.db = db  # unlocked PasswordDatabase instance
+        self.backups = BackupManager(VAULT_PATH)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
+        frame = self.ui.detailFrame
+        frame_width = frame.geometry().width()
+        self.details_max_width = frame_width
+        # print(f"Frame size hint start {frame.geometry().width()} | Details frame with: {self.details_max_width}")
+        
         self.setWindowTitle("PassTreasure - Vault")
         self.entry_cache = []
         self.watcher = None
         self.autolock = None
         self.settings_window = None
+        self.details_open = False
+        self.strength_indicator: PasswordStrengthIndicator | None = None
+        self.visible_timer: QTimer | None = None
+        self.last_clicked_entry_id = None
+
         self.apply_dark_theme()
         self.build_ui()  
         self.apply_styles()
-        self.strength_indicator = PasswordStrengthIndicator(self)
-        self.ui.indicatorHolder.addWidget(self.strength_indicator)  
 
-        self.db.migrate_database()
         if IS_DEBUGGING:
             loaded_entries = self.db.get_all_entries()
             if len(loaded_entries) == 0:
                 self.db.add_test_entries()
 
-        self.details_open = False
-        self.details_max_width = 377
-        self.ui.detailFrame.setMaximumWidth(0)
-        self.ui.detailFrame.hide()
-        self.ui.btnDelete.hide()
-        self.last_clicked_item = None
-        self._block_click = False
         self.load_entries()
-        self.check_auto_backup()
+        self.backups.auto_backup_if_needed()
         self.check_autologout()
-        QTimer.singleShot(0, self.clear_initial_selection)
         self._check_for_updates()
+        self.clear_initial_selection()
+        
 
-                
+    def changeEvent(self, event):
+        if event.type() == QEvent.Type.WindowStateChange:
+            # minimize widow
+            if self.windowState() & Qt.WindowState.WindowMinimized:
+                if self._password_visible:
+                    self.toggle_password_visibility()
+                if self.details_open:
+                    self.close_details()
+                    self.last_clicked_entry_id = None
+            # restore window
+            elif event.oldState() & Qt.WindowState.WindowMinimized:
+                print("Restored")
+        super().changeEvent(event)
+           
     # update
     def _check_for_updates(self):
         settings = load_settings()
@@ -85,7 +101,6 @@ class MainWindow(QWidget):
         except Exception as e:
             DialogPopup("Update Error", f"Failed checking for updates:\n{e}", PopupType.ERROR, self).exec()    
 
-    
     # autologout
     def start_autologout(self):
         settings = load_settings()
@@ -186,6 +201,18 @@ class MainWindow(QWidget):
         self.ui.sortBox.currentIndexChanged.connect(self.sort_by_selection)
         self.ui.mainLayout.setStretch(4, 3)
         self.ui.btnLogout.clicked.connect(self.logout)
+        
+        self.strength_indicator = PasswordStrengthIndicator(self)
+        self.ui.indicatorHolder.addWidget(self.strength_indicator)  
+
+        if self.visible_timer is None:
+            self.visible_timer = QTimer(self)
+        self.visible_timer.setSingleShot(True)
+        self.visible_timer.timeout.connect(self.toggle_password_visibility)
+
+        self.ui.detailFrame.setMaximumWidth(0)
+        self.ui.detailFrame.hide()
+        self.ui.btnDelete.hide()
     
     def clear_initial_selection(self):
         self.ui.listWidget.blockSignals(True)
@@ -193,33 +220,22 @@ class MainWindow(QWidget):
         self.ui.listWidget.clearSelection()
         self.hide_details()
         self.ui.listWidget.blockSignals(False)
-
+   
     def handle_item_click(self, item: QListWidgetItem):
-        if self.last_clicked_item == item and item.isSelected():
-            # Deselects the item
+        entry_id = item.data(Qt.ItemDataRole.UserRole)
+
+        if self.last_clicked_entry_id == entry_id and item.isSelected():
             self.ui.listWidget.blockSignals(True)
             self.ui.listWidget.clearSelection()
             self.ui.listWidget.setCurrentRow(-1)
             self.ui.listWidget.blockSignals(False)
+
             self.hide_details()
-            self.last_clicked_item = None
+            self.last_clicked_entry_id = None
             return
-        self.last_clicked_item = item
+
+        self.last_clicked_entry_id = entry_id
         self.update_details(item)
-            # Or: self.list_widget.setCurrentItem(None) if using setItemSelected(item, False)
-        # Else, it's a new selection, let the default handling work.
-    
-    def show_details(self):
-        self.ui.detailFrame.show()
-        self.ui.btnDelete.show()
-        self.ui.detailLabel.hide()
-        if not self.details_open:
-            self.toggle_details()
-        
-    def hide_details(self):
-        if self.details_open:
-            self.toggle_details()
-        self.ui.btnDelete.hide()
 
     def sort_list(self, role_key):
         self.entry_cache.sort(key= lambda e: e[role_key])
@@ -300,30 +316,42 @@ class MainWindow(QWidget):
     # -------------------------
     # Update detail view
     # -------------------------
+    def show_details(self):
+        self.ui.detailFrame.show()
+        self.ui.btnDelete.show()
+        self.ui.detailLabel.hide()
+        if not self.details_open:
+            self.toggle_details()
+        
+    def hide_details(self):
+        if self.details_open:
+            self.toggle_details()
+        self._current_plain_password = None
+        self.ui.btnDelete.hide()
+        
     def close_details(self):
         self.hide_details()
-        self.ui.listWidget.setCurrentItem(None)
+        self.ui.listWidget.setCurrentRow(-1)
+        self.ui.listWidget.clearSelection()
       
-    def update_details(self, current: QListWidgetItem, previous=None):
+    def update_details(self, current, previous=None):
         if not current:
             self.hide_details()
             return
         #entry_id = int(current.text().split(":")[0])
         entry_id = current.data(Qt.ItemDataRole.UserRole)
-        service = current.data(Qt.ItemDataRole.UserRole + 1)
-        username = current.data(Qt.ItemDataRole.UserRole + 2)
-        category = current.data(Qt.ItemDataRole.UserRole + 3)
-        
         try:
             self.show_details()
             pw = self.db.get_password(entry_id)
             self._current_plain_password = pw
             self._password_visible = False
             details = self.db.get_entry_details(entry_id)
+            category = details.get("category")
             level = evaluate_password_strength(pw)
             self.strength_indicator.set_strength(level)
-            self.ui.serviceLabel.setText(service)
-            self.ui.usernameLabel.setText(username)
+            self.ui.serviceLabel.setText(details.get("service"))
+            self.ui.usernameLabel.setText(details.get("username"))
+
             self.ui.passLabel.setText("•" * len(pw))
             
             settings = load_settings()
@@ -364,6 +392,9 @@ class MainWindow(QWidget):
     def toggle_password_visibility(self):
         if not hasattr(self, "_current_plain_password"):
             return
+        if self.visible_timer.isActive():
+            self.visible_timer.stop()
+            # print("Visible Timer ended")
         if self._password_visible:
             self.ui.passLabel.setText("•" * len(self._current_plain_password))
             self.ui.btnShowPass.setText("Show Password")
@@ -372,7 +403,7 @@ class MainWindow(QWidget):
             self.ui.passLabel.setText(self._current_plain_password)
             self.ui.btnShowPass.setText("Hide Password")
             self._password_visible = True            
-            QTimer.singleShot(5000, self.toggle_password_visibility)
+            self.visible_timer.start(5000)
     # -------------------------
     # Actions
     # -------------------------
@@ -390,13 +421,8 @@ class MainWindow(QWidget):
         category = data["category"]
         note = data["note"]
 
-        if not password:
-            import secrets, string
-            chars = string.ascii_letters + string.digits + string.punctuation
-            password = ''.join(secrets.choice(chars) for _ in range(16))
-
         try:
-            self.db.add_entry(service.strip(), username.strip(), password, category, url, note)
+            self.db.create_entry(service.strip(), username.strip(), password, category, url, note)
             self.load_entries()
             DialogPopup("Add Success", f"New entry:\n\n'{service}\n\nsuccessfully created.'", PopupType.SUCCESS, self).exec()        
         except Exception as e:
@@ -413,8 +439,8 @@ class MainWindow(QWidget):
             return
         try:
             self.db.delete_entry(entry_id)
-            self.load_entries()
             self.hide_details()
+            self.load_entries()
             DialogPopup("Edit Success", f"Entry with id: {entry_id} successfully deleted!", PopupType.SUCCESS, self).exec()        
         except Exception as e:
             DialogPopup("Error", f"Failed to delete entry:\n{e}", PopupType.ERROR, self).exec()    
@@ -426,15 +452,15 @@ class MainWindow(QWidget):
             return
         try:
             self.db.clear_entries()
-            self.load_entries()
             self.hide_details()
+            self.load_entries()
             DialogPopup("Clear Success", f"Entries successfully cleared!", PopupType.SUCCESS, self).exec()        
         except Exception as e:
             DialogPopup("Error", f"Failed to clear entries:\n{e}", PopupType.ERROR, self).exec()    
  
     def edit_entry_username(self):
         selected =  self.ui.listWidget.currentItem()
-        index = self.ui.listWidget.currentIndex()
+        index = self.ui.listWidget.currentRow()
         if not selected:
             return
         
@@ -448,10 +474,9 @@ class MainWindow(QWidget):
             
             try:
                 self.db.edit_username(entry_id, new_username.strip())
+                self.update_details(selected)                
                 self.load_entries()
-                # self.ui.listWidget.setCurrentRow(self.ui.listWidget.count() - 1)
-                self.update_details(selected)
-                self.ui.listWidget.setCurrentIndex(index)
+                self.ui.listWidget.setCurrentRow(index)
                 DialogPopup("Edit Success", f"Username successfully updated for:\n\n'{service}'", PopupType.SUCCESS, self).exec()        
             except Exception as e:
                 DialogPopup("Error", f"Failed to update username:\n{e}", PopupType.ERROR, self).exec()    
@@ -482,12 +507,12 @@ class MainWindow(QWidget):
     
     def edit_entry_category(self):
         selected = self.ui.listWidget.currentItem()
-        index = self.ui.listWidget.currentIndex()
+        index = self.ui.listWidget.currentRow()
         if not selected:
             return
 
-        service_name = self.ui.serviceLabel.text()
         entry_id = selected.data(Qt.ItemDataRole.UserRole)
+        service_name = selected.data(Qt.ItemDataRole.UserRole + 1)
         current_category = self.ui.categoryLabel.text()
         settings = load_settings()
         categories = settings["entry_categories"]
@@ -500,14 +525,14 @@ class MainWindow(QWidget):
                 self.db.edit_category(entry_id, new_category)
                 self.update_details(selected)
                 self.load_entries()
-                self.ui.listWidget.setCurrentIndex(index)
+                self.ui.listWidget.setCurrentRow(index)
                 DialogPopup("Edit Success", f"Category successfully updated for:\n\n'{service_name}'", PopupType.SUCCESS, self).exec()
             except Exception as e:
                 DialogPopup("Error", f"Failed to update category:\n{e}", PopupType.ERROR, self).exec()        
     
     def edit_entry_service(self):
         selected = self.ui.listWidget.currentItem()
-        index  = self.ui.listWidget.currentIndex()
+        index  = self.ui.listWidget.currentRow()
         if not selected:
             return
 
@@ -520,16 +545,16 @@ class MainWindow(QWidget):
                 return
             try:
                 self.db.edit_service(entry_id, new_service.strip())
+                self.update_details(selected)
                 self.load_entries()
-                self.update_details(self.ui.listWidget.currentItem())
-                self.ui.listWidget.setCurrentIndex(index)
+                self.ui.listWidget.setCurrentRow(index)
                 DialogPopup("Edit Success", f"Service successfully updated for:\n\n'{current_service}' => '{new_service}'", PopupType.SUCCESS, self).exec()
             except Exception as e:
                 DialogPopup("Error", f"Failed to update service:\n{e}", PopupType.ERROR, self).exec()        
             
     def edit_entry_url(self):        
         selected = self.ui.listWidget.currentItem()
-        index = self.ui.listWidget.currentIndex()
+        index = self.ui.listWidget.currentRow()
         if not selected:
             return
 
@@ -544,16 +569,16 @@ class MainWindow(QWidget):
                 return
             try:
                 self.db.edit_url(entry_id, new_url.strip())
+                self.update_details(selected)
                 self.load_entries()
-                self.update_details(self.ui.listWidget.currentItem())
-                self.ui.listWidget.setCurrentIndex(index)
+                self.ui.listWidget.setCurrentRow(index)
                 DialogPopup("Edit Success", f"URL successfully updated for:\n\n'{current_service}'", PopupType.SUCCESS, self).exec()        
             except Exception as e:
                 DialogPopup("Edit Error", f"Failed to update url:\n{e}", PopupType.ERROR, self).exec()        
     
     def edit_entry_note(self):
         selected = self.ui.listWidget.currentItem()
-        index = self.ui.listWidget.currentIndex()
+        index = self.ui.listWidget.currentRow()
         if not selected:
             return
 
@@ -566,9 +591,9 @@ class MainWindow(QWidget):
             new_note = dialog.get_note()
             try:
                 self.db.edit_note(entry_id, new_note.strip())
+                self.update_details(selected)
                 self.load_entries()
-                self.update_details(self.ui.listWidget.currentItem())
-                self.ui.listWidget.setCurrentIndex(index)
+                self.ui.listWidget.setCurrentRow(index)
                 DialogPopup("Edit Success", f"Note successfully updated for:\n\n'{current_service}'", PopupType.SUCCESS, self).exec()
             except Exception as e:
                 DialogPopup("Error", f"Failed to update note:\n{e}", PopupType.ERROR, self).exec()        
@@ -584,7 +609,7 @@ class MainWindow(QWidget):
         self.ui.btnCopyPass.setText("✔ Copied!")
         QTimer.singleShot(1000, lambda: self.ui.btnCopyPass.setText(original_text))
 
-        self.show_toast("Password copied!", parent=self.ui.detailBtnFrame)
+        # self.show_toast("Password copied!", parent=self.ui.detailBtnFrame)
         def clear_clip():
             if clipboard.text() == pw:
                 clipboard.clear()
@@ -618,6 +643,8 @@ class MainWindow(QWidget):
         QTimer.singleShot(2000, toast.close)
     
     def open_settings(self):
+        if self.details_open:
+            self.close_details()
         self.settings_window = SettingsWindow(self.db)
         self.settings_window.category_deleted.connect(self.load_entries)
         self.settings_window.backup_restored.connect(self.load_entries)
@@ -630,42 +657,6 @@ class MainWindow(QWidget):
 
     def reset_settingswindow(self):
         self.settings_window = None
-
-    def check_auto_backup(self):
-        settings = load_settings()
-        mode = settings.get("auto_backup", "none")
-        last = settings.get("last_backup", None)
-        now = datetime.now()
-        
-        if mode == "none":
-            return
-        
-        if last is None:
-            self.db.create_backup()
-            settings["last_backup"] = now.isoformat()
-            save_settings(settings)
-            return
-        
-        last_dt = datetime.fromisoformat(last)
-        do_backup = False
-        if mode == "daily" and (now - last_dt).days >= 1:
-            do_backup = True
-
-        elif mode == "weekly" and (now - last_dt).days >= 7:
-            do_backup = True
-
-        elif mode == "monthly" and (
-            now.year != last_dt.year or now.month != last_dt.month
-        ):
-            do_backup = True
-
-        elif mode == "yearly" and now.year != last_dt.year:
-            do_backup = True
-        
-        if do_backup:
-            self.db.create_backup()
-            settings["last_backup"] == now.isoformat()
-            save_settings(settings)
             
     def filter_list(self, text: str):
         text = text.lower()
@@ -695,6 +686,7 @@ class MainWindow(QWidget):
         
     def toggle_details(self):
         frame = self.ui.detailFrame
+        # print(f"Frame size hint {frame.frameGeometry().width()}")
 
         start = frame.width()
         end = self.details_max_width if not self.details_open else 0
