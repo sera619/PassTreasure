@@ -34,16 +34,19 @@ class CategoryEditDialog(QDialog):
         
         utils.colorize_icon(self.ui.button_cancel, "close", "red")
         utils.colorize_icon(self.ui.button_pickColor, "eyedropper", "yellow")
-        utils.colorize_icon(self.ui.button_save, "check", "green")
-        
+        utils.colorize_icon(self.ui.button_save, "check", "green")        
         
     def pick_color(self):
-        new_c = QColorDialog.getColor(self.color, self)
-        if new_c.isValid():
-            self.color = new_c
+        dialog = QColorDialog(self.color)
+        dialog.setOptions( QColorDialog.ColorDialogOption.ShowAlphaChannel | 
+                          QColorDialog.ColorDialogOption.DontUseNativeDialog)
+        dialog.setCurrentColor(self.color)
+        if dialog.exec() == QColorDialog.DialogCode.Accepted:
+            picked_color = dialog.selectedColor()
+            self.color = picked_color
             self.ui.button_colorPreview.setStyleSheet(
                 "QPushButton:disabled{"
-                f"background-color: {new_c.name()}; border-radius: 4px;"
+                f"background-color: {self.color.name()}; border-radius: 4px;"
                 "}"
             )
 
