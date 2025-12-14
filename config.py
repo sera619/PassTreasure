@@ -1,10 +1,14 @@
-from utils import get_base_dir
+from utils import get_base_dir, load_settings
 from enum import Enum
 import os
-
+import json
+from pathlib import Path
+from datetime import datetime, timezone
+import random
 
 WIN_HEIGHT = 570
 WIN_WIDTH = 900
+
 
 IS_DEBUGGING = True
 VERSION_NUM = "2.2.5"
@@ -15,11 +19,58 @@ DATA_PATH = os.path.join(BASE_DIR, "data")
 BACKUP_PATH = os.path.join(BASE_DIR, "backup")
 SETTINGS_PATH = os.path.join(DATA_PATH, "settings.json")
 VAULT_PATH = os.path.join(DATA_PATH, "vault.db")
+TESTFILE_PATH = os.path.join(DATA_PATH, "test_entries.json")
 
 EXPORT_TYPES = [
     ".json",
     ".csv"
 ]
+
+
+def generate_password_json(
+            count: int,
+            filename: str = "test_entries.json",
+            savepath: str = f"{DATA_PATH}",
+            base_service: str = "Service",
+            base_username: str = "user",
+            base_url: str = "https://www.example.com",
+            password: str = "Qm9!t5C8yN",
+        ):
+    """
+    Generate a JSON file with dummy password entries.
+
+    :param filepath: Output JSON file path
+    :param count: Number of entries to generate
+    """
+
+    entries = []
+    now = datetime.now(timezone.utc).isoformat()
+    settings = load_settings()
+    categories = settings.get("entry_categories", ["General"])
+
+    for i in range(1, count + 1):
+        entry = {
+            "id": i,
+            "service": f"{base_service}{i}",
+            "username": f"{base_username}{i}",
+            "password": password,            # stays constant (as requested)
+            "category": random.choice(categories),             # stays constant
+            "url": f"{base_url}/{i}",
+            "note": f"No note {i}",
+            "created_at": now,
+            "updated_at": now,
+        }
+        entries.append(entry)
+
+    
+    if not os.path.exists(savepath):
+        os.makedirs(savepath, exist_ok=True)
+    
+    filepath = os.path.join(savepath, filename)
+    with open(filepath, "w", encoding="utf-8") as f:
+        json.dump(entries, f, indent=4, ensure_ascii=False)
+
+    print(f"Succesfully generated {count}x entries.")
 
 DEFAULT_SETTINGS: dict = {
     "auto_backup": "daily",
