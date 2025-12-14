@@ -3,13 +3,14 @@ import os
 import sqlite3
 import random
 import shutil
+import json
 from pathlib import Path
 from datetime import datetime, timezone
 from typing import Optional, List, Tuple, Dict
 
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
-from config import TEST_ENTRIES
+from config import TEST_ENTRIES, TESTFILE_PATH
 from utils import load_settings, save_settings, get_base_dir
 from backend.crypto_manager import CryptoManager
 from backend.backup_manager import BackupManager
@@ -111,9 +112,13 @@ class PasswordDatabase:
         return True
 
     def disconnect(self) -> bool:
-        if not self.conn:
-            return False
-        self.conn.close()
+        # Connection + state reset (safety)
+        try:
+            if self.conn:
+                self.conn.close()
+        except Exception:
+            pass
+
         self.conn = None
         self.cursor = None
         self.aes_key = None
@@ -294,8 +299,18 @@ class PasswordDatabase:
         if not self.unlock_vault(master_pw):
             raise PermissionError("Wrong master password for restored vault!")
 
-        return True
+        return True 
  
+    def delete_vault(self) -> None:
+        self.disconnect()
+        if not os.path.exists(VAULT_PATH):
+            raise FileNotFoundError("vault.db does not exists - nothing to delete!")
+        try:
+            os.remove(VAULT_PATH)
+        except PermissionError:
+            raise PermissionError(
+                "vault.db cant be deleted — file is locked!\n"
+                "Close all windows and programs before try again!")
     # ------------------------------------------------------------------
     # ENTRY CRUD
     # ------------------------------------------------------------------
@@ -365,11 +380,10 @@ class PasswordDatabase:
         )
         
     def get_export_entries(self) -> list[dict]:
-        """Returns id, service, username, password, url, category, note, created_at, updated_at
-        """
+        """Returns id, service, username, password, nonce, category, url, note, created_at, updated_at"""
         self._require_unlocked()
         rows = self._execute("""
-            SELECT id, service, username, password, nonce, url, category, note, created_at, updated_at
+            SELECT id, service, username, password, nonce, category, url, note, created_at, updated_at
             FROM entries""",
             fetchall=True
         )
@@ -424,7 +438,8 @@ class PasswordDatabase:
     def clear_entries(self):
         self._require_unlocked()
         self._execute(
-            "DELETE FROM entries"
+            "DELETE FROM entries",
+            commit=True
         )
         self._execute(
             "DELETE FROM sqlite_sequence WHERE name='entries'",
@@ -504,18 +519,19 @@ class PasswordDatabase:
 
     def add_test_entries(self):
         self._require_unlocked()
-        settings = load_settings()
-        categories = settings.get("entry_categories", ["General"])
-
-        for entry in TEST_ENTRIES:
-            try:
-                self.create_entry(
-                    service=entry["service"],
-                    username=entry["username"],
-                    password=entry["password"],
-                    category=random.choice(categories),
-                    url=entry.get("url", ""),
-                    note="No note"
-                )
-            except Exception as e:
-                print(f"Test entry failed: {e}")
+        data = None
+        with open(TESTFILE_PATH, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        if data is not None:            
+            for entry in data:
+                try:
+                    self.create_entry(
+                        service=entry["service"],
+                        username=entry["username"],
+                        password=entry["password"],
+                        category=entry["category"],
+                        url=entry["url"],
+                        note="No note"
+                    )
+                except Exception as e:
+                    print(f"Test entry failed: {e}")
