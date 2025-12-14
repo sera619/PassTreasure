@@ -23,7 +23,9 @@ datas = [
     ("utils.py", "."),
     ("config.py", "."),
     ("resources_rc.py", "."),
-    ("app.ico", ".")
+    ("app.ico", "."),
+    ("LICENCE", "."),
+    ("README.md", ".")
 ]
 
 # --- ANALYSIS ---
