@@ -4,11 +4,11 @@ from gui.login_window import LoginWindow
 from gui.main_window import MainWindow
 from gui.intro_splash import IntroSplash
 from gui.dialog_popup import DialogPopup
-
 import config
 from config import Styles, PopupType
 import sys
 import resources_rc
+
 
 app = QApplication(sys.argv)
 main_window = None

@@ -23,7 +23,7 @@ from backend.inactivity_watcher import AutoLocker, InactivityWatcher
 
 from config import VERSION_NUM, Styles, IS_DEBUGGING, PopupType, VAULT_PATH, WIN_HEIGHT, WIN_WIDTH
 from datetime import datetime
-from utils import load_settings, save_settings
+from utils import load_settings
 import utils
 
 class MainWindow(QWidget):
@@ -49,12 +49,12 @@ class MainWindow(QWidget):
         self.strength_indicator: PasswordStrengthIndicator | None = None
         self.visible_timer: QTimer | None = None
         self.last_clicked_entry_id = None
-
+        self._password_visible = False
         self.apply_dark_theme()
         self.build_ui()  
         self.apply_styles()
 
-        if IS_DEBUGGING:
+        if IS_DEBUGGING:          
             loaded_entries = self.db.get_all_entries()
             if len(loaded_entries) == 0:
                 self.db.add_test_entries()
@@ -63,7 +63,7 @@ class MainWindow(QWidget):
         self.backups.auto_backup_if_needed()
         self.check_autologout()
         self._check_for_updates()
-        self.clear_initial_selection()
+        self.clear_list_selection()
         
 
     def changeEvent(self, event):
@@ -76,8 +76,8 @@ class MainWindow(QWidget):
                     self.close_details()
                     self.last_clicked_entry_id = None
             # restore window
-            elif event.oldState() & Qt.WindowState.WindowMinimized:
-                print("Restored")
+            # elif event.oldState() & Qt.WindowState.WindowMinimized:
+            #     print("Restored")
         super().changeEvent(event)
            
     # update
@@ -214,23 +214,18 @@ class MainWindow(QWidget):
         self.ui.detailFrame.hide()
         self.ui.btnDelete.hide()
     
-    def clear_initial_selection(self):
+    def clear_list_selection(self):
         self.ui.listWidget.blockSignals(True)
         self.ui.listWidget.setCurrentRow(-1)
         self.ui.listWidget.clearSelection()
-        self.hide_details()
         self.ui.listWidget.blockSignals(False)
+        self.hide_details()
    
     def handle_item_click(self, item: QListWidgetItem):
         entry_id = item.data(Qt.ItemDataRole.UserRole)
 
         if self.last_clicked_entry_id == entry_id and item.isSelected():
-            self.ui.listWidget.blockSignals(True)
-            self.ui.listWidget.clearSelection()
-            self.ui.listWidget.setCurrentRow(-1)
-            self.ui.listWidget.blockSignals(False)
-
-            self.hide_details()
+            self.clear_list_selection()
             self.last_clicked_entry_id = None
             return
 
@@ -333,6 +328,7 @@ class MainWindow(QWidget):
         self.hide_details()
         self.ui.listWidget.setCurrentRow(-1)
         self.ui.listWidget.clearSelection()
+        self.last_clicked_entry_id = None
       
     def update_details(self, current, previous=None):
         if not current:
@@ -407,7 +403,9 @@ class MainWindow(QWidget):
     # -------------------------
     # Actions
     # -------------------------
-    def add_entry(self):        
+    def add_entry(self):
+        if self.details_open:
+            self.close_details()      
         enty_dialog = NewEntryDialog(self)
         enty_dialog.exec()
         data = enty_dialog.get_entry_data()
@@ -609,39 +607,11 @@ class MainWindow(QWidget):
         self.ui.btnCopyPass.setText("✔ Copied!")
         QTimer.singleShot(1000, lambda: self.ui.btnCopyPass.setText(original_text))
 
-        # self.show_toast("Password copied!", parent=self.ui.detailBtnFrame)
         def clear_clip():
             if clipboard.text() == pw:
                 clipboard.clear()
         QTimer.singleShot(10000, clear_clip)
-        
-    def show_toast(self, message, parent):
-        """
-        A small non-blocking toast-like popup that fades out.
-        """
-        toast = QLabel(message, self)
-        toast.setStyleSheet("""
-            QLabel {
-                background-color: #333;
-                color: white;
-                padding: 8px 12px;
-                border-radius: 6px;
-            }
-        """)
-        toast.setWindowFlags(Qt.ToolTip)
-        toast.setParent(parent)
-        toast.adjustSize()
-        # Position: bottom-right inside window
-        px = parent.width() / 2 - toast.width() / 2
-        py = parent.height() - toast.height() 
-
-        toast.move(int(px), int(py))
-
-        toast.show()
-
-        # Hide after 2 seconds
-        QTimer.singleShot(2000, toast.close)
-    
+            
     def open_settings(self):
         if self.details_open:
             self.close_details()

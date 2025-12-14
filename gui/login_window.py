@@ -21,10 +21,8 @@ class LoginWindow(QWidget):
         super().__init__()
         self.db = PasswordDatabase()
         self.BASE_DIR = DATA_PATH
-        self.VAULT_PATH = VAULT_PATH
-        
+        self.VAULT_PATH = VAULT_PATH        
         self.backups = BackupManager(self.VAULT_PATH)
-
         self.is_first_run = not os.path.exists(self.VAULT_PATH)
         
         # Load UI
@@ -50,13 +48,10 @@ class LoginWindow(QWidget):
         
         self.input_pw.setFocus()
         self._pw_visible = False
-        self._pw2_visible = False
-        
+        self._pw2_visible = False        
         self.configure_mode()
-
         self.ui.btn_toggle_pw.clicked.connect(lambda checked, b=self.ui.btn_toggle_pw: self.toggle_password_visibility(b))
         self.ui.btn_toggle_pw2.clicked.connect(lambda checked, b=self.ui.btn_toggle_pw2: self.toggle_password_visibility(b))
-
         self.ui.btn_delete_vault.clicked.connect(self.handle_delete_vault)
         self.input_pw.returnPressed.connect(self.on_enter)
         self.input_pw.textChanged.connect(self._update_strength)        
@@ -125,8 +120,7 @@ class LoginWindow(QWidget):
             self.configure_mode()
             DialogPopup("Backup Success", f"Backup restored successfully!", PopupType.SUCCESS, self).exec()        
         except Exception as e:
-            DialogPopup("Backup Error", f"Failure restoring backup:\n{e}", PopupType.ERROR, self).exec()        
-  
+            DialogPopup("Backup Error", f"Failure restoring backup:\n{e}", PopupType.ERROR, self).exec()
 
     def handle_delete_vault(self):
         popup = DialogPopup("Confirm Delete", "Are you sure you want to delete this vault?", PopupType.QUESTION, parent=self)
