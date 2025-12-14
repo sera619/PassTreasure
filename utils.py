@@ -110,11 +110,11 @@ def save_settings(data):
     with open(config.SETTINGS_PATH, "w", encoding="utf-8") as f:
         f.write(json.dumps(data, indent=4))
 
-def format_last_backup(iso_str: str) -> str:
-    if not iso_str:
+def reformat_timestamp(time_str: str) -> str:
+    if not time_str:
         return "Never"
     try:
-        dt = datetime.fromisoformat(iso_str)
+        dt = datetime.strptime(time_str, "%d-%m-%Y_%H-%M-%S")
         return dt.strftime("%d.%m.%Y %H:%M:%S")
     except Exception:
         return "Invalid"
