@@ -81,7 +81,8 @@ class DialogPopup(QDialog):
                 icon_colored = utils.tint_pixmap(icon, QColor("#66b8f3"))
                 self.ui.iconLabel.setPixmap(icon_colored)
                 self.ui.titleLabel.setStyleSheet("font: bold 15pt Segoe UI; color: #6fbdf5;")
-                self.ui.buttonBox.setStandardButtons(QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel)
+                self.ui.buttonBox.setStandardButtons(QDialogButtonBox.StandardButton.Ok # | QDialogButtonBox.StandardButton.Cancel
+                                                     )
 
             case PopupType.WARNING:
                 self.setWindowTitle("Warning")
@@ -100,7 +101,6 @@ class DialogPopup(QDialog):
                 self.ui.titleLabel.setStyleSheet("font: bold 15pt Segoe UI; color: #df2b2b;")
                 self.ui.buttonBox.setStandardButtons(QDialogButtonBox.StandardButton.Ok)
                 self.ui.buttonBox.button(QDialogButtonBox.StandardButton.Ok).setAutoDefault(True)
-
 
             case PopupType.QUESTION:
                 self.setWindowTitle("Question")
