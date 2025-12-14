@@ -11,7 +11,8 @@ from gui.dialog_popup import DialogPopup
 from backend.import_worker import CsvImportWorker
 from config import TextStorage, Styles, VAULT_PATH, PopupType, EXPORT_TYPES
 from backend.database import PasswordDatabase
-from utils import load_settings, save_settings, format_last_backup
+from backend.backup_manager import BackupManager
+from utils import load_settings, save_settings, reformat_timestamp
 import utils
 import os, csv, json
 
@@ -28,8 +29,8 @@ class SettingsWindow(QDialog):
         self.ui = Ui_SettingsWindow()
         self.ui.setupUi(self)
         self.db = db
+        self.backups = BackupManager(VAULT_PATH)
         self.default_export_name = "FileTreasure-PasswordExport"
-        self.mapping = ["none", "daily", "weekly", "monthly", "yearly"]
         self.new_category_color = None
         self.setup_navigation()
         self.setup_about_page()
@@ -142,6 +143,22 @@ class SettingsWindow(QDialog):
         self.ui.btnStartUpdate.setStyleSheet(Styles.green_button)
         utils.colorize_icon(self.ui.btnStartUpdate, "check", "dark")
 
+    def setup_navigation(self):
+        self.ui.btn_general.clicked.connect(
+            lambda: self.ui.stack.setCurrentWidget(self.ui.page_general)
+        )
+        self.ui.btn_about.clicked.connect(
+            lambda: self.ui.stack.setCurrentWidget(self.ui.page_about)
+        )
+        self.ui.btn_security.clicked.connect(
+            lambda: self.ui.stack.setCurrentWidget(self.ui.page_security)
+        )
+        self.ui.btn_import.clicked.connect(
+            lambda: self.ui.stack.setCurrentWidget(self.ui.page_import)
+        )
+        self.ui.btn_export.clicked.connect(
+            lambda: self.ui.stack.setCurrentWidget(self.ui.page_export)
+        )
         
     def _update_pw_strength(self):
         pw = self.ui.new_pw1.text()
@@ -150,7 +167,7 @@ class SettingsWindow(QDialog):
     
     def setup_general_page(self):
         settings = load_settings()
-        for mode in self.mapping:
+        for mode in self.backups.BACKUP_INTERVAL_TYPES:
             self.ui.backupModeBox.addItem(mode.capitalize())
         mode = settings.get("auto_backup", "none")
         idx = {
@@ -174,27 +191,27 @@ class SettingsWindow(QDialog):
     
     def _load_all_backups(self):
         self.ui.backupDeleteBox.clear()        
-        backups = self.db.get_all_backups()
+        backups = self.backups.list_backups()
         if not backups or len(backups) == 0:
             return
         self.ui.backupDeleteBox.addItems(backups)        
     
     def update_backup_mode(self, index):
-        mode = self.mapping[index]
+        mode = self.backup_intervall_mapping[index]
         settings = load_settings()
         settings["auto_backup"] = mode
         save_settings(settings)
         DialogPopup("Backup Information", f"Automatic backups set to: '{mode}'!", PopupType.INFO, self).exec()        
         
     def update_general_page(self):
-        lates_backup = self.db.get_latest_backup()
+        newest_backup = self.backups.get_newest_backup()
         self._load_all_backups()
-        if lates_backup:
+        if newest_backup:
             self.ui.btnDeleteBackup.setVisible(True)
             self.ui.btnRestoreBackup.setVisible(True)
             settings = load_settings()
             last_backup_raw = settings.get("last_backup")
-            last_backup_time = format_last_backup(last_backup_raw)
+            last_backup_time = reformat_timestamp(last_backup_raw)
             self.ui.lastBackupLabel.setText(f"{last_backup_time}")
             self.ui.btnClearBackup.show()
             self.ui.backupDeleteBox.show()
@@ -208,22 +225,18 @@ class SettingsWindow(QDialog):
             self.ui.lastBackupLabel.setText("No Backups found!")            
             
     def create_new_backup(self):
-        now = datetime.now()
-        settings = load_settings()        
-        self.db.create_backup()
-        settings["last_backup"] = now.isoformat()
-        save_settings(settings) 
-        latest_backup = self.db.get_latest_backup()
+        self.backups.create_backup()
+        newest_backup = self.backups.get_newest_backup()
         
-        if not latest_backup:
+        if not newest_backup:
             DialogPopup("Create Error", f"Cant find any backup!", PopupType.ERROR, self).exec()
             return
         self.update_general_page()
-        DialogPopup("Create Success", f"Backup:\n{latest_backup}\n created successfully!", PopupType.SUCCESS, self).exec()        
+        DialogPopup("Create Success", f"Backup:\n{newest_backup}\n created successfully!", PopupType.SUCCESS, self).exec()        
 
     def restore_backup(self):
-        latest_backup = self.db.get_latest_backup()
-        if not latest_backup:
+        newest_backup = self.backups.get_newest_backup()
+        if not newest_backup:
             DialogPopup("Restore Error", f"Cant find any backup!", PopupType.ERROR, self).exec()
             return
         popup = DialogPopup("Confirm Restore", "Are you sure you want to restore the backup?", PopupType.QUESTION, parent=self)
@@ -231,12 +244,12 @@ class SettingsWindow(QDialog):
         if result != QDialog.DialogCode.Accepted:
             return
         try:  
-            self.db.apply_backup(latest_backup)
+            self.db.apply_backup(newest_backup)
             self.db.reload_after_backup(self.ask_master_password)
             self.backup_restored.emit(self.db)
-            DialogPopup("Restore Success", f"Backup:\n{latest_backup}\n restored successfully!", PopupType.SUCCESS, self).exec()        
+            DialogPopup("Restore Success", f"Backup:\n{newest_backup}\n restored successfully!", PopupType.SUCCESS, self).exec()        
         except Exception as e:
-            DialogPopup("Restore Error", f"Failed to restore backup({latest_backup}):\n{e}", PopupType.ERROR, self).exec()    
+            DialogPopup("Restore Error", f"Failed to restore backup({newest_backup}):\n{e}", PopupType.ERROR, self).exec()    
         
     def delete_backup(self):
         delete_backup = self.ui.backupDeleteBox.currentText()
@@ -247,7 +260,7 @@ class SettingsWindow(QDialog):
         if result != QDialog.DialogCode.Accepted:
             return
         try:        
-            self.db.delete_backup(delete_backup)
+            self.backups.delete_backup(delete_backup)
             self.update_general_page()
             DialogPopup("Delete Success", f"Backup:\n{delete_backup}\n deleted successfully!", PopupType.SUCCESS, self).exec()        
         except Exception as e:
@@ -259,7 +272,7 @@ class SettingsWindow(QDialog):
         if result != QDialog.DialogCode.Accepted:
             return
         try:
-            removed = self.db.clear_backups()
+            removed = self.backups.clear_backups()
             self.update_general_page()
             DialogPopup("Clear Success", f"Removed {removed}x backups deleted successfully", PopupType.SUCCESS, self).exec()        
         except Exception as e:
@@ -271,19 +284,7 @@ class SettingsWindow(QDialog):
             DialogPopup("Backup Error", f"No backup path found. Please enter a path and try again!", PopupType.ERROR, self).exec()    
             return
         try:
-            settings = load_settings()
-            new_path = os.path.abspath(new_path)
-            old_path = os.path.abspath(settings.get("backup_path"))
-            # print(f"Paths\nOld: {old_path}\nNew: {new_path}")
-            if old_path == new_path:
-                return
-            
-            if not os.path.exists(new_path):
-                os.makedirs(new_path)
-                
-            settings["backup_path"] = str(new_path)
-            save_settings(settings)
-            self.db.create_backup()
+            self.backups.set_backup_path(new_path)
             self.update_general_page()
             DialogPopup("Backup Success", f"Backuppath changed to:\n'{new_path}' successfully!\nNew Backup created!", PopupType.SUCCESS, self).exec()        
         except Exception as e:
@@ -297,23 +298,6 @@ class SettingsWindow(QDialog):
             echo=QLineEdit.EchoMode.Password
         )
         return pw if ok else None
-
-    def setup_navigation(self):
-        self.ui.btn_general.clicked.connect(
-            lambda: self.ui.stack.setCurrentWidget(self.ui.page_general)
-        )
-        self.ui.btn_about.clicked.connect(
-            lambda: self.ui.stack.setCurrentWidget(self.ui.page_about)
-        )
-        self.ui.btn_security.clicked.connect(
-            lambda: self.ui.stack.setCurrentWidget(self.ui.page_security)
-        )
-        self.ui.btn_import.clicked.connect(
-            lambda: self.ui.stack.setCurrentWidget(self.ui.page_import)
-        )
-        self.ui.btn_export.clicked.connect(
-            lambda: self.ui.stack.setCurrentWidget(self.ui.page_export)
-        )
     
     def apply_master_pw(self):
         old = self.ui.old_pw.text().strip()
@@ -384,17 +368,15 @@ class SettingsWindow(QDialog):
         if not self.new_category_color:
             DialogPopup("Create Warning", "No new category color selected!", PopupType.WARNING, self).exec()
             return
-        r, g, b, a = self.new_category_color.getRgb()
-        color_string = f"rgba({r}, {g}, {b}, {a})"
         try:                
             colors = settings["category_colors"]
-            colors[f"{cat_name}"] = color_string
+            colors[f"{cat_name}"] = self.new_category_color.name()
             settings["category_colors"] = colors
             save_settings(settings)
             self.ui.categoryCreatLineEdit.clear()
             self.new_category_color = None
             self.ui.btnCategpryColor.setStyleSheet(
-                f"background-color: #2d2d30;"
+                f"background-color: #ffffff;"
                 f"color: white;"
             )
             self.update_edit_category()
@@ -465,17 +447,16 @@ class SettingsWindow(QDialog):
                     DialogPopup("Edit Error", "Category name already exists!", PopupType.ERROR, self).exec()        
                     return
                 
-                index = user_categories.index(old_name)
+                index = user_categories.index(old_name)                
                 user_categories[index] = new_name
                 cat_colors[new_name] = cat_colors.get(old_name, "rgba(211, 211, 211, 140)")
                 del cat_colors[old_name]
                 entries_to_change = self.db.get_entries_by_category(old_name)
                 if len(entries_to_change) >= 0:
                     for entry in entries_to_change:
-                        entry_id, service, username, password, category = entry
+                        entry_id, *_ = entry
                         self.db.edit_category(int(entry_id), new_name)
-                old_name = new_name
-            
+                old_name = new_name            
             if new_color != old_color:
                 cat_colors[old_name] = new_color
             
@@ -490,7 +471,7 @@ class SettingsWindow(QDialog):
             DialogPopup("Edit Error", f"Cant edit category '{cat}':\n{e}", PopupType.ERROR, self).exec()    
 
     def show_color_dialog(self):        
-        dialog = QColorDialog(QColor(211, 211, 211, 140))
+        dialog = QColorDialog(currentColor=QColor(211, 211, 211, 140))
         dialog.setOptions(QColorDialog.ColorDialogOption.ShowAlphaChannel | 
                           QColorDialog.ColorDialogOption.DontUseNativeDialog)
         
@@ -498,7 +479,6 @@ class SettingsWindow(QDialog):
             selected_color = dialog.selectedColor()
             self.current_color = selected_color 
             self.new_category_color = selected_color
-            r, g, b, a = selected_color.getRgb()            
             self.ui.btnPreviewCatColor.setStyleSheet(
                 "QPushButton:disabled{"
                 f"background-color: {selected_color.name()};"
@@ -680,7 +660,8 @@ class SettingsWindow(QDialog):
                 password = self.db.get_password(entry_id)
                 if password:
                     export_entry["password"] = password
-                
+                else:
+                    continue
                 export_entries.append(export_entry)
             if len(export_entries) == 0:
                 DialogPopup("Export Information", "No entries to export found.", PopupType.INFO, self).exec()
@@ -730,8 +711,7 @@ class SettingsWindow(QDialog):
         self.ui.btnStartUpdate.hide()
 
         utils.open_url(url)
-    
-    
+     
     def _toggle_auto_check_update(self, checked: bool):
         settings = load_settings()
         settings["check_update"] = checked

@@ -1,6 +1,6 @@
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QIcon
-from PySide6.QtWidgets import QDialog, QApplication, QVBoxLayout
+from PySide6.QtWidgets import QDialog, QApplication
 from src.passwordgenerator_dialog_ui import Ui_PasswordGeneratorDialog
 from backend.password_generator import PasswordGenerator
 from gui.password_strength_indicator import PasswordStrengthIndicator
