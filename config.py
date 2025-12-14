@@ -2,7 +2,11 @@ from utils import get_base_dir
 from enum import Enum
 import os
 
-IS_DEBUGGING = False
+
+WIN_HEIGHT = 570
+WIN_WIDTH = 900
+
+IS_DEBUGGING = True
 VERSION_NUM = "2.2.5"
 GITHUB_API = "https://api.github.com/repos/sera619/PassTreasure/releases/latest"
     
@@ -28,12 +32,12 @@ DEFAULT_SETTINGS: dict = {
     "auto_hide_details_time": 60000, # 60 sec
     "entry_categories": ["General", "Work", "Private", "Finance", "Others", "Social Media"],
     "category_colors": {
-        "General": "rgba(211, 211, 211, 180)",    # LightGray
-        "Work": "rgba(70, 130, 180, 180)",      # SteelBlue
-        "Private": "rgba(144, 238, 144, 180)",     # LightGreen
-        "Finance": "rgba(255, 215, 0, 180)",     # Gold
-        "Others": "rgba(255, 165, 0, 180)",    # Orange
-        "Social Media": "rgba(30, 195, 198, 180)" # Cyan  
+        "General": "#d3d3d3",    # LightGray
+        "Work": "#4682b4",      # SteelBlue
+        "Private": "#90ee90",     # LightGreen
+        "Finance": "#ffd700",     # Gold
+        "Others": "#ffa500",    # Orange
+        "Social Media": "#1ec3c6" # Cyan  
     }
 }
 
