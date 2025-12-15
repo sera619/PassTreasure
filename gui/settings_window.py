@@ -12,6 +12,7 @@ from config import TextStorage, Styles, VAULT_PATH, PopupType, EXPORT_TYPES
 from backend.database import PasswordDatabase
 from backend.backup_manager import BackupManager
 from backend.import_manager import ImportManager
+from backend.export_manager import ExportManager
 from utils import load_settings, save_settings, reformat_timestamp
 import utils
 import os, csv, json
@@ -31,6 +32,7 @@ class SettingsWindow(QDialog):
         self.db = db
         self.backups = BackupManager(VAULT_PATH)
         self.import_manager = ImportManager(self)
+        self.export_manager = ExportManager(self)
         self.default_export_name = "FileTreasure-PasswordExport"
         self.new_category_color = None
         self.setup_navigation()
@@ -69,6 +71,10 @@ class SettingsWindow(QDialog):
         self.import_manager.progress.connect(self.on_import_progress)
         self.import_manager.finished.connect(self.on_import_finished)
         self.import_manager.error.connect(self.on_import_error)
+        
+        self.export_manager.progress.connect(self.on_export_progress)
+        self.export_manager.finished.connect(self.on_export_finished)
+        self.export_manager.error.connect(self.on_export_error)
     
         self.ui.exportFilenameLineEdit.setPlaceholderText(f"Enter a filename... (default: {self.default_export_name})")
         # self.ui.stack.setCurrentWidget(self.ui.page_security)
@@ -528,7 +534,6 @@ class SettingsWindow(QDialog):
         self.ui.progressFrame.show()
         self.import_manager.start_import(VAULT_PATH, file_path, pw, mode)
 
-        
     def on_import_progress(self, count, total):
         percentage = int(count / total * 100)
         self.ui.progressLabel.setText(f"Importing {count} / {total} entries...")
@@ -544,7 +549,93 @@ class SettingsWindow(QDialog):
     def on_import_error(self, err):
         DialogPopup("Import Error", f"Error at import:\n{err}", PopupType.ERROR, self).exec()
 
-        
+    # export    
+    def setup_export_page(self):
+        self.ui.btnStartExport.setStyleSheet(Styles.green_button_outlined)
+        self.ui.btnExportPath.setStyleSheet(Styles.yellow_button_outlined)
+        utils.colorize_icon(self.ui.btnExportPath, "open", "yellow")
+        utils.colorize_icon(self.ui.btnStartExport, "export", "green")
+        self.ui.btnExportPath.clicked.connect(self._get_export_file_path)
+        self.ui.btnStartExport.clicked.connect(self.start_export)
+        self.ui.fileEndingBox.addItems(EXPORT_TYPES)
+        self.reset_export_ui()
+    
+    def reset_export_ui(self):
+        self.ui.exportProgressFrame.hide()
+        self.ui.exportProgressBar.setValue(0)
+        self.ui.exportProgressLabel.clear()
+        self.ui.fileEndingBox.setCurrentIndex(-1)
+        self.ui.exportFilenameLineEdit.clear()
+        self.ui.exportFileLineEdit.clear()
+
+    
+    def start_export(self):
+        filename = self.ui.exportFilenameLineEdit.text().strip()
+        export_type = self.ui.fileEndingBox.currentText().lower()
+        dir_path = self.ui.exportFileLineEdit.text()
+
+        if not filename:
+            filename = self.default_export_name
+        if not export_type:
+            DialogPopup("Export Error", f"No filetype selected! Please select a filetype and try again!", PopupType.ERROR, self).exec()        
+            return
+        if not dir_path:
+            DialogPopup("Export Error", f"No directory found! Please select a directory to export.", PopupType.ERROR, self).exec()        
+            return
+
+        pw = self.ask_master_password()
+
+        if not pw:
+            return
+
+        export_filename = f"{filename}{export_type}"
+        export_path = os.path.join(os.path.abspath(dir_path), export_filename)
+                        
+        self.ui.exportProgressBar.setValue(0)
+        self.ui.exportProgressLabel.clear()
+        self.ui.exportProgressFrame.show()
+
+        self.export_manager.start_export(
+            VAULT_PATH,
+            export_path,
+            pw,
+            export_type
+        )
+
+    def _get_export_file_path(self):
+        file_path = QFileDialog.getExistingDirectory(
+            parent=self,
+            caption="Select directory."
+        )        
+        if not file_path:
+            return
+        self.ui.exportFileLineEdit.setText(file_path)
+    
+    def on_export_progress(self, current, total):
+        percent = int(current / total * 100)
+        self.ui.exportProgressBar.setValue(percent)
+        self.ui.exportProgressLabel.setText(
+            f"Exporting {current}/{total} entries..."
+        )
+
+    def on_export_finished(self, path: str):
+        self.ui.exportProgressBar.setValue(100)
+        self.ui.exportProgressLabel.setText(f"Export finished:\n{path}")
+        DialogPopup("Ecport Success", f"Export finished!", PopupType.SUCCESS, self).exec()  
+        QTimer.singleShot(1000, self.reset_export_ui)
+
+
+    def on_export_error(self, msg: str):
+        DialogPopup(
+            "Export Error",
+            msg,
+            PopupType.ERROR,
+            self
+        ).exec()
+
+    
+    
+
     # autologout
     def toggle_autologout(self, checked: bool):
         settings = load_settings()
@@ -605,65 +696,8 @@ class SettingsWindow(QDialog):
         save_settings(settings)
     
     
-    # export    
-    def setup_export_page(self):
-        self.ui.btnStartExport.setStyleSheet(Styles.green_button_outlined)
-        self.ui.btnExportPath.setStyleSheet(Styles.yellow_button_outlined)
-        utils.colorize_icon(self.ui.btnExportPath, "open", "yellow")
-        utils.colorize_icon(self.ui.btnStartExport, "export", "green")
-        self.ui.btnExportPath.clicked.connect(self._get_export_file_path)
-        self.ui.btnStartExport.clicked.connect(self.start_export)
-        self.ui.fileEndingBox.addItems(EXPORT_TYPES)
-    
-    def start_export(self):
-        filename = self.ui.exportFilenameLineEdit.text()
-        if not filename:
-            filename = self.default_export_name
 
-        file_type = self.ui.fileEndingBox.currentText()
-        if not file_type:
-            DialogPopup("Export Error", f"No filetype selected! Please select a filetype and try again!", PopupType.ERROR, self).exec()        
-            return
-        
-        filename += file_type
-                
-        dir_path = self.ui.exportFileLineEdit.text()
-        if not dir_path:
-            DialogPopup("Export Error", f"No directory found! Please select a directory to export.", PopupType.ERROR, self).exec()        
-            return
-        file_path = os.path.join(os.path.abspath(dir_path), filename)
-        try:
-            entries = self.db.get_export_entries()
-            if len(entries) == 0:
-                DialogPopup("Export Information", "No entries to export found.", PopupType.INFO, self).exec()
-                return
-            field_names = entries[0].keys()
-            
-            if file_type == ".csv":
-                with open(file_path, mode="w", newline='') as file:
-                    writer = csv.DictWriter(file, fieldnames=field_names)
-                    writer.writeheader()
-                    writer.writerows(entries)
-            elif file_type == ".json":
-                with open(file_path, mode="w") as file:
-                    data = json.dumps(entries, indent=4)
-                    file.write(data)
-        
-            self.ui.fileEndingBox.setCurrentIndex(-1)
-            self.ui.exportFilenameLineEdit.clear()
-            self.ui.exportFileLineEdit.clear()
-            DialogPopup("Export Success", f"Exporting {len(entries)}x entries to:\n'{filename}'\nsuccessfully!", PopupType.SUCCESS, self).exec()        
-        except Exception as e:
-            DialogPopup("Export Error", f"Failure at export to csv:\n{e}", PopupType.ERROR, self).exec()        
-    
-    def _get_export_file_path(self):
-        file_path = QFileDialog.getExistingDirectory(
-            parent=self,
-            caption="Select directory."
-        )        
-        if not file_path:
-            return
-        self.ui.exportFileLineEdit.setText(file_path)
+
     
     def _get_backup_dir_path(self):
         file_path = QFileDialog.getExistingDirectory(

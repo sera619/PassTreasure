@@ -25,6 +25,7 @@ class Ui_SettingsWindow(object):
     def setupUi(self, SettingsWindow):
         if not SettingsWindow.objectName():
             SettingsWindow.setObjectName(u"SettingsWindow")
+        SettingsWindow.setEnabled(True)
         SettingsWindow.resize(630, 410)
         SettingsWindow.setMinimumSize(QSize(600, 400))
         self.main_layout = QHBoxLayout(SettingsWindow)
@@ -94,7 +95,7 @@ class Ui_SettingsWindow(object):
         self.scrollAreaGeneral.setWidgetResizable(True)
         self.scrollAreaWidgetContents_2 = QWidget()
         self.scrollAreaWidgetContents_2.setObjectName(u"scrollAreaWidgetContents_2")
-        self.scrollAreaWidgetContents_2.setGeometry(QRect(0, -624, 489, 976))
+        self.scrollAreaWidgetContents_2.setGeometry(QRect(0, 0, 489, 976))
         self.verticalLayout_3 = QVBoxLayout(self.scrollAreaWidgetContents_2)
         self.verticalLayout_3.setSpacing(14)
         self.verticalLayout_3.setObjectName(u"verticalLayout_3")
@@ -971,7 +972,7 @@ class Ui_SettingsWindow(object):
         self.label_17.setStyleSheet(u"font: bold 14pt \"Segoe UI\";")
         self.label_17.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        self.verticalLayout_18.addWidget(self.label_17)
+        self.verticalLayout_18.addWidget(self.label_17, 0, Qt.AlignmentFlag.AlignTop)
 
         self.frame_10 = QFrame(self.page_export)
         self.frame_10.setObjectName(u"frame_10")
@@ -1048,6 +1049,27 @@ class Ui_SettingsWindow(object):
 
         self.verticalLayout_20.addLayout(self.horizontalLayout_12)
 
+        self.exportProgressFrame = QFrame(self.frame_10)
+        self.exportProgressFrame.setObjectName(u"exportProgressFrame")
+        self.progresslayout_2 = QVBoxLayout(self.exportProgressFrame)
+        self.progresslayout_2.setSpacing(2)
+        self.progresslayout_2.setObjectName(u"progresslayout_2")
+        self.progresslayout_2.setContentsMargins(1, 1, 1, 1)
+        self.exportProgressLabel = QLabel(self.exportProgressFrame)
+        self.exportProgressLabel.setObjectName(u"exportProgressLabel")
+        self.exportProgressLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        self.progresslayout_2.addWidget(self.exportProgressLabel)
+
+        self.exportProgressBar = QProgressBar(self.exportProgressFrame)
+        self.exportProgressBar.setObjectName(u"exportProgressBar")
+        self.exportProgressBar.setValue(0)
+
+        self.progresslayout_2.addWidget(self.exportProgressBar)
+
+
+        self.verticalLayout_20.addWidget(self.exportProgressFrame)
+
         self.btnStartExport = QPushButton(self.frame_10)
         self.btnStartExport.setObjectName(u"btnStartExport")
 
@@ -1079,7 +1101,7 @@ class Ui_SettingsWindow(object):
         self.scrollArea.setWidgetResizable(True)
         self.scrollAreaWidgetContents = QWidget()
         self.scrollAreaWidgetContents.setObjectName(u"scrollAreaWidgetContents")
-        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 88, 32))
+        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 497, 348))
         self.verticalLayout = QVBoxLayout(self.scrollAreaWidgetContents)
         self.verticalLayout.setSpacing(0)
         self.verticalLayout.setObjectName(u"verticalLayout")
@@ -1187,6 +1209,7 @@ class Ui_SettingsWindow(object):
         self.label_15.setText(QCoreApplication.translate("SettingsWindow", u"Export Path", None))
         self.exportFileLineEdit.setPlaceholderText(QCoreApplication.translate("SettingsWindow", u"Enter path to export directory...", None))
         self.btnExportPath.setText(QCoreApplication.translate("SettingsWindow", u"Select Path", None))
+        self.exportProgressLabel.setText(QCoreApplication.translate("SettingsWindow", u"TextLabel", None))
         self.btnStartExport.setText(QCoreApplication.translate("SettingsWindow", u"Start Export", None))
         self.aboutTitle.setText(QCoreApplication.translate("SettingsWindow", u"About", None))
         self.aboutLabel.setText(QCoreApplication.translate("SettingsWindow", u"PassTreasure v1.0", None))
