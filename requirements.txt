@@ -6,7 +6,7 @@ click==8.3.1
 colorama==0.4.6
 cryptography==46.0.3
 cx_Freeze==8.5.0
-filelock==3.20.0
+filelock==3.20.3
 flanders==0.3.2
 freeze-core==0.4.1
 lief==0.17.1
