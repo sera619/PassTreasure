@@ -4,7 +4,7 @@ cabarchive==0.2.4
 cffi==2.0.0
 click==8.3.1
 colorama==0.4.6
-cryptography==46.0.3
+cryptography==46.0.5
 cx_Freeze==8.5.0
 filelock==3.20.0
 flanders==0.3.2
